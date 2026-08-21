@@ -1,0 +1,133 @@
+{
+  "studio": {
+    "name": "ARCHITAK",
+    "tagline": "CREATED TO CREATE",
+    "statement": "Welcome to Architak, where creativity meets functionality to transform spaces into stunning works of art. As a premier interior designing company in Kochi, we craft environments that reflect your vision, style, and personality.",
+    "location": "Vyttila, Kochi, Kerala",
+    "address": "ARCK Tower, Neelamuri Line, Ponnurunni, Vyttila, Kochi 682019",
+    "phone": "+91 88919 91999",
+    "email": "architak336@gmail.com",
+    "process": [
+      {
+        "step": "01",
+        "title": "Concept",
+        "description": "Transforming ideas into creative visions that reflect your style and purpose."
+      },
+      {
+        "step": "02",
+        "title": "Design",
+        "description": "Crafting detailed plans that blend aesthetics with functionality for stunning spaces."
+      },
+      {
+        "step": "03",
+        "title": "Development",
+        "description": "Bringing concepts to life with precision, quality craftsmanship, and timely execution."
+      }
+    ]
+  },
+  "services": [
+    {
+      "slug": "hospitality",
+      "title": "Hospitality Design",
+      "description": "Immersive spaces for hotels, resorts, and leisure destinations — comfort balanced with elegance."
+    },
+    {
+      "slug": "residential",
+      "title": "Residential Design",
+      "description": "Homes shaped as personal havens with aesthetic appeal and functional layouts."
+    },
+    {
+      "slug": "corporate",
+      "title": "Corporate Design",
+      "description": "Workspaces that foster collaboration and professionalism while reflecting brand identity."
+    },
+    {
+      "slug": "restaurant",
+      "title": "Restaurant Design",
+      "description": "Dining environments that express culinary identity, ambiance, and style."
+    },
+    {
+      "slug": "commercial",
+      "title": "Commercial Design",
+      "description": "Retail and business environments that balance form, function, and engagement."
+    },
+    {
+      "slug": "industrial",
+      "title": "Industrial Design",
+      "description": "Efficient, streamlined spaces that integrate robust functionality with thoughtful design."
+    }
+  ],
+  "heroImage": "/media/architak-in/2025__03__interior-of-modern-design-living-room-3d-rendering-e1604308696322.jpg",
+  "featuredProjects": [
+    {
+      "slug": "living-room-atelier",
+      "title": "Living Room Atelier",
+      "category": "Residential",
+      "location": "Kochi",
+      "summary": "A calm, layered living interior with precise material contrast and spatial depth.",
+      "coverImage": "/media/architak-in/2025__03__interior-of-modern-design-living-room-3d-rendering-e1604308696322.jpg",
+      "gallery": [
+        "/media/architak-in/2025__03__black-minimalist-interior-of-modern-living-room-3d-rendering-e1604308623589.jpg",
+        "/media/architak-in/2025__03__minimalist-living-room-e1604308401943.jpg",
+        "/media/architak-in/2025__03__modern-living-room-with-black-leather-sofa-in-front-of-a-wooden-panel-e1604308631691.jpg"
+      ]
+    },
+    {
+      "slug": "hospitality-lounge",
+      "title": "Hospitality Lounge",
+      "category": "Hospitality",
+      "location": "Kochi",
+      "summary": "Reception and lounge atmospheres designed for arrival, pause, and lasting impression.",
+      "coverImage": "/media/architak-in/2025__03__hotel-lobby-e1604307557586.jpg",
+      "gallery": [
+        "/media/architak-in/2025__03__3d-rendering-loft-and-luxury-hotel-reception-and-cafe-lounge-restaurant-e1604307414821.jpg",
+        "/media/architak-in/2025__03__3d-rendering-loft-and-luxury-hotel-reception-and-vintage-cafe-lounge-restaurant-e1604307374857.jpg"
+      ]
+    },
+    {
+      "slug": "kitchen-craft",
+      "title": "Kitchen Craft",
+      "category": "Residential",
+      "location": "Kochi",
+      "summary": "A kitchen composition focused on material honesty, light, and daily ritual.",
+      "coverImage": "/media/architak-in/2025__03__travertine-house-kitchen.jpg",
+      "gallery": [
+        "/media/architak-in/2025__03__travertine-house-kitchen-1024x1536.jpg",
+        "/media/architak-in/2025__03__architectural-house-interior-1.jpg"
+      ]
+    },
+    {
+      "slug": "corporate-chamber",
+      "title": "Corporate Chamber",
+      "category": "Corporate",
+      "location": "Kochi",
+      "summary": "Meeting and office environments tuned for clarity, focus, and brand presence.",
+      "coverImage": "/media/architak-in/2025__03__3d-rendering-business-meeting-room-on-high-rise-office-building-e1604307631677.jpg",
+      "gallery": [
+        "/media/architak-in/2025__03__3d-rendering-business-meeting-room-on-office-building-e1604307292878.jpg"
+      ]
+    },
+    {
+      "slug": "cafe-interior",
+      "title": "Cafe Interior",
+      "category": "Restaurant",
+      "location": "Kochi",
+      "summary": "Warm commercial hospitality with tactile finishes and intimate seating rhythm.",
+      "coverImage": "/media/architak-in/2025__03__interior-design-of-a-coffee-shop-cafe-3d-rendering-e1604308316522.jpg",
+      "gallery": [
+        "/media/architak-in/2025__03__black-wooden-furniture-and-an-industrial-lamp-above-a-coffee-mac-e1604308501463.jpg"
+      ]
+    },
+    {
+      "slug": "stair-sequence",
+      "title": "Stair Sequence",
+      "category": "Residential",
+      "location": "Kochi",
+      "summary": "Circulation as architecture — a vertical sequence with measured light and form.",
+      "coverImage": "/media/architak-in/2025__03__modern-staircase-e1604307542327.jpg",
+      "gallery": [
+        "/media/architak-in/2025__03__3d-rendering-interior-and-exterior-design-e1604307589570.jpg"
+      ]
+    }
+  ]
+}

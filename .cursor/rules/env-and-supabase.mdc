@@ -1,0 +1,14 @@
+---
+description: Env, secrets, and Supabase client usage
+globs: lib/**/*.{ts,tsx},app/**/*.{ts,tsx},features/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Env and Supabase
+
+- Parse env only via `lib/env.ts` (Zod)
+- Public: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+- Server-only: `SUPABASE_SECRET_KEY`, `ADMIN_*`, R2 credentials
+- Publishable client for public reads (RLS enforced)
+- Secret client only after admin session verification
+- Never log secrets or put them in error messages

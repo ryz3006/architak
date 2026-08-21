@@ -1,0 +1,9 @@
+# Supabase local / CLI placeholder.
+# Migrations with RLS policies land with CMS tables (Phase 3/5).
+# Project: architak-media — Row Level Security is ON by default. Never disable it.
+
+[project]
+id = "architak-media"
+
+[db]
+major_version = 15

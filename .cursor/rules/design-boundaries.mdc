@@ -1,0 +1,13 @@
+---
+description: Public site vs admin design boundaries
+globs: app/**/*,components/**/*,features/**/*
+alwaysApply: false
+---
+
+# Design Boundaries
+
+- Public site: editorial, imagery-led, not default shadcn/dashboard look
+- Admin: may use shadcn/Radix for accessibility and productivity
+- Prefer semantic tokens over arbitrary Tailwind values
+- Respect `prefers-reduced-motion`
+- `/admin` is noindex and robots-denied

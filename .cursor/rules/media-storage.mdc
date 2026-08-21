@@ -1,0 +1,14 @@
+---
+description: Media and R2 storage visibility rules
+globs: lib/storage/**/*,features/media/**/*
+alwaysApply: false
+---
+
+# Media Storage
+
+- Bucket `architak-media` is private by default
+- Every key starts with `public/` or `private/`
+- Refuse mismatched visibility vs prefix
+- Public CDN (`R2_PUBLIC_BASE_URL`) serves `public/` only
+- Private objects: short-lived signed URLs only
+- Do not bind custom domain to expose the whole bucket

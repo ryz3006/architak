@@ -1,0 +1,29 @@
+---
+description: ARCHITAK platform coding and security standards
+alwaysApply: true
+---
+
+# ARCHITAK Platform Rules
+
+## Never
+
+- Use `any` casually; prefer `unknown` and narrowing
+- Commit secrets or put credentials in CMS / `site_settings`
+- Expose `SUPABASE_SECRET_KEY`, R2 secrets, or admin password to the browser
+- Disable Supabase Row Level Security
+- Ship a database table without RLS policies in the same migration
+- Make the R2 bucket blindly public or serve `private/` via `media.architak.in`
+- Convert entire pages to Client Components without need
+- Load GSAP / Three.js globally
+- Bypass admin authorization checks on the server
+
+## Always
+
+- Prefer Server Components; Client Components only for interaction
+- Validate with Zod at UI and server boundaries
+- Keep domain logic under `features/<domain>/`
+- Use design tokens from `styles/tokens.css` (no arbitrary one-off spacing)
+- Public pages must remain crawlable without client JS
+- Authorize (static session or later Supabase Auth) **before** any service-role call
+- Storage keys must start with `public/` or `private/` matching `visibility`
+- Update docs when architecture decisions change

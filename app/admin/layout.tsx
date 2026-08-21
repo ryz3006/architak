@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default function AdminRootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div className="border-b border-border px-6 py-4">

@@ -1,6 +1,7 @@
 import "server-only";
 
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 import {
   decodeSession,
@@ -31,14 +32,19 @@ export async function createSessionToken(username: string): Promise<string> {
 }
 
 export async function getAdminSession(): Promise<SessionPayload | null> {
-  const jar = await cookies();
-  return decodeSession(jar.get(ADMIN_SESSION_COOKIE)?.value);
+  try {
+    const jar = await cookies();
+    return await decodeSession(jar.get(ADMIN_SESSION_COOKIE)?.value);
+  } catch {
+    return null;
+  }
 }
 
+/** Redirects to login when there is no valid admin session. */
 export async function requireAdminSession(): Promise<SessionPayload> {
   const session = await getAdminSession();
   if (!session) {
-    throw new Error("Unauthorized");
+    redirect("/admin/login");
   }
   return session;
 }

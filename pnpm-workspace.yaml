@@ -1,8 +1,5 @@
-# Not a multi-package monorepo — root app only.
-# allowBuilds: required so CI/Vercel can run native install scripts (Next.js → sharp).
-packages:
-  - "."
-
-allowBuilds:
-  sharp: true
-  unrs-resolver: true
+# Single-package app (no workspace members).
+# pnpm 10 setting name: allow native install scripts Next.js relies on.
+onlyBuiltDependencies:
+  - sharp
+  - unrs-resolver

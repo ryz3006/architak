@@ -7,13 +7,12 @@ export const metadata: Metadata = {
   },
 };
 
+/**
+ * Root admin layout.
+ *
+ * Auth and the CMS shell live in `(dashboard)/layout.tsx` so `/admin/login`
+ * remains reachable without a session.
+ */
 export default function AdminRootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return (
-    <div className="min-h-screen bg-background text-foreground">
-      <div className="border-b border-border px-6 py-4">
-        <p className="text-xs tracking-[0.3em] text-muted uppercase">ARCHITAK Admin</p>
-      </div>
-      {children}
-    </div>
-  );
+  return <div className="min-h-dvh bg-background text-foreground">{children}</div>;
 }

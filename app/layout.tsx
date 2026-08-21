@@ -1,5 +1,10 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, DM_Sans } from "next/font/google";
+
+import {
+  buildLocalBusinessJsonLd,
+  jsonLdScript,
+} from "@/features/discovery/structured-data";
 
 import "./globals.css";
 
@@ -29,32 +34,27 @@ export const metadata: Metadata = {
   },
 };
 
-const organizationJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "ProfessionalService",
-  name: "ARCHITAK",
-  description: "Interior design studio in Vyttila, Kochi.",
-  url: "https://architak.in",
-  telephone: "+918891991999",
-  email: "architak336@gmail.com",
-  address: {
-    "@type": "PostalAddress",
-    streetAddress: "ARCK Tower, Neelamuri Line, Ponnurunni, Vyttila",
-    addressLocality: "Kochi",
-    addressRegion: "Kerala",
-    postalCode: "682019",
-    addressCountry: "IN",
-  },
-  image: "/brand/logo.png",
+/**
+ * viewport-fit=cover is required for env(safe-area-inset-*) to report real
+ * values, which is how fixed chrome avoids notches and the home indicator.
+ */
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#0a0a0a",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${display.variable} ${sans.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col bg-background text-foreground">
+        <a href="#main-content" className="skip-link">
+          Skip to content
+        </a>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+          dangerouslySetInnerHTML={jsonLdScript(buildLocalBusinessJsonLd())}
         />
         {children}
       </body>

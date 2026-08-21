@@ -2,27 +2,46 @@
   /* Color */
   --color-background: #0a0a0a;
   --color-foreground: #f5f2eb;
-  --color-muted: #8a8680;
+  --color-muted: #a5a09a;
   --color-border: #2a2a2a;
   --color-accent: #c4a574;
   --color-surface: #121212;
 
+  /* Focus. Never remove an outline without providing one of these. */
+  --color-focus: #e8d5ae;
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 3px;
+
   /* Typography */
   --font-display: var(--font-architak-display), "Times New Roman", serif;
   --font-sans: var(--font-architak-sans), ui-sans-serif, system-ui, sans-serif;
-  --text-xs: 0.75rem;
-  --text-sm: 0.875rem;
-  --text-base: 1rem;
-  --text-lg: 1.125rem;
-  --text-xl: 1.25rem;
-  --text-2xl: 1.5rem;
-  --text-3xl: 2rem;
-  --text-4xl: 2.75rem;
-  --text-5xl: 3.5rem;
-  --leading-tight: 1.15;
-  --leading-normal: 1.5;
 
-  /* Spacing */
+  /*
+   * Fluid modular scale. Each step interpolates between a 20rem (320px)
+   * viewport and a 96rem (1536px) viewport, so intermediate widths such as
+   * Android tablets, scaled Windows laptops, and foldable inner screens get a
+   * proportionate size instead of the nearest breakpoint's.
+   */
+  --step-000: clamp(0.69rem, 0.68rem + 0.07vw, 0.75rem);
+  --step-00: clamp(0.83rem, 0.8rem + 0.13vw, 0.94rem);
+  --step-0: clamp(1rem, 0.96rem + 0.2vw, 1.13rem);
+  --step-1: clamp(1.2rem, 1.11rem + 0.44vw, 1.5rem);
+  --step-2: clamp(1.44rem, 1.27rem + 0.83vw, 2rem);
+  --step-3: clamp(1.73rem, 1.44rem + 1.42vw, 2.66rem);
+  --step-4: clamp(2.07rem, 1.62rem + 2.24vw, 3.55rem);
+  --step-5: clamp(2.49rem, 1.79rem + 3.47vw, 4.73rem);
+  --step-6: clamp(2.99rem, 1.92rem + 5.32vw, 6.31rem);
+  --step-7: clamp(3.58rem, 1.94rem + 8.19vw, 8.41rem);
+
+  --leading-tight: 1.08;
+  --leading-snug: 1.25;
+  --leading-normal: 1.6;
+
+  /* Line length. Long measures are unreadable on ultrawide and TV. */
+  --measure: 68ch;
+  --measure-narrow: 52ch;
+
+  /* Spacing — fixed steps retained, fluid steps added for page rhythm. */
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
@@ -33,28 +52,110 @@
   --space-16: 4rem;
   --space-24: 6rem;
 
+  --space-fluid-xs: clamp(0.5rem, 0.43rem + 0.36vw, 0.75rem);
+  --space-fluid-sm: clamp(1rem, 0.86rem + 0.71vw, 1.5rem);
+  --space-fluid-md: clamp(1.5rem, 1.14rem + 1.79vw, 2.75rem);
+  --space-fluid-lg: clamp(2.5rem, 1.79rem + 3.57vw, 5rem);
+  --space-fluid-xl: clamp(4rem, 2.57rem + 7.14vw, 9rem);
+
+  /*
+   * Page gutter and content width. Extra width beyond the measure becomes
+   * margin, never longer lines.
+   */
+  --gutter: clamp(1.25rem, 0.89rem + 1.79vw, 3rem);
+  --content-max: 90rem;
+  --prose-max: 44rem;
+
+  /* Safe areas. Fall back to zero where the env() values are unsupported. */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+
+  /* Viewport heights. dvh avoids the mobile URL-bar jump. */
+  --hero-height: 88dvh;
+  --hero-height-min: 34rem;
+
   /* Radius / elevation */
   --radius-none: 0;
   --radius-sm: 0.125rem;
   --radius-md: 0.25rem;
   --shadow-soft: 0 12px 40px rgb(0 0 0 / 0.35);
 
-  /* Motion */
+  /*
+   * Motion. Durations are grouped by the distance travelled and the intent,
+   * following standard motion-design guidance: micro feedback is near
+   * instantaneous, entrances are longer than exits, and large surfaces move
+   * more slowly than small ones.
+   */
+  --duration-instant: 80ms;
   --duration-micro: 120ms;
   --duration-small: 200ms;
-  --duration-medium: 400ms;
+  --duration-medium: 320ms;
+  --duration-large: 480ms;
+  --duration-page: 640ms;
+
   --ease-standard: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-entrance: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
 
   /* Z-index */
   --z-header: 40;
   --z-overlay: 50;
   --z-modal: 60;
+  --z-skip-link: 70;
+}
+
+/*
+ * Ten-foot UI. At television widths the viewer is metres away, so the base
+ * size grows and every rem-derived value scales with it.
+ */
+@media (min-width: 160rem) {
+  :root {
+    font-size: 125%;
+    --content-max: 120rem;
+  }
+}
+
+@media (min-width: 240rem) {
+  :root {
+    font-size: 150%;
+    --content-max: 160rem;
+  }
+}
+
+/*
+ * Short landscape viewports (a rotated phone). A full-height hero would push
+ * the headline and its call to action off-screen.
+ */
+@media (orientation: landscape) and (max-height: 32rem) {
+  :root {
+    --hero-height: 100dvh;
+    --hero-height-min: 20rem;
+  }
+}
+
+/*
+ * Higher contrast on request, and for projected output where low-contrast
+ * greys and hairline rules wash out entirely.
+ */
+@media (prefers-contrast: more) {
+  :root {
+    --color-foreground: #ffffff;
+    --color-muted: #d6d2cb;
+    --color-border: #6b6b6b;
+    --color-accent: #e2c894;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   :root {
+    --duration-instant: 0ms;
     --duration-micro: 0ms;
     --duration-small: 0ms;
     --duration-medium: 0ms;
+    --duration-large: 0ms;
+    --duration-page: 0ms;
   }
 }

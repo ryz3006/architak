@@ -35,6 +35,13 @@ See [docs/16-environment-and-configuration.md](docs/16-environment-and-configura
 | `pnpm build` | Production build |
 | `pnpm lint` | ESLint |
 | `pnpm typecheck` | TypeScript check |
+| `pnpm env:check` | Validate local configuration without printing values |
+| `pnpm r2:bootstrap` | Create and verify the R2 prefix marker objects |
+| `pnpm r2:verify` | Verify R2 prefix markers without writing |
+| `pnpm media:scrape` | Refresh the local architak.in media mirror |
+| `pnpm media:manifest` | Rebuild the local image manifest |
+
+The private R2 bucket and public-only delivery Worker are documented in [docs/07-media-architecture.md](docs/07-media-architecture.md) and [cloudflare/media-worker/README.md](cloudflare/media-worker/README.md). Worker deployment and DNS changes are separate Cloudflare control-plane operations.
 
 ## Admin
 

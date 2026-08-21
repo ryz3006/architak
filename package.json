@@ -10,16 +10,28 @@
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "media:scrape": "node scripts/scrape-architak-media.mjs",
-    "media:manifest": "node scripts/rebuild-image-manifest.mjs"
+    "media:manifest": "node scripts/rebuild-image-manifest.mjs",
+    "env:check": "node scripts/check-env.mjs",
+    "r2:bootstrap": "node scripts/r2-bootstrap-prefixes.mjs",
+    "r2:verify": "node scripts/r2-bootstrap-prefixes.mjs --verify-only",
+    "r2:cors": "node scripts/r2-put-cors.mjs",
+    "db:apply": "node scripts/apply-remote-schema.mjs",
+    "media:worker:deploy": "node scripts/deploy-media-worker.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.901.0",
     "@aws-sdk/s3-request-presigner": "^3.901.0",
+    "@react-three/drei": "^10.7.8",
+    "@react-three/fiber": "^9.7.0",
     "@supabase/supabase-js": "^2.75.0",
+    "@types/three": "^0.185.4",
+    "gsap": "^3.15.0",
+    "lenis": "^1.3.26",
     "next": "16.3.1",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "server-only": "^0.0.1",
+    "three": "^0.185.1",
     "zod": "^4.1.11"
   },
   "devDependencies": {
@@ -29,10 +41,12 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.3.1",
+    "postgres": "^3.4.9",
     "prettier": "^3.9.6",
     "prettier-plugin-tailwindcss": "^0.6.14",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wrangler": "^4.125.0"
   },
   "packageManager": "pnpm@10.15.1",
   "engines": {

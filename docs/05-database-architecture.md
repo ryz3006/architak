@@ -12,26 +12,33 @@ Supabase project / database name: **`architak-media`**.
 - Every migration that creates a table must `ENABLE ROW LEVEL SECURITY` and ship policies in the **same** migration
 - Document every policy in this file and `13-security-model.md`
 
-## Planned tables (Phase 3–5)
+## Applied migrations (repo)
+
+| Migration | Contents |
+|-----------|----------|
+| `20260821180000_sprint_0b_schema.sql` | CMS + leads + SEO + audit + profiles, with RLS |
+| `20260821200000_phase_7_ops_foundation.sql` | clients, engagements, estimates, invoices, vendors, BOM, inventory, engagement_documents — deny-by-default RLS |
+
+Apply to the remote project with `pnpm db:apply` after adding `SUPABASE_DB_PASSWORD` or `DATABASE_URL` to `.env.local` (never commit). Alternates: Supabase SQL editor or `supabase db push`. Order: both migrations under `supabase/migrations/`, then `supabase/seed.sql`.
+
+## Tables
 
 | Table | Notes |
 |-------|-------|
-| `profiles` | Phase 5 — 1:1 with `auth.users`, `role` |
-| `media_assets` | `visibility` (`public` \| `private`), `storage_key` prefixed `public/` or `private/` |
-| `project_categories` | Taxonomy |
-| `projects` | Public portfolio (not operational jobs) |
-| `project_media` | Ordering, captions → `media_assets` |
-| `project_related` | Related projects |
-| `testimonials` | Optional until real content |
-| `pages` / `site_settings` | Studio/Services copy — **no secrets** |
-| `enquiries` + `enquiry_events` | Lead capture + status history |
-| `redirects` | SEO redirects |
-| `seo_metadata` | Polymorphic; includes `ai_summary` |
-| `audit_events` | Phase 5 admin mutations |
+| `profiles` | Stub for later Supabase Auth |
+| `media_assets` | `visibility` + `storage_key` prefix constraint |
+| `project_categories` / `projects` / `project_media` / `project_related` | Public portfolio |
+| `pages` / `site_settings` | Copy only — **no secrets** |
+| `enquiries` / `enquiry_events` | Lead capture |
+| `redirects` / `seo_metadata` | SEO |
+| `audit_events` | Admin mutations |
+| `clients` / `engagements` / … | Ops foundation — see `docs/18-operations-domain.md` |
 
-## Future naming
+## Public policies (anon / authenticated)
 
-When operations arrive, use `engagements` / `studio_projects` — do not overload public `projects`.
+- `SELECT` published categories, projects, pages, public media metadata, related published project media, SEO for published subjects
+- `INSERT` on `enquiries` for safe columns only (`name`, `email`, `phone`, `message`, `source_page`, `consent`) with `status = 'new'`
+- Everything else denied; admin writes use `SUPABASE_SECRET_KEY` after `requireAdminSession()`
 
 ## Client usage
 
@@ -40,4 +47,4 @@ When operations arrive, use `engagements` / `studio_projects` — do not overloa
 | Public / browser | Publishable | Enforced |
 | Admin server (after session) | `SUPABASE_SECRET_KEY` | Bypasses — session check is the gate |
 
-Phase 1 ships **no CMS tables** until policies are ready.
+Types: `lib/supabase/database.types.ts` (hand-maintained until `supabase gen types` is available).

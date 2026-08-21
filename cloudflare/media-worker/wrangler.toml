@@ -1,0 +1,17 @@
+name = "architak-media"
+main = "src/index.ts"
+compatibility_date = "2026-08-21"
+workers_dev = true
+preview_urls = false
+
+# Attach media.architak.in after the architak.in zone is active on this Cloudflare account:
+# routes = [
+#   { pattern = "media.architak.in", custom_domain = true }
+# ]
+
+[[r2_buckets]]
+binding = "MEDIA_BUCKET"
+bucket_name = "architak-media"
+
+[vars]
+ALLOWED_ORIGINS = "http://localhost:3000,https://architak.vercel.app,https://architak.in,https://www.architak.in"

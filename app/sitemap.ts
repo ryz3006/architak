@@ -1,19 +1,20 @@
 import type { MetadataRoute } from "next";
 
-import { getStaticProjects } from "@/content/static";
+import { absoluteUrl, getPublishedProjects, getStaticRoutes } from "@/features/discovery";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://architak.in";
-  const projects = getStaticProjects();
+  const lastModified = new Date();
 
   return [
-    { url: `${siteUrl}/`, changeFrequency: "weekly", priority: 1 },
-    { url: `${siteUrl}/work`, changeFrequency: "weekly", priority: 0.9 },
-    { url: `${siteUrl}/studio`, changeFrequency: "monthly", priority: 0.7 },
-    { url: `${siteUrl}/services`, changeFrequency: "monthly", priority: 0.7 },
-    { url: `${siteUrl}/contact`, changeFrequency: "monthly", priority: 0.8 },
-    ...projects.map((project) => ({
-      url: `${siteUrl}/work/${project.slug}`,
+    ...getStaticRoutes().map((route) => ({
+      url: absoluteUrl(route.path),
+      lastModified,
+      changeFrequency: route.changeFrequency,
+      priority: route.priority,
+    })),
+    ...getPublishedProjects().map((project) => ({
+      url: absoluteUrl(project.path),
+      lastModified,
       changeFrequency: "monthly" as const,
       priority: 0.8,
     })),

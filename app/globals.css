@@ -1,6 +1,13 @@
 @import "tailwindcss";
 @import "../styles/tokens.css";
 
+/*
+ * Tailwind theme registration.
+ *
+ * Breakpoints: sm/md/lg/xl/2xl keep Tailwind's defaults because existing
+ * markup already relies on them. The additions extend coverage downward to
+ * compact and folded phones and upward to QHD, 4K, and television.
+ */
 @theme inline {
   --color-background: var(--color-background);
   --color-foreground: var(--color-foreground);
@@ -8,16 +15,215 @@
   --color-border: var(--color-border);
   --color-accent: var(--color-accent);
   --color-surface: var(--color-surface);
+  --color-focus: var(--color-focus);
+
   --font-sans: var(--font-sans);
   --font-display: var(--font-display);
+
+  --breakpoint-xs: 22.5rem;
+  --breakpoint-3xl: 120rem;
+  --breakpoint-4xl: 160rem;
+  --breakpoint-5xl: 240rem;
+
+  --text-fluid-xs: var(--step-000);
+  --text-fluid-sm: var(--step-00);
+  --text-fluid-base: var(--step-0);
+  --text-fluid-lg: var(--step-1);
+  --text-fluid-xl: var(--step-2);
+  --text-display-sm: var(--step-3);
+  --text-display-md: var(--step-4);
+  --text-display-lg: var(--step-5);
+  --text-display-xl: var(--step-6);
+  --text-display-2xl: var(--step-7);
+
+  --spacing-gutter: var(--gutter);
+  --spacing-fluid-xs: var(--space-fluid-xs);
+  --spacing-fluid-sm: var(--space-fluid-sm);
+  --spacing-fluid-md: var(--space-fluid-md);
+  --spacing-fluid-lg: var(--space-fluid-lg);
+  --spacing-fluid-xl: var(--space-fluid-xl);
+
+  --ease-standard: var(--ease-standard);
+  --ease-entrance: var(--ease-entrance);
+  --ease-exit: var(--ease-exit);
 }
 
 body {
   background: var(--color-background);
   color: var(--color-foreground);
   font-family: var(--font-sans);
+  font-size: var(--step-0);
+  line-height: var(--leading-normal);
+  /* Honour the platform's own overflow behaviour; never lock the page here. */
+  overflow-x: hidden;
 }
 
 ::selection {
   background: color-mix(in srgb, var(--color-accent) 40%, transparent);
+}
+
+/*
+ * Focus. A visible indicator is mandatory: against #0a0a0a the user-agent
+ * default is effectively invisible, and TV navigation is focus-driven.
+ */
+:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline-offset: var(--focus-ring-offset);
+  border-radius: var(--radius-sm);
+}
+
+/* Only safe because :focus-visible above restores a stronger indicator. */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/*
+ * Skip link. First focusable element in the document, hidden until focused.
+ */
+.skip-link {
+  position: absolute;
+  top: calc(var(--safe-top) + var(--space-2));
+  left: calc(var(--safe-left) + var(--space-2));
+  z-index: var(--z-skip-link);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-foreground);
+  color: var(--color-background);
+  font-size: var(--step-00);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transform: translateY(-200%);
+  transition: transform var(--duration-small) var(--ease-entrance);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
+/* Page frame: fluid gutters that also clear notches and rounded corners. */
+.page-frame {
+  width: 100%;
+  max-width: var(--content-max);
+  margin-inline: auto;
+  padding-inline: max(var(--gutter), var(--safe-left), var(--safe-right));
+}
+
+.measure {
+  max-width: var(--measure);
+}
+
+.measure-narrow {
+  max-width: var(--measure-narrow);
+}
+
+/* Headings tighten as they grow; long display lines need less leading. */
+.display {
+  font-family: var(--font-display);
+  line-height: var(--leading-tight);
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+/* Prevent orphans in short paragraphs without affecting long copy. */
+p {
+  text-wrap: pretty;
+}
+
+/*
+ * Touch and remote input. Coarse pointers get a larger hit target; hover
+ * affordances are additive only, never the sole route to an action.
+ */
+@media (pointer: coarse) {
+  a,
+  button,
+  [role="button"],
+  summary,
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-height: 2.75rem;
+  }
+
+  a,
+  button,
+  [role="button"] {
+    touch-action: manipulation;
+  }
+}
+
+/* Ten-foot UI: keep content inside the overscan-safe area on televisions. */
+@media (min-width: 160rem) {
+  .page-frame {
+    padding-inline: max(5vw, var(--gutter));
+  }
+
+  :focus-visible {
+    outline-width: 4px;
+    outline-offset: 5px;
+  }
+}
+
+/*
+ * Foldables and dual-screen devices.
+ *
+ * Progressive enhancement only: the single-segment layout above is already
+ * correct, and support for the viewport-segment features is still uneven. When
+ * a horizontal hinge is reported, the page gutter grows to keep primary
+ * content and calls to action clear of the seam.
+ */
+@media (horizontal-viewport-segments: 2) {
+  .page-frame {
+    padding-inline: max(var(--gutter), 4vw);
+  }
+
+  /* Two segments read naturally as two columns; do not stretch one across. */
+  .fold-aware-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (vertical-viewport-segments: 2) {
+  .page-frame {
+    padding-block: var(--space-fluid-sm);
+  }
+}
+
+/*
+ * Wide-gamut displays (recent MacBooks, high-end Android tablets). The sRGB
+ * accent above remains the baseline; this only enriches it where supported.
+ */
+@media (color-gamut: p3) {
+  :root {
+    --color-accent: oklch(76% 0.075 75);
+  }
+}
+
+/*
+ * Windows High Contrast and other forced-colour modes replace the palette,
+ * so borders and focus must be expressed in system colours to survive.
+ */
+@media (forced-colors: active) {
+  :focus-visible {
+    outline: 3px solid CanvasText;
+    outline-offset: 3px;
+  }
+
+  .skip-link {
+    background: Canvas;
+    color: CanvasText;
+    border: 1px solid CanvasText;
+  }
+}
+
+/*
+ * Reduced motion. Transitions collapse to instant state changes; layout is
+ * never allowed to depend on an animation having run.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

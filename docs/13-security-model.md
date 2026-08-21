@@ -8,31 +8,33 @@
 - Never make the R2 bucket blindly public
 - Never commit secrets
 
-## Phase 1 baseline
+## Baseline
 
-- Zod `lib/env.ts`
+- Zod `lib/env.ts` + `pnpm env:check`
 - `.gitignore` for `.env*` except `.env.example`
-- Static admin session cookie; middleware on `/admin`
-- Security headers: CSP starter, HSTS (production), nosniff, referrer-policy, permissions-policy, frame denial for admin
-- `robots.ts` denies `/admin`
+- Static admin session cookie; auth gate in `app/admin/(dashboard)/layout.tsx`
+- Security headers in `next.config.ts` (CSP starter, HSTS, nosniff, referrer-policy, permissions-policy, frame denial)
+- `robots.ts` denies `/admin`, `/api/`, `/dev/`
+- Rate limits on login and enquiry; honeypot + timing check on contact
+- Dependabot; CI lint/typecheck/build + adaptive/a11y Playwright job
 
-## Clients and RLS
+## RLS summary
 
-| Path | Key | Behavior |
-|------|-----|----------|
-| Public | Publishable | RLS enforced |
-| Admin writes | Secret key | Bypasses RLS; **only after** session verification |
+| Surface | Policy |
+|---------|--------|
+| Published portfolio / pages / public media metadata | anon SELECT |
+| Enquiries | anon INSERT (safe columns, status=new) only |
+| Ops tables, profiles, settings, audit, redirects, enquiry_events | deny all to anon/authenticated |
+| Admin writes | `SUPABASE_SECRET_KEY` **only after** `requireAdminSession()` |
 
-## Later phases
-
-- CSRF / origin checks on Server Actions
-- Rate limits on enquiry and login
-- Honeypot on contact
-- Signed uploads; MIME/size validation
-- Audit log
-- Dependabot; preview deployment protection
-- MFA when Supabase Auth lands
+Audit checklist: `docs/20-hardening-and-cutover.md`.
 
 ## Media
 
-Private keys never served via `media.architak.in`. Presigned URLs only for private objects.
+Private keys never served via `media.architak.in`. Worker source: `cloudflare/media-worker/`. Presigned URLs only for private objects.
+
+## Later
+
+- Nonce-based CSP once motion bundles are verified under it
+- MFA when Supabase Auth replaces static admin credentials
+- Preview deployment protection

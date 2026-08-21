@@ -1,0 +1,101 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Least privilege: nothing here needs write access to the repository.
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Build-time placeholders that satisfy the fail-closed Zod schema in
+  # lib/env.ts. Real values live in Vercel per environment and are never
+  # committed or echoed.
+  NEXT_PUBLIC_SITE_URL: https://architak.in
+  NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ci-placeholder-publishable-key
+  SUPABASE_SECRET_KEY: ci-placeholder-secret-key
+  ADMIN_USERNAME: ci-admin
+  ADMIN_PASSWORD: ci-placeholder-password
+  ADMIN_SESSION_SECRET: ci-placeholder-session-secret-at-least-32-chars
+
+jobs:
+  verify:
+    name: Lint, typecheck, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Enumerate required configuration names
+        run: pnpm env:check --vercel
+
+      - run: pnpm lint
+
+      - run: pnpm typecheck
+
+      - run: pnpm build
+
+      - name: Cache build output for the e2e job
+        uses: actions/upload-artifact@v4
+        with:
+          name: next-build
+          path: .next
+          retention-days: 1
+
+  accessibility-and-adaptive:
+    name: Accessibility and device matrix
+    runs-on: ubuntu-latest
+    needs: verify
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Install test-only tooling
+        # Deliberately not committed to package.json: the lockfile cannot be
+        # regenerated on the current development machine. Installing here keeps
+        # `pnpm install --frozen-lockfile` valid for Vercel and the verify job.
+        # Move these into devDependencies once the lockfile can be updated.
+        run: pnpm add -D --no-frozen-lockfile @playwright/test @axe-core/playwright
+
+      - name: Typecheck end-to-end specs
+        run: pnpm exec tsc --noEmit -p tsconfig.e2e.json
+
+      - run: pnpm exec playwright install --with-deps chromium
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: next-build
+          path: .next
+
+      - name: Run adaptive and accessibility suites
+        run: pnpm exec playwright test --project=desktop-chromium
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: playwright-report
+          retention-days: 7

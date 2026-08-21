@@ -32,5 +32,13 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    // End-to-end specs are typechecked by tsconfig.e2e.json, which is only
+    // resolvable once the Playwright test dependencies are installed. Keeping
+    // them out of the app project means `pnpm typecheck` and the Next.js build
+    // never depend on test-only packages.
+    "e2e",
+    "playwright.config.ts"
+  ]
 }

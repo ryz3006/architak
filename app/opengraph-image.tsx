@@ -27,45 +27,78 @@ export default async function OpengraphImage() {
           justifyContent: "space-between",
           background: "#0a0a0a",
           color: "#f5f2eb",
-          padding: "72px",
+          padding: 72,
           fontFamily: "sans-serif",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "24px" }}>
-          {/* Triangle mark drawn inline so the card needs no network asset. */}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+        >
           <div
             style={{
-              width: 0,
-              height: 0,
-              borderLeft: "26px solid transparent",
-              borderRight: "26px solid transparent",
-              borderBottom: "44px solid #c4a574",
+              display: "flex",
+              width: 44,
+              height: 44,
+              background: "#c4a574",
+              marginRight: 24,
             }}
           />
-          <div style={{ fontSize: 40, letterSpacing: "0.24em" }}>ARCHITAK</div>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-          <div style={{ fontSize: 92, lineHeight: 1.02, letterSpacing: "-0.02em" }}>
-            {studio.tagline}
-          </div>
-          <div style={{ fontSize: 30, color: "#a5a09a" }}>
-            Interior design studio · {studio.location}
+          <div
+            style={{
+              display: "flex",
+              fontSize: 40,
+              letterSpacing: "0.24em",
+            }}
+          >
+            ARCHITAK
           </div>
         </div>
 
         <div
           style={{
             display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              fontSize: 92,
+              lineHeight: 1.02,
+              letterSpacing: "-0.02em",
+              marginBottom: 20,
+            }}
+          >
+            {studio.tagline}
+          </div>
+          <div
+            style={{
+              display: "flex",
+              fontSize: 30,
+              color: "#a5a09a",
+            }}
+          >
+            {`Interior design studio · ${studio.location}`}
+          </div>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
             justifyContent: "space-between",
             fontSize: 24,
             color: "#a5a09a",
             borderTop: "1px solid #2a2a2a",
-            paddingTop: "24px",
+            paddingTop: 24,
           }}
         >
-          <span>architak.in</span>
-          <span>{studio.phone}</span>
+          <div style={{ display: "flex" }}>architak.in</div>
+          <div style={{ display: "flex" }}>{studio.phone}</div>
         </div>
       </div>
     ),

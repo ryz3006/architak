@@ -31,36 +31,73 @@ export default async function ProjectOpengraphImage({
           justifyContent: "space-between",
           background: "#0a0a0a",
           color: "#f5f2eb",
-          padding: "72px",
+          padding: 72,
           fontFamily: "sans-serif",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+        >
           <div
             style={{
-              width: 0,
-              height: 0,
-              borderLeft: "20px solid transparent",
-              borderRight: "20px solid transparent",
-              borderBottom: "34px solid #c4a574",
+              display: "flex",
+              width: 34,
+              height: 34,
+              background: "#c4a574",
+              marginRight: 20,
             }}
           />
-          <div style={{ fontSize: 30, letterSpacing: "0.24em" }}>ARCHITAK</div>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
-          <div style={{ fontSize: 28, letterSpacing: "0.2em", color: "#c4a574" }}>
-            {meta.toUpperCase()}
+          <div
+            style={{
+              display: "flex",
+              fontSize: 30,
+              letterSpacing: "0.24em",
+            }}
+          >
+            ARCHITAK
           </div>
-          <div style={{ fontSize: 84, lineHeight: 1.04, letterSpacing: "-0.02em" }}>{title}</div>
         </div>
 
         <div
           style={{
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              fontSize: 28,
+              letterSpacing: "0.2em",
+              color: "#c4a574",
+              marginBottom: 18,
+            }}
+          >
+            {meta.toUpperCase()}
+          </div>
+          <div
+            style={{
+              display: "flex",
+              fontSize: 84,
+              lineHeight: 1.04,
+              letterSpacing: "-0.02em",
+            }}
+          >
+            {title}
+          </div>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
             fontSize: 24,
             color: "#a5a09a",
             borderTop: "1px solid #2a2a2a",
-            paddingTop: "24px",
+            paddingTop: 24,
           }}
         >
           architak.in

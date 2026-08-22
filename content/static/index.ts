@@ -63,6 +63,8 @@ export function getSpaceStory(): SpaceStory {
 
 export type StudioPageContent = typeof site.studioPage;
 export type ServicesPageContent = typeof site.servicesPage;
+export type ContactPageContent = typeof site.contactPage;
+export type ProjectPageContent = typeof site.projectPage;
 
 export type EditorialHero = StudioPageContent["hero"];
 export type EditorialManifesto = StudioPageContent["manifesto"];
@@ -78,6 +80,14 @@ export function getStudioPageContent(): StudioPageContent {
 
 export function getServicesPageContent(): ServicesPageContent {
   return site.servicesPage;
+}
+
+export function getContactPageContent(): ContactPageContent {
+  return site.contactPage;
+}
+
+export function getProjectPageContent(): ProjectPageContent {
+  return site.projectPage;
 }
 
 export function getTestimonials(): Testimonial[] {

@@ -1,16 +1,30 @@
 import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { PageCta } from "@/components/pages/page-cta";
 import { SiteFooter, SiteHeader } from "@/components/layout/site-chrome";
-import { getStaticProjectBySlug, getStaticProjects } from "@/content/static";
+import { ProjectGallery } from "@/components/project/project-gallery";
+import { ProjectHero } from "@/components/project/project-hero";
+import { ProjectNav } from "@/components/project/project-nav";
+import { ProjectSummary } from "@/components/project/project-summary";
+import { SmoothScroll } from "@/components/motion/smooth-scroll";
+import { StudioAtmosphere } from "@/components/studio/studio-atmosphere";
+import { StudioReveal } from "@/components/studio/studio-reveal";
+import {
+  getProjectPageContent,
+  getStaticProjectBySlug,
+  getStaticProjects,
+  getStudioPageContent,
+} from "@/content/static";
 import { absoluteUrl } from "@/features/discovery";
 import {
   buildBreadcrumbJsonLd,
   buildProjectJsonLd,
   jsonLdScript,
 } from "@/features/discovery/structured-data";
+
+import "@/styles/project-page.css";
+import "@/styles/studio-page.css";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -26,7 +40,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!project) return {};
 
   return {
-    title: project.title,
+    title: `${project.title} — ARCHITAK`,
     description: project.summary,
     alternates: { canonical: absoluteUrl(`/work/${project.slug}`) },
     openGraph: {
@@ -43,6 +57,9 @@ export default async function ProjectPage({ params }: Props) {
   const project = getStaticProjectBySlug(slug);
   if (!project) notFound();
 
+  const pageCopy = getProjectPageContent();
+  const studioPage = getStudioPageContent();
+
   const discoveryProject = {
     slug: project.slug,
     path: `/work/${project.slug}`,
@@ -54,7 +71,7 @@ export default async function ProjectPage({ params }: Props) {
   };
 
   return (
-    <main id="main-content" className="flex min-h-dvh flex-col">
+    <main id="main-content" className="studio-page project-page flex min-h-dvh flex-col">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={jsonLdScript(buildProjectJsonLd(discoveryProject))}
@@ -69,55 +86,39 @@ export default async function ProjectPage({ params }: Props) {
           ]),
         )}
       />
-      <SiteHeader />
-      <article>
-        <div
-          className="relative w-full"
-          style={{ minHeight: "max(70dvh, var(--hero-height-min))" }}
-        >
-          <Image
-            src={project.coverImage}
-            alt={project.title}
-            fill
-            priority
-            className="object-cover"
-            sizes="100vw"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
-          <div className="page-frame absolute inset-x-0 bottom-0 pb-fluid-md">
-            <p className="text-fluid-xs tracking-widest text-accent uppercase">
-              {project.category} · {project.location}
-            </p>
-            <h1 className="display mt-2 text-display-lg">{project.title}</h1>
-          </div>
-        </div>
+      <StudioAtmosphere />
+      <SmoothScroll />
 
-        <div className="page-frame py-fluid-xl">
-          <p className="measure text-fluid-lg text-muted">{project.summary}</p>
-          <div className="mt-14 grid gap-fluid-sm [grid-template-columns:repeat(auto-fit,minmax(min(22rem,100%),1fr))]">
-            {project.gallery.map((src) => (
-              <div key={src} className="relative aspect-4/3 overflow-hidden bg-surface">
-                <Image
-                  src={src}
-                  alt=""
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 48rem) 100vw, 50vw"
-                />
-              </div>
-            ))}
-          </div>
-          <p className="mt-12">
-            <Link
-              href="/studio#work"
-              className="text-fluid-sm tracking-widest text-muted uppercase hover:text-foreground"
-            >
-              ← Studio work
-            </Link>
-          </p>
-        </div>
-      </article>
-      <SiteFooter />
+      <div className="studio-page__content">
+        <SiteHeader />
+
+        <ProjectHero project={project} />
+
+        <StudioReveal variant="center">
+          <ProjectSummary eyebrow={pageCopy.summaryEyebrow} summary={project.summary} />
+        </StudioReveal>
+
+        <StudioReveal variant="rise">
+          <ProjectGallery
+            eyebrow={pageCopy.galleryEyebrow}
+            title={project.title}
+            images={project.gallery}
+          />
+        </StudioReveal>
+
+        <StudioReveal variant="right">
+          <ProjectNav backLabel={pageCopy.backLabel} />
+        </StudioReveal>
+
+        <PageCta
+          eyebrow={studioPage.cta.eyebrow}
+          headline={studioPage.cta.headline}
+          support={studioPage.cta.support}
+          showContactLink={false}
+        />
+
+        <SiteFooter />
+      </div>
     </main>
   );
 }

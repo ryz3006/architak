@@ -441,6 +441,37 @@
       "support": "Tell us about the space you are imagining. We will help you see it clearly."
     }
   },
+  "contactPage": {
+    "hero": {
+      "eyebrow": "Let's connect",
+      "headline": ["Begin", "here."],
+      "lead": ["Every space starts", "with a conversation."],
+      "support": "Tell us how you live. We will shape the space around it.",
+      "image": "/media/hero/experience-living.jpg",
+      "imageAlt": "ARCHITAK contact — interior design studio Kochi"
+    },
+    "bridge": {
+      "lines": [
+        "We read every message.",
+        "And we reply with care."
+      ]
+    },
+    "channels": {
+      "eyebrow": "Direct lines",
+      "headline": "Reach us when you're ready.",
+      "support": "Phone, email, or WhatsApp — whichever feels natural."
+    },
+    "form": {
+      "eyebrow": "Project enquiry",
+      "headline": "A short brief is enough.",
+      "support": "Rooms, timeline, and how you imagine living inside the space."
+    }
+  },
+  "projectPage": {
+    "summaryEyebrow": "The space",
+    "galleryEyebrow": "Inside the project",
+    "backLabel": "Explore more work in the studio"
+  },
   "testimonials": [
     {
       "quote": "They listened before they drew a single line. The kitchen now feels like the centre of our home — not a room we pass through.",

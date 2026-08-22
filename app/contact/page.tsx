@@ -1,26 +1,34 @@
 import type { Metadata } from "next";
 
+import { ContactConnect } from "@/components/contact/contact-connect";
+import { ContactHero } from "@/components/contact/contact-hero";
 import { SiteFooter, SiteHeader } from "@/components/layout/site-chrome";
-import { getStaticSite } from "@/content/static";
+import { SmoothScroll } from "@/components/motion/smooth-scroll";
+import { StudioAtmosphere } from "@/components/studio/studio-atmosphere";
+import { StudioBridge } from "@/components/studio/studio-bridge";
+import { StudioLocation } from "@/components/studio/studio-location";
+import { StudioReveal } from "@/components/studio/studio-reveal";
+import { getContactPageContent, getStaticSite, getStudioPageContent } from "@/content/static";
 import { absoluteUrl } from "@/features/discovery";
-import { EnquiryForm } from "@/features/enquiries/enquiry-form";
-import {
-  buildBreadcrumbJsonLd,
-  jsonLdScript,
-} from "@/features/discovery/structured-data";
+import { buildBreadcrumbJsonLd, jsonLdScript } from "@/features/discovery/structured-data";
+
+import "@/styles/contact-page.css";
+import "@/styles/studio-page.css";
 
 export const metadata: Metadata = {
-  title: "Contact",
-  description: "Contact ARCHITAK in Vyttila, Kochi — phone, email, WhatsApp, and project enquiry.",
+  title: "Contact — ARCHITAK | Let's Connect",
+  description:
+    "Contact ARCHITAK in Vyttila, Kochi — phone, email, WhatsApp, and project enquiry. Every space starts with a conversation.",
   alternates: { canonical: absoluteUrl("/contact") },
 };
 
 export default function ContactPage() {
   const { studio } = getStaticSite();
-  const wa = studio.phone.replace(/\D/g, "");
+  const page = getContactPageContent();
+  const studioPage = getStudioPageContent();
 
   return (
-    <main id="main-content" className="flex min-h-dvh flex-col">
+    <main id="main-content" className="studio-page contact-page flex min-h-dvh flex-col">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={jsonLdScript(
@@ -30,56 +38,34 @@ export default function ContactPage() {
           ]),
         )}
       />
-      <SiteHeader />
-      <section className="page-frame grid gap-fluid-lg py-fluid-xl lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
-        <div>
-          <p className="text-fluid-sm tracking-[0.3em] text-muted uppercase">Contact</p>
-          <h1 className="display mt-3 text-display-lg">Begin here</h1>
-          <p className="measure mt-6 text-muted">
-            Tell us how you live. We will shape the space around it.
-          </p>
+      <StudioAtmosphere />
+      <SmoothScroll />
 
-          <address className="mt-12 not-italic">
-            <p className="text-fluid-lg">
-              <a href={`tel:${studio.phone.replace(/\s/g, "")}`} className="hover:text-accent">
-                {studio.phone}
-              </a>
-            </p>
-            <p className="mt-2 text-fluid-lg">
-              <a href={`mailto:${studio.email}`} className="hover:text-accent">
-                {studio.email}
-              </a>
-            </p>
-            <p className="mt-4 text-muted">{studio.address}</p>
-          </address>
+      <div className="studio-page__content">
+        <SiteHeader />
 
-          <div className="mt-10 flex flex-wrap gap-4">
-            <a
-              href={`https://wa.me/${wa}`}
-              className="border border-foreground bg-foreground px-6 py-3 text-fluid-sm tracking-widest text-background uppercase"
-              rel="noopener noreferrer"
-              target="_blank"
-            >
-              WhatsApp
-            </a>
-            <a
-              href={`mailto:${studio.email}?subject=Project%20enquiry`}
-              className="border border-border px-6 py-3 text-fluid-sm tracking-widest uppercase hover:border-accent"
-            >
-              Email enquiry
-            </a>
-          </div>
-        </div>
+        <ContactHero hero={page.hero} />
 
-        <div className="border border-border bg-surface p-6 md:p-8">
-          <h2 className="display text-display-sm">Project enquiry</h2>
-          <p className="mt-3 text-fluid-sm text-muted">A short brief is enough.</p>
-          <div className="mt-8">
-            <EnquiryForm />
-          </div>
-        </div>
-      </section>
-      <SiteFooter />
+        <StudioReveal variant="center">
+          <StudioBridge lines={page.bridge.lines} />
+        </StudioReveal>
+
+        <StudioReveal variant="left">
+          <ContactConnect
+            channels={page.channels}
+            form={page.form}
+            phone={studio.phone}
+            email={studio.email}
+            address={studio.address}
+          />
+        </StudioReveal>
+
+        <StudioReveal variant="right">
+          <StudioLocation location={studioPage.location} />
+        </StudioReveal>
+
+        <SiteFooter />
+      </div>
     </main>
   );
 }

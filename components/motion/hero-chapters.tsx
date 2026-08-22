@@ -19,9 +19,6 @@ type HeroChaptersProps = {
   tagline: string;
 };
 
-/** Scroll progress at which each chapter is fully composed. */
-const CHAPTER_TARGETS = [0, 0.43, 0.72] as const;
-
 /** Matches the pinning breakpoint in styles/hero-chapters.css. */
 const PINNED_QUERY = "(min-width: 64rem)";
 
@@ -63,16 +60,14 @@ function HeroScene({
         )}
 
         <div className={`hero-copy${showEntrance ? " hero-headline-enter" : ""}`}>
-          <p className="hero-chapter-label">
-            {chapter.index} / {chapter.label}
-          </p>
+          <p className="hero-chapter-label">{chapter.label}</p>
           <Headline className="hero-chapter-headline">
-            <span className="hero-headline-line block">{chapter.headline}</span>
+            <span className="hero-headline-line">{chapter.headline}</span>
             {chapter.id === "experience" && tagline ? (
-              <span className="hero-headline-bridge block">{tagline}</span>
+              <span className="hero-headline-bridge">{tagline}</span>
             ) : null}
             {chapter.headlineLine2 ? (
-              <span className="hero-headline-line block">{chapter.headlineLine2}</span>
+              <span className="hero-headline-line">{chapter.headlineLine2}</span>
             ) : null}
           </Headline>
           <p className="hero-chapter-support">{chapter.support}</p>
@@ -272,43 +267,10 @@ export function HeroChapters({ journey, chapters, tagline }: HeroChaptersProps) 
     };
   }, [animated, finePointer]);
 
-  const scrollToChapter = (index: number) => {
-    const track = trackRef.current;
-    const target = CHAPTER_TARGETS[index];
-    if (!track || !animated || target === undefined) return;
-
-    const scrollable = Math.max(1, track.offsetHeight - window.innerHeight);
-    window.scrollTo({
-      top: track.offsetTop + scrollable * target,
-      behavior: reduced ? "auto" : "smooth",
-    });
-  };
-
   return (
     <section className="hero-root" aria-label="Hero" ref={rootRef}>
       <div className="hero-track" ref={trackRef}>
         <div className="hero-stage">
-          {animated ? (
-            <nav className="hero-progress" aria-label="Hero chapters">
-              {chapters.map((chapter, index) => (
-                <div className="hero-progress-step" key={chapter.id}>
-                  <button
-                    type="button"
-                    className="hero-progress-item"
-                    aria-current={activeChapter === index ? "step" : undefined}
-                    onClick={() => scrollToChapter(index)}
-                  >
-                    <span>{chapter.index}</span>
-                    <span className="hero-progress-bar" aria-hidden="true" />
-                  </button>
-                  {index < chapters.length - 1 ? (
-                    <span className="hero-progress-connector" aria-hidden="true" />
-                  ) : null}
-                </div>
-              ))}
-            </nav>
-          ) : null}
-
           <div className="hero-composition" ref={compositionRef}>
             {chapters.map((chapter, index) => (
               <HeroScene

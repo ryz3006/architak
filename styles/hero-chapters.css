@@ -74,12 +74,14 @@
 .hero-scene-text {
   position: relative;
   z-index: 3;
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-6);
   min-width: 0;
   min-height: 0;
   padding-block: clamp(1.5rem, 4vh, 2.75rem) var(--space-fluid-md);
-  padding-inline: calc(var(--gutter) + var(--safe-left) + 2.5rem) var(--space-fluid-sm);
+  padding-inline: calc(var(--gutter) + var(--safe-left)) var(--space-fluid-sm);
   transform: translate3d(var(--hero-type-x), var(--hero-type-y), 0);
 }
 
@@ -92,8 +94,10 @@
 
 .hero-copy {
   display: flex;
+  flex: 1;
   flex-direction: column;
   justify-content: center;
+  gap: var(--space-4);
   min-height: 0;
   max-width: var(--hero-type-max);
 }
@@ -103,33 +107,38 @@
   letter-spacing: 0.3em;
   text-transform: uppercase;
   color: var(--color-accent);
-  margin-bottom: var(--space-4);
 }
 
 .hero-chapter-headline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
   font-family: var(--font-display);
   font-weight: 400;
   font-size: clamp(2.4rem, 4.6vw, 4.4rem);
-  line-height: 0.98;
+  line-height: 1.08;
   letter-spacing: -0.02em;
   text-wrap: balance;
   overflow-wrap: break-word;
-  transform: scale(var(--hero-type-scale));
-  transform-origin: left center;
 }
 
 .hero-scene[data-chapter="experience"] .hero-chapter-headline {
-  font-size: clamp(2.75rem, 5.4vw, 5rem);
-  line-height: 0.96;
+  font-size: clamp(2.35rem, 4.5vw, 4.1rem);
+  gap: var(--space-2);
+}
+
+.hero-headline-line {
+  display: block;
+  line-height: 1.06;
 }
 
 .hero-headline-bridge {
-  margin-block: 0.2em 0.35em;
+  display: block;
   font-family: var(--font-sans);
   font-size: var(--step-000);
   font-weight: 400;
-  letter-spacing: 0.35em;
-  line-height: 1.4;
+  letter-spacing: 0.28em;
+  line-height: 1.5;
   text-transform: uppercase;
   color: var(--color-accent);
 }
@@ -146,7 +155,6 @@
 }
 
 .hero-chapter-support {
-  margin-top: var(--space-6);
   max-width: 34ch;
   font-size: var(--step-00);
   line-height: var(--leading-normal);
@@ -155,9 +163,9 @@
 
 .hero-cta {
   display: flex;
+  flex-shrink: 0;
   flex-wrap: wrap;
   gap: var(--space-4);
-  align-self: end;
   opacity: var(--hero-cta-opacity);
   transform: translateY(calc((1 - var(--hero-cta-opacity)) * 0.75rem));
 }
@@ -226,83 +234,13 @@
     );
 }
 
-/* ---------------------------------------------------------- progress index */
-
-/*
- * Chapter rail — sits to the left of the headline block, matching the editorial
- * reference rather than floating over the photograph.
- */
-.hero-progress {
-  position: absolute;
-  left: calc(var(--gutter) + var(--safe-left));
-  top: 50%;
-  z-index: 5;
-  transform: translateY(-42%);
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.35rem;
-  padding: 0;
-  font-size: var(--step-000);
-  letter-spacing: 0.12em;
-  color: color-mix(in srgb, var(--color-foreground) 38%, transparent);
-  background: none;
-}
-
-.hero-progress-step {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.35rem;
-}
-
-.hero-progress-item {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-  background: none;
-  border: none;
-  padding: 0.1rem 0;
-  color: inherit;
-  cursor: pointer;
-  font: inherit;
-  transition: color var(--duration-medium) var(--ease-standard);
-}
-
-.hero-progress-item[aria-current="step"] {
-  color: var(--color-foreground);
-}
-
-.hero-progress-bar {
-  display: block;
-  height: 1px;
-  width: 0;
-  background: var(--color-accent);
-  opacity: 0;
-  transition:
-    width var(--duration-medium) var(--ease-standard),
-    opacity var(--duration-medium) var(--ease-standard);
-}
-
-.hero-progress-item[aria-current="step"] .hero-progress-bar {
-  width: 1.25rem;
-  opacity: 1;
-}
-
-.hero-progress-connector {
-  width: 1px;
-  height: 0.75rem;
-  background: var(--color-border);
-  margin-left: 0.35rem;
-}
-
 /* -------------------------------------------------------------- entrance */
 
 .hero-headline-enter .hero-headline-line {
   animation: heroHeadlineIn var(--duration-page) var(--ease-entrance) both;
 }
 
-.hero-headline-enter .hero-headline-line:nth-child(2) {
+.hero-headline-enter .hero-headline-line:nth-child(3) {
   animation-delay: 80ms;
 }
 
@@ -390,10 +328,6 @@
     opacity: 1;
     transform: none;
   }
-
-  .hero-progress {
-    display: none;
-  }
 }
 
 @media (min-width: 48rem) and (max-width: 63.99rem) {
@@ -413,9 +347,5 @@
 @media (prefers-reduced-motion: reduce) {
   .hero-headline-enter .hero-headline-line {
     animation: none;
-  }
-
-  .hero-progress-bar {
-    transition: none;
   }
 }

@@ -70,7 +70,6 @@ test.describe("hero composition", () => {
       .evaluate((node) => getComputedStyle(node).position);
     expect(stagePosition).toBe("relative");
 
-    await expect(page.locator(".hero-progress")).toHaveCount(0);
     await expect(page.getByRole("link", { name: /view work/i })).toBeVisible();
   });
 });

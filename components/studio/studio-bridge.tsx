@@ -7,12 +7,17 @@ type StudioBridgeProps = {
 
 export function StudioBridge({ lines, className = "" }: StudioBridgeProps) {
   return (
-    <section className={`studio-bridge page-frame${className ? ` ${className}` : ""}`} aria-label="Transition">
-      {lines.map((line) => (
-        <p key={line} className="studio-bridge__line display">
-          {line}
-        </p>
-      ))}
+    <section
+      className={`studio-bridge studio-section studio-section--bridge page-frame${className ? ` ${className}` : ""}`}
+      aria-label="Transition"
+    >
+      <div className="studio-bridge__inner">
+        {lines.map((line) => (
+          <p key={line} className="studio-bridge__line display">
+            {line}
+          </p>
+        ))}
+      </div>
     </section>
   );
 }

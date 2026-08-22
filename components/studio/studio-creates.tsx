@@ -52,11 +52,13 @@ export function StudioCreates({ creates }: StudioCreatesProps) {
   }, [creates.pillars.length, reduced]);
 
   return (
-    <section ref={sectionRef} className="studio-creates page-frame" aria-labelledby="studio-creates-title">
-      <p className="studio-eyebrow">{creates.eyebrow}</p>
-      <h2 id="studio-creates-title" className="studio-creates__intro display">
-        We create
-      </h2>
+    <section ref={sectionRef} className="studio-creates studio-section studio-section--creates page-frame" aria-labelledby="studio-creates-title">
+      <div className="studio-creates__header">
+        <p className="studio-eyebrow">{creates.eyebrow}</p>
+        <h2 id="studio-creates-title" className="studio-creates__intro display">
+          We create
+        </h2>
+      </div>
 
       <ol className="studio-creates__pillars">
         {creates.pillars.map((pillar, index) => (
@@ -66,6 +68,7 @@ export function StudioCreates({ creates }: StudioCreatesProps) {
               pillarRefs.current[index] = element;
             }}
             className="studio-creates__pillar"
+            data-align={index % 2 === 0 ? "start" : "end"}
             data-state={index === 0 ? "active" : "future"}
           >
             <h3 className="studio-creates__pillar-title display">{pillar.title}.</h3>

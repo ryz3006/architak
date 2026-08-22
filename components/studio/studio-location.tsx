@@ -10,7 +10,7 @@ type StudioLocationProps = {
 
 export function StudioLocation({ location }: StudioLocationProps) {
   return (
-    <section className="studio-location page-frame" aria-labelledby="studio-location-title">
+    <section className="studio-location studio-section studio-section--location page-frame" aria-labelledby="studio-location-title">
       <p className="studio-eyebrow">{location.eyebrow}</p>
       <h2 id="studio-location-title" className="studio-location__name display">
         {location.name}

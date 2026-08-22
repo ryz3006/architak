@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 
 import { PageCta } from "@/components/pages/page-cta";
 import { SiteFooter, SiteHeader } from "@/components/layout/site-chrome";
-import { Reveal } from "@/components/motion/reveal";
 import { SmoothScroll } from "@/components/motion/smooth-scroll";
+import { StudioAtmosphere } from "@/components/studio/studio-atmosphere";
 import { StudioBridge } from "@/components/studio/studio-bridge";
 import { StudioCompliment } from "@/components/studio/studio-compliment";
 import { StudioCreates } from "@/components/studio/studio-creates";
@@ -11,6 +11,7 @@ import { StudioHero } from "@/components/studio/studio-hero";
 import { StudioLocation } from "@/components/studio/studio-location";
 import { StudioManifesto } from "@/components/studio/studio-manifesto";
 import { StudioProcess } from "@/components/studio/studio-process";
+import { StudioReveal } from "@/components/studio/studio-reveal";
 import { StudioVoices } from "@/components/studio/studio-voices";
 import { StudioWorkDome } from "@/components/studio/studio-work-dome";
 import { StudioWorkIntro } from "@/components/studio/studio-work-intro";
@@ -47,54 +48,58 @@ export default async function StudioPage() {
           ]),
         )}
       />
+      <StudioAtmosphere />
       <SmoothScroll />
-      <SiteHeader />
 
-      <StudioHero hero={page.hero} />
+      <div className="studio-page__content">
+        <SiteHeader />
 
-      <Reveal>
-        <StudioManifesto manifesto={page.manifesto} />
-      </Reveal>
+        <StudioHero hero={page.hero} />
 
-      <Reveal>
-        <StudioCreates creates={page.creates} />
-      </Reveal>
+        <StudioReveal variant="center">
+          <StudioManifesto manifesto={page.manifesto} />
+        </StudioReveal>
 
-      <Reveal>
-        <section id="work" className="studio-work-section border-t border-border">
-          <StudioWorkIntro work={page.work} />
-          <StudioWorkDome projects={projects} />
-        </section>
-      </Reveal>
+        <StudioReveal variant="left">
+          <StudioCreates creates={page.creates} />
+        </StudioReveal>
 
-      <Reveal>
-        <StudioBridge lines={page.workBridge.lines} />
-      </Reveal>
+        <StudioReveal variant="rise">
+          <section id="work" className="studio-work-section border-t border-border">
+            <StudioWorkIntro work={page.work} />
+            <StudioWorkDome projects={projects} />
+          </section>
+        </StudioReveal>
 
-      <Reveal>
-        <StudioVoices voices={page.voices} items={testimonials} />
-      </Reveal>
+        <StudioReveal variant="center">
+          <StudioBridge lines={page.workBridge.lines} />
+        </StudioReveal>
 
-      <Reveal>
-        <StudioCompliment compliment={page.compliment} />
-      </Reveal>
+        <StudioReveal variant="right">
+          <StudioVoices voices={page.voices} items={testimonials} />
+        </StudioReveal>
 
-      <Reveal>
-        <StudioProcess process={page.process} />
-      </Reveal>
+        <StudioReveal variant="center">
+          <StudioCompliment compliment={page.compliment} />
+        </StudioReveal>
 
-      <Reveal>
-        <StudioLocation location={page.location} />
-      </Reveal>
+        <StudioReveal variant="left">
+          <StudioProcess process={page.process} />
+        </StudioReveal>
 
-      <PageCta
-        eyebrow={page.cta.eyebrow}
-        headline={page.cta.headline}
-        support={page.cta.support}
-        showContactLink={false}
-      />
+        <StudioReveal variant="right">
+          <StudioLocation location={page.location} />
+        </StudioReveal>
 
-      <SiteFooter />
+        <PageCta
+          eyebrow={page.cta.eyebrow}
+          headline={page.cta.headline}
+          support={page.cta.support}
+          showContactLink={false}
+        />
+
+        <SiteFooter />
+      </div>
     </main>
   );
 }

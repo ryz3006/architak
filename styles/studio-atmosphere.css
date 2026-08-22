@@ -1,0 +1,56 @@
+.studio-atmosphere {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.studio-atmosphere__base {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 120% 80% at 50% -10%, rgb(22 20 18 / 0.95) 0%, var(--color-background) 58%),
+    var(--color-background);
+}
+
+.studio-atmosphere__snow {
+  position: absolute;
+  inset: 0;
+  opacity: 0.72;
+}
+
+.studio-atmosphere__veil {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgb(10 10 10 / 0.55) 0%, rgb(10 10 10 / 0.18) 38%, rgb(10 10 10 / 0.62) 100%),
+    radial-gradient(ellipse 90% 60% at 50% 50%, transparent 0%, rgb(10 10 10 / 0.35) 100%);
+}
+
+.studio-atmosphere__glow {
+  position: absolute;
+  width: min(42rem, 70vw);
+  height: min(42rem, 70vw);
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.22;
+}
+
+.studio-atmosphere__glow--left {
+  top: 18%;
+  left: -8%;
+  background: rgb(196 165 116 / 0.35);
+}
+
+.studio-atmosphere__glow--right {
+  bottom: 8%;
+  right: -6%;
+  background: rgb(120 100 72 / 0.28);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .studio-atmosphere__snow {
+    display: none;
+  }
+}

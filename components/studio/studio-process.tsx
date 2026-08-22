@@ -8,11 +8,13 @@ type StudioProcessProps = {
 
 export function StudioProcess({ process }: StudioProcessProps) {
   return (
-    <section className="studio-process page-frame" aria-labelledby="studio-process-title">
-      <p className="studio-eyebrow">{process.eyebrow}</p>
-      <h2 id="studio-process-title" className="studio-process__headline display">
-        {process.headline}
-      </h2>
+    <section className="studio-process studio-section studio-section--process page-frame" aria-labelledby="studio-process-title">
+      <div className="studio-process__header">
+        <p className="studio-eyebrow">{process.eyebrow}</p>
+        <h2 id="studio-process-title" className="studio-process__headline display">
+          {process.headline}
+        </h2>
+      </div>
 
       <ol className="studio-process__steps">
         {process.steps.map((step) => (

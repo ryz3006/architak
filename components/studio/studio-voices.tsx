@@ -34,7 +34,7 @@ export function StudioVoices({ voices, items }: StudioVoicesProps) {
   }
 
   return (
-    <section className="studio-voices" aria-labelledby="studio-voices-title">
+    <section className="studio-voices studio-section studio-section--voices" aria-labelledby="studio-voices-title">
       <header className="studio-voices__intro page-frame">
         <p className="studio-eyebrow">{voices.eyebrow}</p>
         <h2 id="studio-voices-title" className="studio-voices__headline display">
@@ -61,7 +61,7 @@ export function StudioVoices({ voices, items }: StudioVoicesProps) {
             {formatIndex(activeIndex, total)}
           </p>
 
-          <figure className="studio-voices__quote-wrap">
+          <figure key={`${active.name}-${activeIndex}`} className="studio-voices__quote-wrap">
             <blockquote className="studio-voices__quote">
               <p>&ldquo;{active.quote}&rdquo;</p>
             </blockquote>

@@ -7,6 +7,12 @@ import type { HeroChapter, HeroImage, HeroJourneyResolved } from "@/content/stat
 import { useReducedMotion } from "@/lib/a11y/use-reduced-motion";
 import { persistHeroJourneyCookie } from "@/lib/hero/cookie-client";
 import { computeHeroComposition } from "@/lib/hero/scroll-math";
+import {
+  getHeroViewportProfile,
+  heroUsesMobileFocus,
+  HERO_TRACK_VH,
+  type HeroViewportProfile,
+} from "@/lib/hero/viewport-profile";
 
 import "@/styles/hero-chapters.css";
 
@@ -16,9 +22,6 @@ type HeroChaptersProps = {
   journey: HeroJourneyResolved;
   chapters: HeroChapter[];
 };
-
-/** Matches the pinning breakpoint in styles/hero-chapters.css. */
-const PINNED_QUERY = "(min-width: 64rem)";
 
 function chapterImage(journey: HeroJourneyResolved, chapterId: string): HeroImage {
   if (chapterId === "space") return journey.space;
@@ -31,13 +34,16 @@ function HeroScene({
   image,
   priority,
   showEntrance,
+  mobileFocus,
 }: {
   chapter: HeroChapter;
   image: HeroImage;
   priority: boolean;
   showEntrance: boolean;
+  mobileFocus: boolean;
 }) {
-  const [focusX, focusY] = image.focus.desktop.split(" ");
+  const focus = mobileFocus ? image.focus.mobile : image.focus.desktop;
+  const [focusX, focusY] = focus.split(" ");
   const Headline = chapter.id === "experience" ? "h1" : "h2";
 
   return (
@@ -71,7 +77,7 @@ function HeroScene({
             fill
             priority={priority}
             loading={priority ? undefined : "eager"}
-            sizes="(max-width: 64rem) 100vw, 60vw"
+            sizes="(max-width: 48rem) 100vw, (max-width: 120rem) 60vw, 50vw"
             className="object-cover"
           />
         </div>
@@ -87,13 +93,29 @@ export function HeroChapters({ journey, chapters }: HeroChaptersProps) {
   const compositionRef = useRef<HTMLDivElement>(null);
   const preloadedSpace = useRef(false);
   const preloadedFeel = useRef(false);
+  const profileRef = useRef<HeroViewportProfile>("wide");
 
   const reduced = useReducedMotion();
   const [mounted, setMounted] = useState(false);
-  const [pinned, setPinned] = useState(false);
-  const [finePointer, setFinePointer] = useState(false);
+  const [profile, setProfile] = useState<HeroViewportProfile>("wide");
+  const [mobileFocus, setMobileFocus] = useState(false);
 
-  const animated = pinned && !reduced;
+  const animated = !reduced;
+
+  const syncViewport = useCallback(() => {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const nextProfile = getHeroViewportProfile(width, height);
+    profileRef.current = nextProfile;
+    setProfile(nextProfile);
+    setMobileFocus(heroUsesMobileFocus(nextProfile, width, height));
+
+    const root = rootRef.current;
+    if (root) {
+      root.dataset.profile = nextProfile;
+      root.style.setProperty("--hero-track-height", `${HERO_TRACK_VH[nextProfile]}vh`);
+    }
+  }, []);
 
   useEffect(() => {
     setMounted(true);
@@ -104,28 +126,21 @@ export function HeroChapters({ journey, chapters }: HeroChaptersProps) {
       img.src = src;
     }
 
-    const pinnedQuery = window.matchMedia(PINNED_QUERY);
-    const pointerQuery = window.matchMedia("(pointer: fine)");
-    const sync = () => {
-      setPinned(pinnedQuery.matches);
-      setFinePointer(pointerQuery.matches);
-    };
-
-    sync();
-    pinnedQuery.addEventListener("change", sync);
-    pointerQuery.addEventListener("change", sync);
+    syncViewport();
+    window.addEventListener("resize", syncViewport, { passive: true });
+    window.addEventListener("orientationchange", syncViewport);
     return () => {
-      pinnedQuery.removeEventListener("change", sync);
-      pointerQuery.removeEventListener("change", sync);
+      window.removeEventListener("resize", syncViewport);
+      window.removeEventListener("orientationchange", syncViewport);
     };
-  }, [journey.feel.src, journey.id, journey.space.src]);
+  }, [journey.feel.src, journey.id, journey.space.src, syncViewport]);
 
   const applyComposition = useCallback(
     (progress: number) => {
       const root = rootRef.current;
       if (!root) return;
 
-      const vars = computeHeroComposition(progress);
+      const vars = computeHeroComposition(progress, profileRef.current);
       const style = root.style;
 
       style.setProperty("--hero-progress", String(vars.progress));
@@ -195,7 +210,7 @@ export function HeroChapters({ journey, chapters }: HeroChaptersProps) {
   }, [animated, applyComposition]);
 
   useEffect(() => {
-    if (!animated || !finePointer) return;
+    if (!animated) return;
 
     const composition = compositionRef.current;
     const root = rootRef.current;
@@ -211,22 +226,35 @@ export function HeroChapters({ journey, chapters }: HeroChaptersProps) {
       root.style.setProperty("--hero-pointer-y", String(y));
     };
 
-    const onMove = (event: MouseEvent) => {
+    const onPointer = (clientX: number, clientY: number) => {
       const rect = composition.getBoundingClientRect();
-      x = Math.max(-2, Math.min(2, ((event.clientX - rect.left) / rect.width - 0.5) * 4));
-      y = Math.max(-2, Math.min(2, ((event.clientY - rect.top) / rect.height - 0.5) * 4));
+      x = Math.max(-2, Math.min(2, ((clientX - rect.left) / rect.width - 0.5) * 4));
+      y = Math.max(-2, Math.min(2, ((clientY - rect.top) / rect.height - 0.5) * 4));
       if (!rafId) rafId = window.requestAnimationFrame(apply);
     };
 
-    composition.addEventListener("mousemove", onMove);
+    const onMouseMove = (event: MouseEvent) => onPointer(event.clientX, event.clientY);
+    const onTouchMove = (event: TouchEvent) => {
+      const touch = event.touches[0];
+      if (touch) onPointer(touch.clientX, touch.clientY);
+    };
+
+    composition.addEventListener("mousemove", onMouseMove);
+    composition.addEventListener("touchmove", onTouchMove, { passive: true });
     return () => {
-      composition.removeEventListener("mousemove", onMove);
+      composition.removeEventListener("mousemove", onMouseMove);
+      composition.removeEventListener("touchmove", onTouchMove);
       if (rafId) window.cancelAnimationFrame(rafId);
     };
-  }, [animated, finePointer]);
+  }, [animated]);
 
   return (
-    <section className="hero-root" aria-label="Hero" ref={rootRef}>
+    <section
+      className={`hero-root${animated ? "" : " is-static"}`}
+      data-profile={profile}
+      aria-label="Hero"
+      ref={rootRef}
+    >
       <div className="hero-track" ref={trackRef}>
         <div className="hero-stage">
           <div className="hero-composition" ref={compositionRef}>
@@ -236,7 +264,8 @@ export function HeroChapters({ journey, chapters }: HeroChaptersProps) {
                 chapter={chapter}
                 image={chapterImage(journey, chapter.id)}
                 priority={index === 0}
-                showEntrance={mounted && !reduced && index === 0}
+                showEntrance={mounted && animated && index === 0}
+                mobileFocus={mobileFocus}
               />
             ))}
           </div>

@@ -1,10 +1,7 @@
 /*
- * Living editorial hero.
- *
- * One composition, three narrative scenes. The scenes share the same layout
- * variables, so the frame itself reorganises while the content crossfades —
- * the markup is identical on server and client, and CSS alone decides whether
- * the composition is pinned or stacked.
+ * Living editorial hero — pinned scroll composition on every viewport.
+ * Profile-aware layout (narrow / medium / wide / ultra) is set on .hero-root
+ * from JS; reduced motion alone falls back to .is-static stacking.
  */
 
 .hero-root {
@@ -16,6 +13,7 @@
   --hero-type-max: 34rem;
   --hero-overlay: 0.18;
   --hero-release: 0;
+  --hero-track-height: 340vh;
   --hero-exp-weight: 1;
   --hero-space-weight: 0;
   --hero-feel-weight: 0;
@@ -31,7 +29,7 @@
 
 .hero-track {
   position: relative;
-  height: 340vh;
+  height: var(--hero-track-height);
 }
 
 .hero-stage {
@@ -48,31 +46,12 @@
   height: 100%;
 }
 
-.hero-scene-text {
-  position: relative;
-  z-index: 3;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-width: 0;
-  min-height: 0;
-  padding-block: clamp(1.5rem, 4vh, 2.75rem);
-  padding-inline: calc(var(--gutter) + var(--safe-left)) var(--space-fluid-sm);
-  transform: translate3d(var(--hero-type-x), var(--hero-type-y), 0);
-}
-
-@media (min-width: 64rem) {
-  .hero-scene-text {
-    padding-top: clamp(6.5rem, 15vh, 9rem);
-  }
-}
-
 .hero-scene {
   position: absolute;
   inset: 0;
   display: grid;
-  grid-template-columns: minmax(0, calc(var(--hero-split) * 100%)) minmax(0, 1fr);
   min-height: 0;
+  grid-template-columns: minmax(0, calc(var(--hero-split) * 100%)) minmax(0, 1fr);
 }
 
 .hero-scene[data-chapter="experience"] {
@@ -87,7 +66,22 @@
   opacity: var(--hero-feel-weight);
 }
 
-/* ---------------------------------------------------------------- type side */
+/* ---------------------------------------------------------------- text side */
+
+.hero-scene-text {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  min-height: 0;
+  padding-block: clamp(1rem, 3vh, 2.75rem);
+  padding-inline: calc(var(--gutter) + var(--safe-left)) var(--space-fluid-sm);
+  padding-top: clamp(5.25rem, calc(var(--safe-top) + 11vh), 9rem);
+  transform: translate3d(var(--hero-type-x), var(--hero-type-y), 0) scale(var(--hero-type-scale));
+  transform-origin: left center;
+}
 
 .hero-copy {
   display: flex;
@@ -111,7 +105,7 @@
   gap: var(--space-3);
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: clamp(2.4rem, 4.6vw, 4.4rem);
+  font-size: clamp(2rem, 4.6vw, 4.4rem);
   line-height: 1.08;
   letter-spacing: -0.02em;
   text-wrap: balance;
@@ -119,7 +113,7 @@
 }
 
 .hero-scene[data-chapter="experience"] .hero-chapter-headline {
-  font-size: clamp(2.35rem, 4.5vw, 4.1rem);
+  font-size: clamp(2rem, 4.5vw, 4.1rem);
   gap: var(--space-2);
 }
 
@@ -129,12 +123,12 @@
 }
 
 .hero-scene[data-chapter="space"] .hero-chapter-headline {
-  font-size: clamp(2.1rem, 4vw, 3.8rem);
+  font-size: clamp(1.85rem, 4vw, 3.8rem);
   letter-spacing: -0.01em;
 }
 
 .hero-scene[data-chapter="feel"] .hero-chapter-headline {
-  font-size: clamp(1.9rem, 3.4vw, 3.2rem);
+  font-size: clamp(1.7rem, 3.4vw, 3.2rem);
   letter-spacing: 0;
   line-height: 1.12;
 }
@@ -151,7 +145,7 @@
 .hero-scene-image {
   position: relative;
   min-width: 0;
-  margin-block: clamp(1.25rem, 3.5vh, 2.5rem);
+  margin-block: clamp(0.75rem, 2.5vh, 2.5rem);
   margin-inline: 0 clamp(0.25rem, 1.5vw, 1rem);
   overflow: hidden;
   background: var(--color-surface);
@@ -160,7 +154,7 @@
 .hero-image-layer {
   position: absolute;
   inset: 0;
-  will-change: transform;
+  will-change: transform, opacity;
 }
 
 .hero-image-layer img {
@@ -181,10 +175,6 @@
   transform: scale(var(--hero-feel-scale));
 }
 
-/*
- * The seam. Without it the photograph ends on a hard vertical edge against the
- * near-black type column, which reads as two panels instead of one field.
- */
 .hero-scrim {
   position: absolute;
   inset: 0;
@@ -204,6 +194,148 @@
       color-mix(in srgb, var(--color-background) calc(var(--hero-overlay) * 100%), transparent),
       transparent 62%
     );
+}
+
+/* --------------------------------------------------------- narrow (phones) */
+
+.hero-root[data-profile="narrow"] .hero-scene {
+  grid-template-columns: 1fr;
+  grid-template-rows: minmax(0, calc((1 - var(--hero-split)) * 100%)) minmax(0, calc(var(--hero-split) * 100%));
+}
+
+.hero-root[data-profile="narrow"] .hero-scene-image {
+  order: -1;
+  margin: 0;
+}
+
+.hero-root[data-profile="narrow"] .hero-scene-text {
+  transform-origin: left bottom;
+  justify-content: flex-end;
+  padding-bottom: calc(var(--space-fluid-sm) + var(--safe-bottom));
+}
+
+.hero-root[data-profile="narrow"] .hero-scrim {
+  background:
+    linear-gradient(
+      to top,
+      var(--color-background) 0%,
+      color-mix(in srgb, var(--color-background) 72%, transparent) 18%,
+      color-mix(in srgb, var(--color-background) 28%, transparent) 42%,
+      transparent 62%
+    ),
+    linear-gradient(
+      to top,
+      color-mix(in srgb, var(--color-background) calc(var(--hero-overlay) * 100%), transparent),
+      transparent 70%
+    );
+}
+
+/* ---------------------------------------------- medium portrait (phablet) */
+
+.hero-root[data-profile="medium"] .hero-scene {
+  grid-template-columns: 1fr;
+  grid-template-rows: minmax(0, calc((1 - var(--hero-split)) * 100%)) minmax(0, calc(var(--hero-split) * 100%));
+}
+
+.hero-root[data-profile="medium"] .hero-scene-image {
+  order: -1;
+  margin: 0;
+}
+
+.hero-root[data-profile="medium"] .hero-scene-text {
+  transform-origin: left bottom;
+  justify-content: flex-end;
+  padding-bottom: calc(var(--space-fluid-sm) + var(--safe-bottom));
+}
+
+.hero-root[data-profile="medium"] .hero-scrim {
+  background:
+    linear-gradient(
+      to top,
+      var(--color-background) 0%,
+      color-mix(in srgb, var(--color-background) 68%, transparent) 16%,
+      transparent 55%
+    ),
+    linear-gradient(
+      to top,
+      color-mix(in srgb, var(--color-background) calc(var(--hero-overlay) * 100%), transparent),
+      transparent 68%
+    );
+}
+
+@media (min-width: 48rem) {
+  .hero-root[data-profile="medium"] .hero-scene {
+    grid-template-columns: minmax(0, calc(var(--hero-split) * 100%)) minmax(0, 1fr);
+    grid-template-rows: none;
+  }
+
+  .hero-root[data-profile="medium"] .hero-scene-image {
+    order: 0;
+    margin-block: clamp(1rem, 3vh, 2rem);
+    margin-inline: 0 clamp(0.25rem, 1.5vw, 1rem);
+  }
+
+  .hero-root[data-profile="medium"] .hero-scene-text {
+    transform-origin: left center;
+    justify-content: center;
+    padding-bottom: clamp(1rem, 3vh, 2.75rem);
+  }
+
+  .hero-root[data-profile="medium"] .hero-scrim {
+    background:
+      linear-gradient(
+        to right,
+        var(--color-background) 0%,
+        color-mix(in srgb, var(--color-background) 82%, transparent) 9%,
+        color-mix(in srgb, var(--color-background) 42%, transparent) 24%,
+        color-mix(in srgb, var(--color-background) 14%, transparent) 40%,
+        transparent 56%
+      ),
+      linear-gradient(
+        to top,
+        color-mix(in srgb, var(--color-background) calc(var(--hero-overlay) * 100%), transparent),
+        transparent 62%
+      );
+  }
+}
+
+/* ---------------------------------------------------------- ultra (4K+) */
+
+.hero-root[data-profile="ultra"] .hero-chapter-headline {
+  font-size: clamp(2.75rem, 3.2vw, 4.75rem) !important;
+}
+
+.hero-root[data-profile="ultra"] .hero-scene-text {
+  padding-inline: calc(var(--gutter) + var(--safe-left)) var(--space-fluid-md);
+}
+
+.hero-root[data-profile="ultra"] .hero-scene-image {
+  margin-inline: 0 var(--space-fluid-sm);
+}
+
+/* ---------------------------------------- short landscape (folded phone) */
+
+@media (orientation: landscape) and (max-height: 32rem) {
+  .hero-scene {
+    grid-template-columns: minmax(0, calc(var(--hero-split) * 100%)) minmax(0, 1fr) !important;
+    grid-template-rows: none !important;
+  }
+
+  .hero-scene-image {
+    order: 0 !important;
+    margin-block: clamp(0.5rem, 2vh, 1.25rem) !important;
+  }
+
+  .hero-scene-text {
+    justify-content: center !important;
+    padding-top: calc(var(--safe-top) + 4.5rem) !important;
+    padding-bottom: clamp(0.75rem, 2vh, 1.5rem) !important;
+    transform-origin: left center !important;
+  }
+
+  .hero-chapter-headline {
+    font-size: clamp(1.5rem, 4.5vw, 2.25rem) !important;
+  }
 }
 
 /* -------------------------------------------------------------- entrance */
@@ -227,75 +359,70 @@
   }
 }
 
-/*
- * Stacked composition.
- *
- * Below the pinning breakpoint, and whenever motion is reduced, the same three
- * scenes read as an editorial sequence instead of an animated frame.
- */
-@media (max-width: 63.99rem), (prefers-reduced-motion: reduce) {
-  .hero-track {
-    height: auto;
-  }
+/* ------------------------------------------- reduced motion fallback */
 
-  .hero-stage {
-    position: relative;
-    height: auto;
-    min-height: 0;
-    overflow: visible;
-    opacity: 1;
-    padding-inline: calc(var(--gutter) + var(--safe-left)) calc(var(--gutter) + var(--safe-right));
-    padding-block: var(--space-fluid-lg);
-  }
-
-  .hero-composition {
-    height: auto;
-    display: grid;
-    gap: var(--space-fluid-xl);
-  }
-
-  .hero-scene {
-    position: relative;
-    inset: auto;
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--space-fluid-sm);
-    opacity: 1 !important;
-  }
-
-  .hero-scene-image {
-    order: -1;
-    aspect-ratio: 16 / 10;
-    max-height: 52vh;
-  }
-
-  .hero-image-layer {
-    transform: none !important;
-  }
-
-  .hero-scene-text {
-    display: block;
-    padding: 0;
-    transform: none;
-  }
-
-  .hero-copy {
-    max-width: none;
-  }
-
-  .hero-chapter-headline {
-    font-size: clamp(2.1rem, 7.5vw, 3.4rem) !important;
-    transform: none;
-  }
+.hero-root.is-static .hero-track {
+  height: auto;
 }
 
-@media (min-width: 48rem) and (max-width: 63.99rem) {
-  .hero-scene {
+.hero-root.is-static .hero-stage {
+  position: relative;
+  height: auto;
+  min-height: 0;
+  overflow: visible;
+  opacity: 1;
+  padding-inline: calc(var(--gutter) + var(--safe-left)) calc(var(--gutter) + var(--safe-right));
+  padding-block: var(--space-fluid-lg);
+}
+
+.hero-root.is-static .hero-composition {
+  height: auto;
+  display: grid;
+  gap: var(--space-fluid-xl);
+}
+
+.hero-root.is-static .hero-scene {
+  position: relative;
+  inset: auto;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: none;
+  gap: var(--space-fluid-sm);
+  opacity: 1 !important;
+}
+
+.hero-root.is-static .hero-scene-image {
+  order: -1;
+  aspect-ratio: 16 / 10;
+  max-height: 52vh;
+  margin: 0;
+}
+
+.hero-root.is-static .hero-image-layer {
+  transform: none !important;
+}
+
+.hero-root.is-static .hero-scene-text {
+  display: block;
+  padding: 0;
+  transform: none !important;
+}
+
+.hero-root.is-static .hero-copy {
+  max-width: none;
+}
+
+.hero-root.is-static .hero-chapter-headline {
+  font-size: clamp(2.1rem, 7.5vw, 3.4rem) !important;
+}
+
+@media (min-width: 48rem) {
+  .hero-root.is-static .hero-scene {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
     align-items: center;
     gap: var(--space-fluid-md);
   }
 
-  .hero-scene-image {
+  .hero-root.is-static .hero-scene-image {
     order: 0;
     aspect-ratio: 4 / 5;
     max-height: none;

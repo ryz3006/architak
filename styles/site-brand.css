@@ -54,7 +54,7 @@
   );
 }
 
-@media (max-width: 63.99rem), (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
   .site-header--home {
     position: relative;
     background: none;

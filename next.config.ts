@@ -23,6 +23,7 @@ const securityHeaders = [
       "font-src 'self' data:",
       // media.architak.in is production; workers.dev is the testing CDN until DNS moves to Cloudflare.
       "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.r2.cloudflarestorage.com https://media.architak.in https://architak-media.architak.workers.dev",
+      "frame-src 'self' https://www.google.com https://maps.google.com",
       "worker-src 'self' blob:",
       "frame-ancestors 'none'",
       "base-uri 'self'",

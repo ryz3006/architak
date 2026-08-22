@@ -10,47 +10,54 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 120% 80% at 50% -10%, rgb(22 20 18 / 0.95) 0%, var(--color-background) 58%),
+    radial-gradient(ellipse 130% 90% at 50% -5%, rgb(32 28 24 / 0.88) 0%, var(--color-background) 72%),
     var(--color-background);
 }
 
 .studio-atmosphere__snow {
   position: absolute;
   inset: 0;
-  opacity: 0.72;
+  opacity: 1;
+  mix-blend-mode: screen;
 }
 
 .studio-atmosphere__veil {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(180deg, rgb(10 10 10 / 0.55) 0%, rgb(10 10 10 / 0.18) 38%, rgb(10 10 10 / 0.62) 100%),
-    radial-gradient(ellipse 90% 60% at 50% 50%, transparent 0%, rgb(10 10 10 / 0.35) 100%);
+    linear-gradient(180deg, rgb(10 10 10 / 0.28) 0%, rgb(10 10 10 / 0.06) 42%, rgb(10 10 10 / 0.32) 100%),
+    radial-gradient(ellipse 100% 70% at 50% 48%, transparent 0%, rgb(10 10 10 / 0.12) 100%);
 }
 
 .studio-atmosphere__glow {
   position: absolute;
-  width: min(42rem, 70vw);
-  height: min(42rem, 70vw);
+  width: min(48rem, 80vw);
+  height: min(48rem, 80vw);
   border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.22;
+  filter: blur(72px);
+  opacity: 0.42;
 }
 
 .studio-atmosphere__glow--left {
-  top: 18%;
-  left: -8%;
-  background: rgb(196 165 116 / 0.35);
+  top: 12%;
+  left: -10%;
+  background: rgb(196 165 116 / 0.55);
 }
 
 .studio-atmosphere__glow--right {
-  bottom: 8%;
-  right: -6%;
-  background: rgb(120 100 72 / 0.28);
+  bottom: 6%;
+  right: -8%;
+  background: rgb(148 124 88 / 0.45);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .studio-atmosphere__snow {
     display: none;
+  }
+}
+
+@media (pointer: coarse) {
+  .studio-atmosphere__snow {
+    opacity: 0.75;
   }
 }

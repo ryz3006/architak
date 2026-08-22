@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { Suspense } from "react";
 
-import { useHeavyMotionAllowed, useReducedMotion } from "@/lib/a11y/use-reduced-motion";
+import { useReducedMotion } from "@/lib/a11y/use-reduced-motion";
 
 import "@/styles/studio-atmosphere.css";
 
@@ -14,23 +14,23 @@ const PixelSnow = dynamic(
 
 export function StudioAtmosphere() {
   const reduced = useReducedMotion();
-  const heavyOk = useHeavyMotionAllowed();
 
   return (
     <div className="studio-atmosphere" aria-hidden="true">
       <div className="studio-atmosphere__base" />
-      {!reduced && heavyOk ? (
+      {!reduced ? (
         <Suspense fallback={null}>
           <PixelSnow
             className="studio-atmosphere__snow"
-            color="#c4a574"
-            flakeSize={0.01}
-            minFlakeSize={1.15}
-            pixelResolution={260}
-            speed={0.55}
-            density={0.16}
+            color="#d4b896"
+            flakeSize={0.012}
+            minFlakeSize={1.45}
+            pixelResolution={220}
+            speed={0.72}
+            density={0.32}
             direction={125}
-            brightness={0.48}
+            brightness={0.92}
+            depthFade={7}
             variant="round"
           />
         </Suspense>

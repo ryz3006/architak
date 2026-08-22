@@ -41,6 +41,7 @@ export function StudioLocation({ location }: StudioLocationProps) {
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
             allowFullScreen
+            allow="fullscreen"
           />
         </div>
       </div>

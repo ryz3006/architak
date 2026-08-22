@@ -1,6 +1,7 @@
 import site from "@/content/static/site.json";
 
 export type StaticProject = (typeof site.featuredProjects)[number];
+export type FeaturedWorkVideo = (typeof site.featuredWorkVideos)[number];
 export type StaticService = (typeof site.services)[number];
 export type HeroChapter = (typeof site.heroChapters)[number];
 export type HeroImage = (typeof site.heroImages)[number];
@@ -19,6 +20,10 @@ export function getStaticSite() {
 
 export function getStaticProjects(): StaticProject[] {
   return site.featuredProjects;
+}
+
+export function getFeaturedWorkVideos(): FeaturedWorkVideo[] {
+  return site.featuredWorkVideos;
 }
 
 export function getStaticProjectBySlug(slug: string): StaticProject | undefined {

@@ -20,8 +20,15 @@ interface R2ObjectBody extends R2Object {
   body: ReadableStream<Uint8Array>;
 }
 
+interface R2GetOptions {
+  range?: {
+    offset: number;
+    length?: number;
+  };
+}
+
 interface R2Bucket {
-  get(key: string): Promise<R2ObjectBody | null>;
+  get(key: string, options?: R2GetOptions): Promise<R2ObjectBody | null>;
   head(key: string): Promise<R2Object | null>;
 }
 
@@ -36,10 +43,12 @@ const CACHE_CONTROL = "public, max-age=3600, s-maxage=86400, stale-while-revalid
 function responseHeaders(request: Request, env: Env): Headers {
   const headers = new Headers({
     "Access-Control-Allow-Methods": "GET, HEAD",
-    "Access-Control-Expose-Headers": "Content-Length, Content-Type, ETag, Last-Modified",
+    "Access-Control-Expose-Headers":
+      "Content-Length, Content-Type, ETag, Last-Modified, Content-Range, Accept-Ranges",
     "Cache-Control": CACHE_CONTROL,
     "Cross-Origin-Resource-Policy": "cross-origin",
     "X-Content-Type-Options": "nosniff",
+    "Accept-Ranges": "bytes",
   });
 
   const origin = request.headers.get("Origin");
@@ -104,12 +113,83 @@ function errorResponse(request: Request, env: Env, status: number, message: stri
   return new Response(message, { status, headers });
 }
 
-function applyObjectHeaders(headers: Headers, object: R2Object): void {
+function applyObjectHeaders(headers: Headers, object: R2Object, contentLength?: number): void {
   object.writeHttpMetadata(headers);
   headers.set("Cache-Control", CACHE_CONTROL);
-  headers.set("Content-Length", object.size.toString());
+  headers.set("Content-Length", String(contentLength ?? object.size));
   headers.set("ETag", object.httpEtag);
   headers.set("Last-Modified", object.uploaded.toUTCString());
+  headers.set("Accept-Ranges", "bytes");
+}
+
+function parseRangeHeader(rangeHeader: string, size: number): { start: number; end: number } | null {
+  const match = /^bytes=(\d*)-(\d*)$/i.exec(rangeHeader.trim());
+  if (!match) return null;
+
+  const startRaw = match[1];
+  const endRaw = match[2];
+
+  if (startRaw === "" && endRaw === "") return null;
+
+  let start = startRaw === "" ? Math.max(0, size - Number(endRaw)) : Number(startRaw);
+  let end = endRaw === "" ? size - 1 : Number(endRaw);
+
+  if (!Number.isFinite(start) || !Number.isFinite(end)) return null;
+  if (start < 0 || end < start || start >= size) return null;
+
+  end = Math.min(end, size - 1);
+  return { start, end };
+}
+
+async function serveObject(
+  request: Request,
+  env: Env,
+  key: string,
+  method: "GET" | "HEAD",
+): Promise<Response> {
+  const head = await env.MEDIA_BUCKET.head(key);
+  if (!head) return errorResponse(request, env, 404, "Not Found");
+
+  const rangeHeader = request.headers.get("Range");
+  const parsedRange = rangeHeader ? parseRangeHeader(rangeHeader, head.size) : null;
+
+  if (rangeHeader && !parsedRange) {
+    const headers = responseHeaders(request, env);
+    headers.set("Content-Range", `bytes */${head.size}`);
+    return new Response("Range Not Satisfiable", { status: 416, headers });
+  }
+
+  if (method === "HEAD") {
+    const headers = responseHeaders(request, env);
+    if (parsedRange) {
+      const length = parsedRange.end - parsedRange.start + 1;
+      applyObjectHeaders(headers, head, length);
+      headers.set("Content-Range", `bytes ${parsedRange.start}-${parsedRange.end}/${head.size}`);
+      return new Response(null, { status: 206, headers });
+    }
+    applyObjectHeaders(headers, head);
+    return new Response(null, { status: 200, headers });
+  }
+
+  if (parsedRange) {
+    const length = parsedRange.end - parsedRange.start + 1;
+    const object = await env.MEDIA_BUCKET.get(key, {
+      range: { offset: parsedRange.start, length },
+    });
+    if (!object) return errorResponse(request, env, 404, "Not Found");
+
+    const headers = responseHeaders(request, env);
+    applyObjectHeaders(headers, object, length);
+    headers.set("Content-Range", `bytes ${parsedRange.start}-${parsedRange.end}/${head.size}`);
+    return new Response(object.body, { status: 206, headers });
+  }
+
+  const object = await env.MEDIA_BUCKET.get(key);
+  if (!object) return errorResponse(request, env, 404, "Not Found");
+
+  const headers = responseHeaders(request, env);
+  applyObjectHeaders(headers, object);
+  return new Response(object.body, { status: 200, headers });
 }
 
 export default {
@@ -123,20 +203,6 @@ export default {
     const key = publicKey(request);
     if (!key) return errorResponse(request, env, 404, "Not Found");
 
-    if (request.method === "HEAD") {
-      const object = await env.MEDIA_BUCKET.head(key);
-      if (!object) return errorResponse(request, env, 404, "Not Found");
-
-      const headers = responseHeaders(request, env);
-      applyObjectHeaders(headers, object);
-      return new Response(null, { status: 200, headers });
-    }
-
-    const object = await env.MEDIA_BUCKET.get(key);
-    if (!object) return errorResponse(request, env, 404, "Not Found");
-
-    const headers = responseHeaders(request, env);
-    applyObjectHeaders(headers, object);
-    return new Response(object.body, { status: 200, headers });
+    return serveObject(request, env, key, request.method);
   },
 };

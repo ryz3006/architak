@@ -31,8 +31,8 @@ export const metadata: Metadata = {
   description: "CREATED TO CREATE — interior design studio in Vyttila, Kochi.",
   metadataBase: getMetadataBase(),
   icons: {
-    icon: [{ url: "/brand/logo.png", type: "image/png" }],
-    apple: [{ url: "/brand/logo.png", type: "image/png" }],
+    icon: [{ url: "/brand/logo-mark.png", type: "image/png" }],
+    apple: [{ url: "/brand/logo-mark.png", type: "image/png" }],
   },
   openGraph: {
     type: "website",

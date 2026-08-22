@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { PageCta } from "@/components/pages/page-cta";
 import { SiteFooter, SiteHeader } from "@/components/layout/site-chrome";
+import { FeaturedWorkReel } from "@/components/work/featured-work-reel";
 import { FeaturedWorkAccordion } from "@/components/motion/featured-work-accordion";
 import { HeroChapters } from "@/components/motion/hero-chapters";
 import { OptionalThreeMark } from "@/components/motion/optional-three";
@@ -19,6 +20,7 @@ import {
 } from "@/features/discovery/structured-data";
 import { getDriftWallImages } from "@/features/story/drift-images";
 import { getFeaturedAccordionItems } from "@/features/work/accordion-items";
+import { resolveFeaturedWorkVideos } from "@/features/work/featured-videos";
 import { resolveHeroJourney, preloadHeroImageHints } from "@/lib/hero/journey";
 
 import "@/styles/home-work.css";
@@ -38,6 +40,7 @@ export default async function HomePage() {
   const spaceStory = getSpaceStory();
   const driftImages = getDriftWallImages();
   const featuredWork = await getFeaturedAccordionItems();
+  const featuredVideos = resolveFeaturedWorkVideos();
   const studioWork = getStudioPageContent().work;
   const studioCta = getStudioPageContent().cta;
   const threeEnabled = process.env.FEATURE_THREE_D === "true";
@@ -71,6 +74,7 @@ export default async function HomePage() {
             <h2 className="display text-display-md">Selected work</h2>
           </div>
           <FeaturedWorkAccordion items={featuredWork} />
+          <FeaturedWorkReel items={featuredVideos} />
           <footer className="home-work-more">
             <p className="home-work-more__support">{studioWork.support}</p>
             <Link href="/studio#work" className="home-work-more__link">

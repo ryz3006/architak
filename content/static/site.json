@@ -300,6 +300,11 @@
       "headline": "Every space begins somewhere.",
       "support": "These are the places where an idea found its form."
     },
+    "featuredWorks": {
+      "eyebrow": "In motion",
+      "headline": "See the work unfold",
+      "support": "Walk through finished spaces — material, light, and the life they hold."
+    },
     "workBridge": {
       "lines": [
         "But the finished room is only half the story.",
@@ -511,6 +516,34 @@
       "role": "Restaurant owner",
       "location": "Kochi",
       "image": "/media/hero/experience-dining.jpg"
+    }
+  ],
+  "featuredWorkVideos": [
+    {
+      "id": "residential-reel",
+      "title": "Residential Interior",
+      "category": "Residential",
+      "location": "Kochi",
+      "summary": "Light, material, and proportion finding their place in a lived room.",
+      "poster": "/media/architak-in/2025__03__interior-of-modern-design-living-room-3d-rendering-e1604308696322.jpg",
+      "video": {
+        "objectPath": "portfolio/featured/img-7761.mp4",
+        "localPath": "/media/featured-works/img-7761.mp4",
+        "mimeType": "video/mp4"
+      }
+    },
+    {
+      "id": "space-walkthrough",
+      "title": "Interior Walkthrough",
+      "category": "Interior",
+      "location": "Kochi",
+      "summary": "A continuous passage through finished space — from arrival to the details that stay.",
+      "poster": "/media/architak-in/2025__03__hotel-lobby-e1604307557586.jpg",
+      "video": {
+        "objectPath": "portfolio/featured/img-9023.mov",
+        "localPath": "/media/featured-works/img-9023.mov",
+        "mimeType": "video/quicktime"
+      }
     }
   ],
   "featuredProjects": [

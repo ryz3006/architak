@@ -13,6 +13,7 @@ import { StudioManifesto } from "@/components/studio/studio-manifesto";
 import { StudioProcess } from "@/components/studio/studio-process";
 import { StudioReveal } from "@/components/studio/studio-reveal";
 import { StudioVoices } from "@/components/studio/studio-voices";
+import { StudioFeaturedWorks } from "@/components/studio/studio-featured-works";
 import { StudioWorkDome } from "@/components/studio/studio-work-dome";
 import { StudioWorkIntro } from "@/components/studio/studio-work-intro";
 import {
@@ -27,6 +28,10 @@ import {
   buildStudioWorkListJsonLd,
   jsonLdScript,
 } from "@/features/discovery/structured-data";
+import {
+  resolveFeaturedWorkVideos,
+  toDepthCarouselItems,
+} from "@/features/work/featured-videos";
 
 import "@/styles/studio-page.css";
 
@@ -42,6 +47,7 @@ export default async function StudioPage() {
   const page = getStudioPageContent();
   const projects = getStaticProjects();
   const testimonials = getTestimonials();
+  const featuredVideos = toDepthCarouselItems(resolveFeaturedWorkVideos());
 
   return (
     <main id="main-content" className="studio-page flex min-h-dvh flex-col">
@@ -77,6 +83,12 @@ export default async function StudioPage() {
         <StudioReveal variant="rise">
           <section id="work" className="studio-work-section border-t border-border">
             <StudioWorkIntro work={page.work} />
+            <StudioFeaturedWorks
+              eyebrow={page.featuredWorks.eyebrow}
+              headline={page.featuredWorks.headline}
+              support={page.featuredWorks.support}
+              items={featuredVideos}
+            />
             <StudioWorkDome projects={projects} />
           </section>
         </StudioReveal>

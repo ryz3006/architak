@@ -20,6 +20,7 @@ const securityHeaders = [
       "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https:",
+      "media-src 'self' blob: https://media.architak.in https://architak-media.architak.workers.dev",
       "font-src 'self' data:",
       // media.architak.in is production; workers.dev is the testing CDN until DNS moves to Cloudflare.
       "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.r2.cloudflarestorage.com https://media.architak.in https://architak-media.architak.workers.dev",

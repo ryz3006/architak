@@ -15,6 +15,7 @@
     "r2:bootstrap": "node scripts/r2-bootstrap-prefixes.mjs",
     "r2:verify": "node scripts/r2-bootstrap-prefixes.mjs --verify-only",
     "r2:cors": "node scripts/r2-put-cors.mjs",
+    "media:upload-featured": "node scripts/r2-upload-featured-videos.mjs",
     "db:apply": "node scripts/apply-remote-schema.mjs",
     "media:worker:deploy": "node scripts/deploy-media-worker.mjs"
   },

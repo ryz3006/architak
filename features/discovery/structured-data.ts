@@ -35,8 +35,8 @@ export function buildLocalBusinessJsonLd() {
     url: getSiteUrl(),
     telephone: studio.phone,
     email: studio.email,
-    image: absoluteUrl("/brand/logo.png"),
-    logo: absoluteUrl("/brand/logo.png"),
+    image: absoluteUrl("/brand/logo-mark.png"),
+    logo: absoluteUrl("/brand/logo-mark.png"),
     ...(sameAs.length > 0 ? { sameAs } : {}),
     areaServed: { "@type": "City", name: "Kochi" },
     address: {

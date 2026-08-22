@@ -40,4 +40,10 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+
+# Large featured-work uploads (served from R2; run pnpm media:upload-featured locally)
+/public/media/featured-works/*.mp4
+/public/media/featured-works/*.mov
+/public/media/featured-works/*.MP4
+/public/media/featured-works/*.MOV
 # Keep next-env.d.ts tracked for IDE support

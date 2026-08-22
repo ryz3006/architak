@@ -29,7 +29,7 @@ export function FeaturedWorkAccordion({ items }: FeaturedWorkAccordionProps) {
       overlayColor="var(--color-background)"
       textColor="var(--color-foreground)"
       expandRatio={coarsePointer ? 0.58 : 0.52}
-      trigger={coarsePointer ? "click" : "hover"}
+      trigger="hover"
       height={460}
       gap={10}
       radius={12}

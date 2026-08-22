@@ -7,7 +7,6 @@ import {
   useState,
   type CSSProperties,
   type KeyboardEvent,
-  type MouseEvent,
 } from "react";
 import type gsap from "gsap";
 
@@ -276,15 +275,55 @@ export function AccordionGallery({
     setActive((current) => Math.min(current, count - 1));
   }, [count]);
 
+  useEffect(() => {
+    if (!stacked || count === 0) return;
+
+    let rafId = 0;
+
+    const updateActiveFromScroll = () => {
+      rafId = 0;
+      const panels = panelRefs.current;
+      const anchor = window.innerHeight * 0.42;
+      let nextIndex = 0;
+      let closest = Number.POSITIVE_INFINITY;
+
+      panels.forEach((panel, index) => {
+        if (!panel) return;
+        const rect = panel.getBoundingClientRect();
+        if (rect.bottom <= 0 || rect.top >= window.innerHeight) return;
+
+        const center = rect.top + rect.height / 2;
+        const distance = Math.abs(center - anchor);
+        if (distance < closest) {
+          closest = distance;
+          nextIndex = index;
+        }
+      });
+
+      setActive((current) => (current === nextIndex ? current : nextIndex));
+    };
+
+    const onScroll = () => {
+      if (!rafId) rafId = window.requestAnimationFrame(updateActiveFromScroll);
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    updateActiveFromScroll();
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (rafId) window.cancelAnimationFrame(rafId);
+    };
+  }, [count, stacked]);
+
   const handleEnter = (index: number) => {
     if (trigger === "hover") setActive(index);
   };
 
-  const handleClick = (index: number, event: MouseEvent<HTMLElement>) => {
-    if (index !== active) {
-      event.preventDefault();
-      setActive(index);
-    }
+  const handleFocus = (index: number) => {
+    if (!stacked) setActive(index);
   };
 
   const handleKeyDown = (index: number, event: KeyboardEvent<HTMLElement>) => {
@@ -328,9 +367,8 @@ export function AccordionGallery({
           },
           className: `ag-panel${isActive ? " ag-panel--active" : ""}`,
           style: { borderRadius: `${radius}px` },
-          onClick: (event: MouseEvent<HTMLElement>) => handleClick(index, event),
           onMouseEnter: () => handleEnter(index),
-          onFocus: () => setActive(index),
+          onFocus: () => handleFocus(index),
           onKeyDown: (event: KeyboardEvent<HTMLElement>) => handleKeyDown(index, event),
           role: "listitem" as const,
           tabIndex: 0,

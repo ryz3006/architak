@@ -42,6 +42,28 @@
   color: var(--color-accent);
 }
 
+@media (max-width: 47.99rem) {
+  .brand-lockup {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+  }
+
+  .brand-lockup-logo-wrap {
+    height: clamp(3rem, 12vw, 3.75rem);
+    width: clamp(3rem, 12vw, 3.75rem);
+  }
+
+  .brand-lockup-name {
+    font-size: clamp(1.15rem, 5vw, 1.45rem);
+  }
+
+  .brand-lockup-tagline {
+    font-size: clamp(0.5rem, 2.4vw, 0.58rem);
+    letter-spacing: 0.24em;
+  }
+}
+
 .site-header--home {
   position: fixed;
   inset-inline: 0;

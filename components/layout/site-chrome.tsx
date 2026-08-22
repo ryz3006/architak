@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { EnquireButton } from "@/components/layout/enquire-button";
 import { BrandLockup } from "@/components/layout/brand-lockup";
 import { MobileNav, type NavLink } from "@/components/layout/mobile-nav";
 import { getStaticSite } from "@/content/static";
@@ -8,7 +9,6 @@ const links: readonly NavLink[] = [
   { href: "/work", label: "Work" },
   { href: "/studio", label: "Studio" },
   { href: "/services", label: "Services" },
-  { href: "/contact", label: "Contact" },
 ] as const;
 
 export function SiteHeader({ homeHero = false }: { homeHero?: boolean }) {
@@ -23,19 +23,22 @@ export function SiteHeader({ homeHero = false }: { homeHero?: boolean }) {
         <BrandLockup tagline={tagline} logoPriority />
       </Link>
 
-      <nav aria-label="Primary" className="hidden gap-8 text-fluid-sm tracking-widest uppercase md:flex">
-        {links.map((link) => (
-          <Link
-            key={link.href}
-            href={link.href}
-            className="text-muted transition-colors duration-[var(--duration-micro)] hover:text-foreground"
-          >
-            {link.label}
-          </Link>
-        ))}
-      </nav>
+      <div className="flex shrink-0 items-center gap-3 md:gap-8">
+        <nav aria-label="Primary" className="hidden gap-8 text-fluid-sm tracking-widest uppercase md:flex">
+          {links.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="text-muted transition-colors duration-[var(--duration-micro)] hover:text-foreground"
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
 
-      <MobileNav links={links} />
+        <EnquireButton className="relative z-[calc(var(--z-header)+1)]" />
+        <MobileNav links={links} />
+      </div>
     </header>
   );
 }

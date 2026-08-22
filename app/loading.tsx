@@ -1,15 +1,16 @@
+import { MorphingInfinity } from "@/components/loading-ui/morphing-infinity";
+
 /**
- * Route-level loading state. Announced politely rather than trapping focus, and
- * deliberately typographic instead of a spinner over the whole page.
+ * Route-level loading state. Announced politely rather than trapping focus.
  */
 export default function Loading() {
   return (
     <div
-      role="status"
       aria-live="polite"
-      className="page-frame flex min-h-dvh flex-col justify-center py-fluid-xl"
+      className="page-frame flex min-h-dvh flex-col items-start justify-center gap-6 py-fluid-xl"
     >
-      <p className="display text-display-sm text-muted">Loading</p>
+      <MorphingInfinity className="size-12 text-accent md:size-14" />
+      <p className="display text-fluid-sm tracking-[0.18em] text-muted uppercase">Loading</p>
       <span className="sr-only">Loading page content</span>
     </div>
   );

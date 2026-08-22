@@ -58,7 +58,7 @@ test.describe("adaptive layout", () => {
       const menuToggle = page.getByRole("button", { name: /open menu/i });
 
       if (await menuToggle.isVisible()) {
-        // Compact layout: the panel must open, trap focus, and close on Escape.
+        await expect(page.getByRole("link", { name: /let's create/i })).toBeVisible();
         await menuToggle.click();
         const dialog = page.getByRole("dialog", { name: "Site navigation" });
         await expect(dialog).toBeVisible();
@@ -69,6 +69,7 @@ test.describe("adaptive layout", () => {
       } else {
         await expect(desktopNav).toBeVisible();
         await expect(desktopNav.getByRole("link", { name: "Work" })).toBeVisible();
+        await expect(page.getByRole("link", { name: /let's create/i })).toBeVisible();
       }
     });
 

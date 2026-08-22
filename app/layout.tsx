@@ -6,6 +6,8 @@ import {
   jsonLdScript,
 } from "@/features/discovery/structured-data";
 
+import { SiteEffects } from "@/components/layout/site-effects";
+
 import "./globals.css";
 
 const display = Cormorant_Garamond({
@@ -46,6 +48,8 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const splashCursorEnabled = process.env.FEATURE_SPLASH_CURSOR !== "false";
+
   return (
     <html lang="en" className={`${display.variable} ${sans.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col bg-background text-foreground">
@@ -56,6 +60,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           type="application/ld+json"
           dangerouslySetInnerHTML={jsonLdScript(buildLocalBusinessJsonLd())}
         />
+        <SiteEffects splashCursorEnabled={splashCursorEnabled} />
         {children}
       </body>
     </html>

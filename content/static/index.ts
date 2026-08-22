@@ -63,6 +63,13 @@ export function getSpaceStory(): SpaceStory {
 
 export type StudioPageContent = typeof site.studioPage;
 export type ServicesPageContent = typeof site.servicesPage;
+
+export type EditorialHero = StudioPageContent["hero"];
+export type EditorialManifesto = StudioPageContent["manifesto"];
+export type EditorialIntro = StudioPageContent["work"];
+export type EditorialBridge = StudioPageContent["workBridge"];
+export type EditorialProcess = StudioPageContent["process"];
+export type EditorialCompliment = StudioPageContent["compliment"];
 export type Testimonial = (typeof site.testimonials)[number];
 
 export function getStudioPageContent(): StudioPageContent {

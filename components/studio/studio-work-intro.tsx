@@ -1,9 +1,9 @@
-import type { StudioPageContent } from "@/content/static";
+import type { EditorialIntro } from "@/content/static";
 
 import "@/styles/studio-page.css";
 
 type StudioWorkIntroProps = {
-  work: StudioPageContent["work"];
+  work: EditorialIntro;
 };
 
 export function StudioWorkIntro({ work }: StudioWorkIntroProps) {

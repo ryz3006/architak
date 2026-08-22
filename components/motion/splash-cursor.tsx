@@ -1190,6 +1190,7 @@ export function SplashCursor({
     }
 
     let firstMouseMoveHandled = false;
+    let firstTouchMoveHandled = false;
 
     function handleMouseMove(e: MouseEvent) {
       const pointer = primaryPointer;
@@ -1213,6 +1214,8 @@ export function SplashCursor({
         const posX = scaleByPixelRatio(touch.clientX);
         const posY = scaleByPixelRatio(touch.clientY);
         updatePointerDownData(pointer, touch.identifier, posX, posY);
+        clickSplat(pointer);
+        firstTouchMoveHandled = false;
       }
     }
 
@@ -1224,7 +1227,13 @@ export function SplashCursor({
         if (!touch) continue;
         const posX = scaleByPixelRatio(touch.clientX);
         const posY = scaleByPixelRatio(touch.clientY);
-        updatePointerMoveData(pointer, posX, posY, pointer.color);
+        if (!firstTouchMoveHandled) {
+          const color = generateColor();
+          updatePointerMoveData(pointer, posX, posY, color);
+          firstTouchMoveHandled = true;
+        } else {
+          updatePointerMoveData(pointer, posX, posY, pointer.color);
+        }
       }
     }
 
@@ -1238,9 +1247,9 @@ export function SplashCursor({
 
     window.addEventListener("mousedown", handleMouseDown);
     window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("touchstart", handleTouchStart);
-    window.addEventListener("touchmove", handleTouchMove, false);
-    window.addEventListener("touchend", handleTouchEnd);
+    window.addEventListener("touchstart", handleTouchStart, { passive: true });
+    window.addEventListener("touchmove", handleTouchMove, { passive: true });
+    window.addEventListener("touchend", handleTouchEnd, { passive: true });
 
     updateFrame();
 

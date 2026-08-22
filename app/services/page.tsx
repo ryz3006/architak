@@ -1,11 +1,17 @@
 import type { Metadata } from "next";
 
 import { PageCta } from "@/components/pages/page-cta";
-import { PageHero } from "@/components/pages/page-hero";
 import { SiteFooter, SiteHeader } from "@/components/layout/site-chrome";
-import { Reveal } from "@/components/motion/reveal";
 import { SmoothScroll } from "@/components/motion/smooth-scroll";
-import { ServicesShowcase } from "@/components/services/services-showcase";
+import { ServicesDisciplines } from "@/components/services/services-disciplines";
+import { ServicesHero } from "@/components/services/services-hero";
+import { StudioAtmosphere } from "@/components/studio/studio-atmosphere";
+import { StudioBridge } from "@/components/studio/studio-bridge";
+import { StudioCompliment } from "@/components/studio/studio-compliment";
+import { StudioManifesto } from "@/components/studio/studio-manifesto";
+import { StudioProcess } from "@/components/studio/studio-process";
+import { StudioReveal } from "@/components/studio/studio-reveal";
+import { StudioWorkIntro } from "@/components/studio/studio-work-intro";
 import { getServicesPageContent, getStaticServices } from "@/content/static";
 import { absoluteUrl } from "@/features/discovery";
 import {
@@ -13,6 +19,9 @@ import {
   buildServiceListJsonLd,
   jsonLdScript,
 } from "@/features/discovery/structured-data";
+
+import "@/styles/services-page.css";
+import "@/styles/studio-page.css";
 
 export const metadata: Metadata = {
   title: "Services — ARCHITAK | Interior Design Practice",
@@ -26,7 +35,7 @@ export default function ServicesPage() {
   const page = getServicesPageContent();
 
   return (
-    <main id="main-content" className="flex min-h-dvh flex-col">
+    <main id="main-content" className="studio-page services-page flex min-h-dvh flex-col">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={jsonLdScript(buildServiceListJsonLd())}
@@ -40,26 +49,46 @@ export default function ServicesPage() {
           ]),
         )}
       />
+      <StudioAtmosphere />
       <SmoothScroll />
-      <SiteHeader />
 
-      <PageHero
-        eyebrow={page.eyebrow}
-        headline={page.headline}
-        support={page.support}
-        image={page.heroImage}
-        imageAlt="ARCHITAK services — modern kitchen interior"
-      />
+      <div className="studio-page__content">
+        <SiteHeader />
 
-      <Reveal>
-        <section className="page-frame py-fluid-xl">
-          <ServicesShowcase services={services} />
-        </section>
-      </Reveal>
+        <ServicesHero hero={page.hero} />
 
-      <PageCta headline={page.closing} support={page.closingSupport} />
+        <StudioReveal variant="center">
+          <StudioManifesto manifesto={page.manifesto} />
+        </StudioReveal>
 
-      <SiteFooter />
+        <StudioReveal variant="right">
+          <StudioWorkIntro work={page.disciplines} />
+        </StudioReveal>
+
+        <StudioReveal variant="rise">
+          <ServicesDisciplines services={services} />
+        </StudioReveal>
+
+        <StudioReveal variant="center">
+          <StudioBridge lines={page.bridge.lines} />
+        </StudioReveal>
+
+        <StudioReveal variant="left">
+          <StudioProcess process={page.approach} />
+        </StudioReveal>
+
+        <StudioReveal variant="center">
+          <StudioCompliment compliment={page.compliment} />
+        </StudioReveal>
+
+        <PageCta
+          eyebrow={page.cta.eyebrow}
+          headline={page.cta.headline}
+          support={page.cta.support}
+        />
+
+        <SiteFooter />
+      </div>
     </main>
   );
 }

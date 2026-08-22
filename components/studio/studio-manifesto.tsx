@@ -2,13 +2,13 @@
 
 import { useEffect, useRef } from "react";
 
-import type { StudioPageContent } from "@/content/static";
+import type { EditorialManifesto } from "@/content/static";
 import { useReducedMotion } from "@/lib/a11y/use-reduced-motion";
 
 import "@/styles/studio-page.css";
 
 type StudioManifestoProps = {
-  manifesto: StudioPageContent["manifesto"];
+  manifesto: EditorialManifesto;
 };
 
 export function StudioManifesto({ manifesto }: StudioManifestoProps) {

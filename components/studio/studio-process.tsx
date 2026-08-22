@@ -1,9 +1,9 @@
-import type { StudioPageContent } from "@/content/static";
+import type { EditorialProcess } from "@/content/static";
 
 import "@/styles/studio-page.css";
 
 type StudioProcessProps = {
-  process: StudioPageContent["process"];
+  process: EditorialProcess;
 };
 
 export function StudioProcess({ process }: StudioProcessProps) {

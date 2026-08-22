@@ -364,12 +364,82 @@
     }
   },
   "servicesPage": {
-    "eyebrow": "Practice",
-    "headline": "What we design.",
-    "support": "Six disciplines. One studio. Every project begins with understanding how you live, work, and gather.",
-    "heroImage": "/media/hero/experience-kitchen.jpg",
-    "closing": "Every project begins with a conversation.",
-    "closingSupport": "Tell us about the space you are imagining. We will help you see it clearly."
+    "hero": {
+      "eyebrow": "Practice",
+      "headline": ["What", "we", "design."],
+      "lead": ["Six disciplines.", "One studio."],
+      "support": "Every project begins with understanding how you live, work, and gather.",
+      "image": "/media/hero/experience-kitchen.jpg",
+      "imageAlt": "ARCHITAK services — modern kitchen interior"
+    },
+    "manifesto": {
+      "eyebrow": "Our approach",
+      "statement": "Every brief is a life waiting for form.",
+      "lines": [
+        "A hotel lobby is an arrival.",
+        "A kitchen is a daily ritual.",
+        "An office is how a team thinks.",
+        "A restaurant is a room that tastes.",
+        "A showroom is an invitation.",
+        "A workshop is work made visible."
+      ],
+      "closing": "We design for all of it."
+    },
+    "disciplines": {
+      "eyebrow": "Disciplines",
+      "headline": "Where life meets layout.",
+      "support": "Each practice area is a different question — answered with the same care."
+    },
+    "bridge": {
+      "lines": [
+        "The discipline changes.",
+        "The method does not."
+      ]
+    },
+    "approach": {
+      "eyebrow": "How we begin",
+      "headline": "Every project starts with listening.",
+      "steps": [
+        {
+          "step": "01",
+          "title": "Understand",
+          "lines": [
+            "We learn how the space will be lived in.",
+            "Who arrives.",
+            "Who stays.",
+            "What must happen here."
+          ]
+        },
+        {
+          "step": "02",
+          "title": "Compose",
+          "lines": [
+            "Layout, light, and material find their rhythm.",
+            "Circulation.",
+            "Atmosphere.",
+            "Detail."
+          ]
+        },
+        {
+          "step": "03",
+          "title": "Deliver",
+          "lines": [
+            "Until the room feels inevitable.",
+            "Not decorated.",
+            "Inhabited."
+          ]
+        }
+      ]
+    },
+    "compliment": {
+      "headline": "The measure of good design is not how it looks on day one.",
+      "support": "It is how naturally people move through it on day one hundred."
+    },
+    "cta": {
+      "eyebrow": "The next project",
+      "headline": "Every project begins with a conversation.",
+      "support": "Tell us about the space you are imagining. We will help you see it clearly."
+    }
   },
   "testimonials": [
     {

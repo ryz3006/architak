@@ -1,9 +1,9 @@
-import type { StudioPageContent } from "@/content/static";
+import type { EditorialCompliment } from "@/content/static";
 
 import "@/styles/studio-page.css";
 
 type StudioComplimentProps = {
-  compliment: StudioPageContent["compliment"];
+  compliment: EditorialCompliment;
 };
 
 export function StudioCompliment({ compliment }: StudioComplimentProps) {

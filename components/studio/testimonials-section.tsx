@@ -1,5 +1,7 @@
 import type { Testimonial } from "@/content/static";
 
+import { TestimonialsChroma } from "@/components/studio/testimonials-chroma";
+
 import "@/styles/testimonials.css";
 
 type TestimonialsSectionProps = {
@@ -18,21 +20,38 @@ export function TestimonialsSection({ heading, support, items }: TestimonialsSec
         <p className="testimonials__support">{support}</p>
       </header>
 
-      <ul className="testimonials__list">
+      <TestimonialsChroma items={items} />
+
+      <ul className="testimonials__sr-list" aria-label="Client testimonials">
         {items.map((item) => (
-          <li key={`${item.name}-${item.role}`} className="testimonials__item">
-            <blockquote className="testimonials__quote">
+          <li key={`${item.name}-${item.role}`}>
+            <blockquote>
               <p>&ldquo;{item.quote}&rdquo;</p>
-              <footer className="testimonials__attribution">
-                <cite className="testimonials__name">{item.name}</cite>
-                <span className="testimonials__role">
-                  {item.role} · {item.location}
-                </span>
+              <footer>
+                {item.name}, {item.role}, {item.location}
               </footer>
             </blockquote>
           </li>
         ))}
       </ul>
+
+      <noscript>
+        <ul className="testimonials__fallback">
+          {items.map((item) => (
+            <li key={`${item.name}-${item.role}`}>
+              <blockquote>
+                <p>&ldquo;{item.quote}&rdquo;</p>
+                <footer>
+                  <cite>{item.name}</cite>
+                  <span>
+                    {item.role} · {item.location}
+                  </span>
+                </footer>
+              </blockquote>
+            </li>
+          ))}
+        </ul>
+      </noscript>
     </section>
   );
 }

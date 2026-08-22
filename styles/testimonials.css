@@ -5,7 +5,7 @@
 
 .testimonials__intro {
   max-width: min(var(--prose-max, 42rem), 100%);
-  margin-bottom: clamp(2.5rem, 6vw, 4rem);
+  margin-bottom: clamp(2rem, 5vw, 3.5rem);
 }
 
 .testimonials__heading {
@@ -21,54 +21,56 @@
   line-height: var(--leading-normal);
 }
 
-.testimonials__list {
-  display: grid;
-  gap: var(--space-fluid-md);
+.testimonials__chroma-wrap {
+  position: relative;
+  width: 100vw;
+  max-width: 100vw;
+  margin-inline: calc(50% - 50vw);
+  height: clamp(26rem, 52vw, 34rem);
+  border-block: 1px solid var(--color-border);
+  background:
+    radial-gradient(ellipse 90% 70% at 50% 40%, rgb(18 18 18 / 0.9) 0%, var(--color-background) 88%),
+    var(--color-background);
+}
+
+.testimonials__chroma {
+  height: 100%;
+}
+
+.testimonials__sr-list {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-@media (min-width: 48rem) {
-  .testimonials__list {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+.testimonials__fallback {
+  display: grid;
+  gap: var(--space-fluid-md);
+  list-style: none;
+  margin: var(--space-fluid-md) 0 0;
+  padding: 0;
 }
 
-.testimonials__item {
-  border: 1px solid var(--color-border);
-  background: color-mix(in srgb, var(--color-surface) 88%, transparent);
-  padding: clamp(1.25rem, 3vw, 2rem);
-}
-
-.testimonials__quote {
+.testimonials__fallback blockquote {
   margin: 0;
-  display: grid;
-  gap: var(--space-fluid-sm);
+  border: 1px solid var(--color-border);
+  padding: var(--space-4);
 }
 
-.testimonials__quote p {
-  font-family: var(--font-display);
-  font-size: clamp(1.05rem, 1.6vw, 1.35rem);
-  line-height: var(--leading-snug);
-  color: var(--color-foreground);
-}
-
-.testimonials__attribution {
-  display: grid;
-  gap: var(--space-1);
-}
-
-.testimonials__name {
+.testimonials__fallback cite {
+  display: block;
   font-style: normal;
-  font-size: var(--step-00);
-  letter-spacing: 0.06em;
   color: var(--color-accent);
 }
 
-.testimonials__role {
+.testimonials__fallback span {
+  display: block;
+  margin-top: var(--space-1);
   font-size: var(--step-000);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
   color: var(--color-muted);
 }

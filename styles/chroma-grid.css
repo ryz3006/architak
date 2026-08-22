@@ -1,0 +1,241 @@
+.chroma-grid {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  --x: 50%;
+  --y: 50%;
+  --r: 220px;
+  --chroma-card-width: clamp(17rem, 28vw, 20rem);
+}
+
+.chroma-grid--marquee {
+  overflow: hidden;
+  max-width: none;
+  padding-block: var(--space-fluid-sm);
+}
+
+.chroma-grid__track {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: var(--space-3);
+  width: max-content;
+  padding-inline: max(var(--gutter), var(--safe-left)) max(var(--gutter), var(--safe-right));
+  will-change: transform;
+}
+
+.chroma-grid:not(.chroma-grid--marquee) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(var(--chroma-card-width), var(--chroma-card-width)));
+  justify-content: center;
+  gap: var(--space-3);
+  max-width: var(--content-max);
+  margin-inline: auto;
+  padding: var(--space-4);
+}
+
+.chroma-grid--reduced.chroma-grid--marquee {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+}
+
+.chroma-grid--reduced .chroma-grid__track {
+  animation: none;
+  transform: none !important;
+}
+
+.chroma-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 var(--chroma-card-width);
+  width: var(--chroma-card-width);
+  border-radius: var(--radius-md, 1rem);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  transition: border-color var(--duration-small) var(--ease-standard);
+  background: var(--card-gradient);
+  scroll-snap-align: start;
+
+  --mouse-x: 50%;
+  --mouse-y: 50%;
+  --spotlight-color: rgb(196 165 116 / 0.22);
+}
+
+.chroma-card:hover,
+.chroma-card:focus-within {
+  border-color: var(--card-border);
+}
+
+.chroma-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at var(--mouse-x) var(--mouse-y), var(--spotlight-color), transparent 70%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  z-index: 2;
+}
+
+.chroma-card:hover::before,
+.chroma-card:focus-within::before {
+  opacity: 1;
+}
+
+.chroma-img-wrapper {
+  position: relative;
+  z-index: 1;
+  aspect-ratio: 4 / 3;
+  padding: var(--space-2);
+  box-sizing: border-box;
+  background: transparent;
+}
+
+.chroma-img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: calc(var(--radius-md, 1rem) - 4px);
+  display: block;
+}
+
+.chroma-info {
+  position: relative;
+  z-index: 1;
+  padding: var(--space-3) var(--space-4) var(--space-4);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  row-gap: var(--space-1);
+  column-gap: var(--space-3);
+}
+
+.chroma-info__name {
+  margin: 0;
+  grid-column: 1 / -1;
+  font-family: var(--font-display);
+  font-size: var(--step-0);
+  line-height: var(--leading-snug);
+}
+
+.chroma-info__meta,
+.chroma-info__role,
+.chroma-info__location {
+  font-size: var(--step-000);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.chroma-info__role {
+  grid-column: 1 / -1;
+  margin: 0;
+  text-transform: none;
+  letter-spacing: 0.04em;
+  font-size: var(--step-00);
+  color: var(--color-accent);
+}
+
+.chroma-info__location {
+  grid-column: 1 / -1;
+}
+
+.chroma-info__quote {
+  grid-column: 1 / -1;
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  border: none;
+}
+
+.chroma-info__quote p {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--step-00);
+  line-height: var(--leading-snug);
+  color: color-mix(in srgb, var(--color-foreground) 92%, transparent);
+}
+
+.chroma-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  backdrop-filter: grayscale(1) brightness(0.78);
+  -webkit-backdrop-filter: grayscale(1) brightness(0.78);
+  background: rgb(0 0 0 / 0.001);
+
+  mask-image: radial-gradient(
+    circle var(--r) at var(--x) var(--y),
+    transparent 0%,
+    transparent 15%,
+    rgb(0 0 0 / 0.1) 30%,
+    rgb(0 0 0 / 0.22) 45%,
+    rgb(0 0 0 / 0.35) 60%,
+    rgb(0 0 0 / 0.5) 75%,
+    rgb(0 0 0 / 0.68) 88%,
+    white 100%
+  );
+  -webkit-mask-image: radial-gradient(
+    circle var(--r) at var(--x) var(--y),
+    transparent 0%,
+    transparent 15%,
+    rgb(0 0 0 / 0.1) 30%,
+    rgb(0 0 0 / 0.22) 45%,
+    rgb(0 0 0 / 0.35) 60%,
+    rgb(0 0 0 / 0.5) 75%,
+    rgb(0 0 0 / 0.68) 88%,
+    white 100%
+  );
+}
+
+.chroma-fade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 4;
+  backdrop-filter: grayscale(1) brightness(0.78);
+  -webkit-backdrop-filter: grayscale(1) brightness(0.78);
+  background: rgb(0 0 0 / 0.001);
+
+  mask-image: radial-gradient(
+    circle var(--r) at var(--x) var(--y),
+    white 0%,
+    white 15%,
+    rgb(255 255 255 / 0.9) 30%,
+    rgb(255 255 255 / 0.78) 45%,
+    rgb(255 255 255 / 0.65) 60%,
+    rgb(255 255 255 / 0.5) 75%,
+    rgb(255 255 255 / 0.32) 88%,
+    transparent 100%
+  );
+  -webkit-mask-image: radial-gradient(
+    circle var(--r) at var(--x) var(--y),
+    white 0%,
+    white 15%,
+    rgb(255 255 255 / 0.9) 30%,
+    rgb(255 255 255 / 0.78) 45%,
+    rgb(255 255 255 / 0.65) 60%,
+    rgb(255 255 255 / 0.5) 75%,
+    rgb(255 255 255 / 0.32) 88%,
+    transparent 100%
+  );
+
+  opacity: 1;
+  transition: opacity 0.25s ease;
+}
+
+.chroma-grid--reduced .chroma-overlay,
+.chroma-grid--reduced .chroma-fade {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chroma-grid__track {
+    transform: none !important;
+  }
+}

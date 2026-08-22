@@ -271,25 +271,29 @@
       "quote": "They listened before they drew a single line. The kitchen now feels like the centre of our home — not a room we pass through.",
       "name": "Anjali M.",
       "role": "Residential client",
-      "location": "Vyttila, Kochi"
+      "location": "Vyttila, Kochi",
+      "image": "/media/hero/experience-kitchen.jpg"
     },
     {
       "quote": "Our lobby used to feel like a corridor. Now guests pause when they arrive. That was the brief, and they delivered it without shouting.",
       "name": "Rahul K.",
       "role": "Hospitality developer",
-      "location": "Kochi"
+      "location": "Kochi",
+      "image": "/media/hero/feel-lobby.jpg"
     },
     {
       "quote": "The office no longer feels borrowed from a template. Light, material, and layout finally match how our team actually works.",
       "name": "Deepa S.",
       "role": "Corporate client",
-      "location": "Ernakulam"
+      "location": "Ernakulam",
+      "image": "/media/hero/feel-office.jpg"
     },
     {
       "quote": "They treated the café like a dining room, not a fit-out. Regulars notice — the space has a warmth that photographs never capture.",
       "name": "Thomas V.",
       "role": "Restaurant owner",
-      "location": "Kochi"
+      "location": "Kochi",
+      "image": "/media/hero/experience-dining.jpg"
     }
   ],
   "featuredProjects": [

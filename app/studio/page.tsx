@@ -63,9 +63,11 @@ export default async function StudioPage() {
       </Reveal>
 
       <Reveal>
-        <section id="work" className="page-frame border-t border-border py-fluid-xl">
-          <p className="text-fluid-sm tracking-[0.3em] text-muted uppercase">{page.workHeading}</p>
-          <p className="measure mt-4 max-w-2xl text-muted">{page.workSupport}</p>
+        <section id="work" className="studio-work-section border-t border-border">
+          <div className="page-frame py-fluid-xl pb-fluid-md">
+            <p className="text-fluid-sm tracking-[0.3em] text-muted uppercase">{page.workHeading}</p>
+            <p className="measure mt-4 max-w-2xl text-muted">{page.workSupport}</p>
+          </div>
 
           <StudioWorkDome projects={projects} />
         </section>

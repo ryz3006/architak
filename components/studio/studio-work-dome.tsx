@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import type { StaticProject } from "@/content/static";
 import { getStudioDomeGalleryItems } from "@/features/studio/dome-gallery-items";
@@ -20,48 +20,114 @@ type StudioWorkDomeProps = {
   projects: StaticProject[];
 };
 
-function useDomeRadius(): { minRadius: number; fit: number } {
-  const [config, setConfig] = useState({ minRadius: 480, fit: 0.48 });
+type DomeLayout = {
+  fit: number;
+  minRadius: number;
+  maxRadius: number;
+  fitBasis: "auto" | "width" | "min";
+  segments: number;
+};
+
+function resolveDomeLayout(width: number, height: number): DomeLayout {
+  const minDim = Math.min(width, height);
+  const aspect = width / Math.max(height, 1);
+
+  if (width < 480) {
+    return {
+      fit: 0.5,
+      minRadius: Math.round(minDim * 0.44),
+      maxRadius: Math.round(width * 0.78),
+      fitBasis: "min",
+      segments: 30,
+    };
+  }
+
+  if (width < 768) {
+    return {
+      fit: 0.54,
+      minRadius: Math.round(minDim * 0.46),
+      maxRadius: Math.round(width * 0.82),
+      fitBasis: aspect > 1.15 ? "width" : "min",
+      segments: 32,
+    };
+  }
+
+  if (width < 1200) {
+    return {
+      fit: 0.56,
+      minRadius: Math.round(minDim * 0.48),
+      maxRadius: Math.round(width * 0.85),
+      fitBasis: "width",
+      segments: 35,
+    };
+  }
+
+  return {
+    fit: aspect > 1.6 ? 0.62 : 0.58,
+    minRadius: Math.round(minDim * 0.5),
+    maxRadius: Math.round(width * 0.9),
+    fitBasis: "width",
+    segments: 35,
+  };
+}
+
+function useDomeLayout(containerRef: React.RefObject<HTMLDivElement | null>): DomeLayout {
+  const [layout, setLayout] = useState<DomeLayout>({
+    fit: 0.56,
+    minRadius: 480,
+    maxRadius: 1200,
+    fitBasis: "width",
+    segments: 35,
+  });
 
   useEffect(() => {
+    const node = containerRef.current;
+    if (!node) return;
+
     const sync = () => {
-      const width = window.innerWidth;
-      if (width < 480) {
-        setConfig({ minRadius: 320, fit: 0.42 });
-      } else if (width < 768) {
-        setConfig({ minRadius: 400, fit: 0.45 });
-      } else if (width < 1200) {
-        setConfig({ minRadius: 480, fit: 0.48 });
-      } else {
-        setConfig({ minRadius: 560, fit: 0.5 });
-      }
+      const rect = node.getBoundingClientRect();
+      if (rect.width < 1 || rect.height < 1) return;
+      setLayout(resolveDomeLayout(rect.width, rect.height));
     };
 
     sync();
-    window.addEventListener("resize", sync, { passive: true });
-    return () => window.removeEventListener("resize", sync);
-  }, []);
+    const observer = new ResizeObserver(sync);
+    observer.observe(node);
+    window.addEventListener("orientationchange", sync);
 
-  return config;
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("orientationchange", sync);
+    };
+  }, [containerRef]);
+
+  return layout;
 }
 
 export function StudioWorkDome({ projects }: StudioWorkDomeProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
-  const { minRadius, fit } = useDomeRadius();
+  const layout = useDomeLayout(containerRef);
   const items = getStudioDomeGalleryItems(projects);
 
   if (reduced) {
-    return <StudioWorkGrid projects={projects} />;
+    return (
+      <div className="studio-work-section__dome studio-work-section__dome--grid page-frame">
+        <StudioWorkGrid projects={projects} />
+      </div>
+    );
   }
 
   return (
-    <div className="studio-work-dome">
+    <div ref={containerRef} className="studio-work-dome">
       <DomeGallery
         images={items}
-        fit={fit}
-        minRadius={minRadius}
-        maxRadius={720}
-        padFactor={0.2}
+        fit={layout.fit}
+        fitBasis={layout.fitBasis}
+        minRadius={layout.minRadius}
+        maxRadius={layout.maxRadius}
+        segments={layout.segments}
+        padFactor={0.12}
         overlayBlurColor="#0a0a0a"
         dragSensitivity={22}
         dragDampening={2.2}

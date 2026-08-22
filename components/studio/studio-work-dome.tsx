@@ -34,38 +34,38 @@ function resolveDomeLayout(width: number, height: number): DomeLayout {
 
   if (width < 480) {
     return {
-      fit: 0.5,
-      minRadius: Math.round(minDim * 0.44),
-      maxRadius: Math.round(width * 0.78),
-      fitBasis: "min",
+      fit: 0.68,
+      minRadius: Math.round(minDim * 0.4),
+      maxRadius: Number.POSITIVE_INFINITY,
+      fitBasis: "width",
       segments: 30,
     };
   }
 
   if (width < 768) {
     return {
-      fit: 0.54,
-      minRadius: Math.round(minDim * 0.46),
-      maxRadius: Math.round(width * 0.82),
-      fitBasis: aspect > 1.15 ? "width" : "min",
+      fit: 0.82,
+      minRadius: Math.round(width * 0.38),
+      maxRadius: Number.POSITIVE_INFINITY,
+      fitBasis: "width",
       segments: 32,
     };
   }
 
   if (width < 1200) {
     return {
-      fit: 0.56,
-      minRadius: Math.round(minDim * 0.48),
-      maxRadius: Math.round(width * 0.85),
+      fit: aspect > 1.15 ? 1.02 : 0.94,
+      minRadius: Math.round(width * 0.4),
+      maxRadius: Number.POSITIVE_INFINITY,
       fitBasis: "width",
       segments: 35,
     };
   }
 
   return {
-    fit: aspect > 1.6 ? 0.62 : 0.58,
-    minRadius: Math.round(minDim * 0.5),
-    maxRadius: Math.round(width * 0.9),
+    fit: aspect > 1.35 ? 1.08 : 1.02,
+    minRadius: Math.round(width * 0.42),
+    maxRadius: Number.POSITIVE_INFINITY,
     fitBasis: "width",
     segments: 35,
   };
@@ -127,7 +127,8 @@ export function StudioWorkDome({ projects }: StudioWorkDomeProps) {
         minRadius={layout.minRadius}
         maxRadius={layout.maxRadius}
         segments={layout.segments}
-        padFactor={0.12}
+        padFactor={0.03}
+        heightCapFactor={false}
         overlayBlurColor="#0a0a0a"
         dragSensitivity={22}
         dragDampening={2.2}
@@ -136,6 +137,7 @@ export function StudioWorkDome({ projects }: StudioWorkDomeProps) {
         openedImageBorderRadius="10px"
         openedImageWidth="min(420px, 92vw)"
         openedImageHeight="auto"
+        className="sphere-root--studio-fill"
       />
       <p className="studio-work-dome__hint">Drag to explore · Tap to view</p>
     </div>

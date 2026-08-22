@@ -257,20 +257,52 @@ main.sphere-main {
 }
 
 .studio-work-section {
+  width: 100%;
+  max-width: none;
   overflow: hidden;
 }
 
+/* Break out to true viewport width on tablets and laptops */
 .studio-work-dome {
   position: relative;
   width: 100vw;
   max-width: 100vw;
   margin-inline: calc(50% - 50vw);
-  height: clamp(28rem, 88svh, 56rem);
+  height: clamp(30rem, 92svh, 68rem);
   border-block: 1px solid var(--color-border);
   background:
-    radial-gradient(ellipse 92% 68% at 50% 42%, rgb(18 18 18 / 0.92) 0%, var(--color-background) 82%),
+    radial-gradient(ellipse 118% 78% at 50% 42%, rgb(18 18 18 / 0.82) 0%, var(--color-background) 92%),
     var(--color-background);
   overflow: hidden;
+}
+
+/* Wider visible arc — studio full-bleed dome */
+.studio-work-dome .sphere-root--studio-fill .overlay {
+  background-image: radial-gradient(
+    rgb(235 235 235 / 0) 94%,
+    rgb(235 235 235 / 0) 97%,
+    var(--overlay-blur-color, #0a0a0a) 100%
+  );
+}
+
+.studio-work-dome .sphere-root--studio-fill .overlay--blur {
+  -webkit-mask-image: radial-gradient(
+    rgb(235 235 235 / 0) 95%,
+    var(--overlay-blur-color, #0a0a0a) 100%
+  );
+  mask-image: radial-gradient(rgb(235 235 235 / 0) 95%, var(--overlay-blur-color, #0a0a0a) 100%);
+  backdrop-filter: blur(2px);
+}
+
+.studio-work-dome .sphere-root--studio-fill .edge-fade {
+  height: clamp(2rem, 5vh, 3.5rem);
+  opacity: 0.45;
+}
+
+@media (min-width: 48rem) {
+  .studio-work-dome .sphere-root--studio-fill .stage {
+    perspective: calc(var(--radius) * 1.65);
+  }
 }
 
 .studio-work-section__dome--grid {
@@ -308,15 +340,21 @@ body.dg-scroll-lock {
   }
 }
 
+@media (min-width: 48rem) {
+  .studio-work-dome {
+    height: clamp(34rem, 94svh, 72rem);
+  }
+}
+
 @media (min-width: 90rem) {
   .studio-work-dome {
-    height: clamp(36rem, min(92svh, 52vw), 60rem);
+    height: clamp(38rem, min(96svh, 56vw), 76rem);
   }
 }
 
 @media (min-width: 120rem) {
   .studio-work-dome {
-    height: clamp(40rem, min(88svh, 48vw), 64rem);
+    height: clamp(42rem, min(92svh, 50vw), 80rem);
   }
 }
 

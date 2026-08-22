@@ -37,6 +37,8 @@ type DomeGalleryProps = {
   openedImageBorderRadius?: string;
   grayscale?: boolean;
   className?: string;
+  /** When false, radius is not capped by container height (full-width layouts). */
+  heightCapFactor?: number | false;
 };
 
 type DomeCoord = {
@@ -158,6 +160,7 @@ export function DomeGallery({
   openedImageBorderRadius = "12px",
   grayscale = true,
   className = "",
+  heightCapFactor = 1.35,
 }: DomeGalleryProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const mainRef = useRef<HTMLElement>(null);
@@ -278,7 +281,15 @@ export function DomeGallery({
       }
 
       let radius = basis * fit;
-      radius = Math.min(radius, h * 1.35);
+      if (heightCapFactor !== false) {
+        const capMultiplier =
+          heightCapFactor > 0
+            ? heightCapFactor
+            : aspect >= 1.15
+              ? 2.6
+              : 1.85;
+        radius = Math.min(radius, h * capMultiplier);
+      }
       radius = clamp(radius, minRadius, maxRadius);
 
       root.style.setProperty("--radius", `${Math.round(radius)}px`);
@@ -303,6 +314,7 @@ export function DomeGallery({
     openedImageBorderRadius,
     overlayBlurColor,
     padFactor,
+    heightCapFactor,
   ]);
 
   useEffect(() => {

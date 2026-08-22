@@ -47,7 +47,15 @@ export default async function HomePage() {
       <Reveal>
         <section className="page-frame py-fluid-xl">
           <p className="measure max-w-3xl text-fluid-lg text-muted">{manifesto}</p>
-          <h2 className="display mt-fluid-md text-display-md">Work</h2>
+          <div className="mt-fluid-md flex flex-wrap items-end justify-between gap-4">
+            <h2 className="display text-display-md">Selected work</h2>
+            <a
+              href="/studio#work"
+              className="text-fluid-sm tracking-widest text-muted uppercase transition-colors duration-[var(--duration-micro)] hover:text-accent"
+            >
+              View studio
+            </a>
+          </div>
           <FeaturedWorkAccordion items={featuredWork} />
         </section>
       </Reveal>

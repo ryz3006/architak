@@ -21,7 +21,7 @@ const VIEWPORTS = [
   { name: "uhd-tv", width: 3840, height: 2160 },
 ] as const;
 
-const ROUTES = ["/", "/work", "/studio", "/services", "/contact"] as const;
+const ROUTES = ["/", "/studio", "/services", "/contact"] as const;
 
 test.describe("adaptive layout", () => {
   for (const viewport of VIEWPORTS) {

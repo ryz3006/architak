@@ -1,0 +1,94 @@
+.services-showcase {
+  display: grid;
+  gap: clamp(3rem, 8vw, 6rem);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.services-showcase__item {
+  display: grid;
+  gap: var(--space-fluid-md);
+  align-items: center;
+}
+
+@media (min-width: 56rem) {
+  .services-showcase__item {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    gap: clamp(2rem, 5vw, 4rem);
+  }
+
+  .services-showcase__item[data-reverse="true"] {
+    direction: rtl;
+  }
+
+  .services-showcase__item[data-reverse="true"] > * {
+    direction: ltr;
+  }
+}
+
+.services-showcase__media {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+.services-showcase__image {
+  object-fit: cover;
+  transition: transform var(--duration-large) var(--ease-standard);
+}
+
+.services-showcase__item:hover .services-showcase__image,
+.services-showcase__item:focus-within .services-showcase__image {
+  transform: scale(1.03);
+}
+
+.services-showcase__scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgb(10 10 10 / 0.15) 0%, rgb(10 10 10 / 0.45) 100%);
+  pointer-events: none;
+}
+
+.services-showcase__copy {
+  display: grid;
+  gap: var(--space-3);
+  max-width: 36rem;
+}
+
+.services-showcase__index {
+  font-size: var(--step-000);
+  letter-spacing: 0.28em;
+  color: var(--color-accent);
+}
+
+.services-showcase__title {
+  font-size: clamp(1.65rem, 3vw, 2.5rem);
+  line-height: var(--leading-tight);
+}
+
+.services-showcase__lead {
+  font-family: var(--font-display);
+  font-size: clamp(1.05rem, 1.5vw, 1.25rem);
+  line-height: var(--leading-snug);
+  color: var(--color-foreground);
+}
+
+.services-showcase__detail {
+  font-size: var(--step-00);
+  line-height: var(--leading-normal);
+  color: var(--color-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .services-showcase__image {
+    transition: none;
+  }
+
+  .services-showcase__item:hover .services-showcase__image,
+  .services-showcase__item:focus-within .services-showcase__image {
+    transform: none;
+  }
+}

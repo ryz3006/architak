@@ -208,32 +208,88 @@
     {
       "slug": "hospitality",
       "title": "Hospitality Design",
-      "description": "Arrival, stay, and memory, held in one atmosphere."
+      "description": "Arrival, stay, and memory, held in one atmosphere.",
+      "detail": "Hotels, lounges, and reception environments where the first impression becomes the lasting one — light, material, and circulation composed for guests who arrive tired and leave remembered.",
+      "image": "/media/hero/feel-lobby.jpg"
     },
     {
       "slug": "residential",
       "title": "Residential Design",
-      "description": "Homes that feel like the people who live in them."
+      "description": "Homes that feel like the people who live in them.",
+      "detail": "Apartments, villas, and family homes shaped around daily ritual — how you cook, gather, rest, and host — so the interior reads as yours, not a catalogue.",
+      "image": "/media/hero/experience-living.jpg"
     },
     {
       "slug": "corporate",
       "title": "Corporate Design",
-      "description": "Workplaces with identity, not just desks."
+      "description": "Workplaces with identity, not just desks.",
+      "detail": "Offices and meeting environments tuned for focus, collaboration, and brand presence — from reception to boardroom, every room supports how your team actually works.",
+      "image": "/media/hero/feel-office.jpg"
     },
     {
       "slug": "restaurant",
       "title": "Restaurant Design",
-      "description": "Rooms that taste like the kitchen's intent."
+      "description": "Rooms that taste like the kitchen's intent.",
+      "detail": "Cafés, restaurants, and dining rooms where atmosphere supports the menu — seating rhythm, lighting layers, and material warmth that make every table feel considered.",
+      "image": "/media/hero/experience-dining.jpg"
     },
     {
       "slug": "commercial",
       "title": "Commercial Design",
-      "description": "Retail and business space that invites and converts."
+      "description": "Retail and business space that invites and converts.",
+      "detail": "Showrooms, retail floors, and commercial interiors that balance display with dwell time — spaces that invite people in and keep them engaged.",
+      "image": "/media/hero/space-commercial-astra.jpg"
     },
     {
       "slug": "industrial",
       "title": "Industrial Design",
-      "description": "Clear, durable rooms where process can breathe."
+      "description": "Clear, durable rooms where process can breathe.",
+      "detail": "Workshops, studios, and functional interiors where clarity of layout and honest materials support the work happening inside them.",
+      "image": "/media/hero/space-commercial-summit.jpg"
+    }
+  ],
+  "studioPage": {
+    "eyebrow": "Studio",
+    "headline": "Created to create.",
+    "support": "We do not decorate rooms. We shape how a life is lived.",
+    "heroImage": "/media/hero/feel-lobby.jpg",
+    "workHeading": "Selected work",
+    "workSupport": "Residential, hospitality, and commercial interiors from Kochi — each space shaped around the life inside it.",
+    "voicesHeading": "Client voices",
+    "voicesSupport": "What clients say after the drawings disappear and the room simply feels right."
+  },
+  "servicesPage": {
+    "eyebrow": "Practice",
+    "headline": "What we design.",
+    "support": "Six disciplines. One studio. Every project begins with understanding how you live, work, and gather.",
+    "heroImage": "/media/hero/experience-kitchen.jpg",
+    "closing": "Every project begins with a conversation.",
+    "closingSupport": "Tell us about the space you are imagining. We will help you see it clearly."
+  },
+  "testimonials": [
+    {
+      "quote": "They listened before they drew a single line. The kitchen now feels like the centre of our home — not a room we pass through.",
+      "name": "Anjali M.",
+      "role": "Residential client",
+      "location": "Vyttila, Kochi"
+    },
+    {
+      "quote": "Our lobby used to feel like a corridor. Now guests pause when they arrive. That was the brief, and they delivered it without shouting.",
+      "name": "Rahul K.",
+      "role": "Hospitality developer",
+      "location": "Kochi"
+    },
+    {
+      "quote": "The office no longer feels borrowed from a template. Light, material, and layout finally match how our team actually works.",
+      "name": "Deepa S.",
+      "role": "Corporate client",
+      "location": "Ernakulam"
+    },
+    {
+      "quote": "They treated the café like a dining room, not a fit-out. Regulars notice — the space has a warmth that photographs never capture.",
+      "name": "Thomas V.",
+      "role": "Restaurant owner",
+      "location": "Kochi"
     }
   ],
   "featuredProjects": [

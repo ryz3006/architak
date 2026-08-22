@@ -60,3 +60,19 @@ export type SpaceStory = typeof site.spaceStory;
 export function getSpaceStory(): SpaceStory {
   return site.spaceStory;
 }
+
+export type StudioPageContent = typeof site.studioPage;
+export type ServicesPageContent = typeof site.servicesPage;
+export type Testimonial = (typeof site.testimonials)[number];
+
+export function getStudioPageContent(): StudioPageContent {
+  return site.studioPage;
+}
+
+export function getServicesPageContent(): ServicesPageContent {
+  return site.servicesPage;
+}
+
+export function getTestimonials(): Testimonial[] {
+  return site.testimonials;
+}

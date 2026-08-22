@@ -64,7 +64,7 @@ export default async function ProjectPage({ params }: Props) {
         dangerouslySetInnerHTML={jsonLdScript(
           buildBreadcrumbJsonLd([
             { name: "Home", path: "/" },
-            { name: "Work", path: "/work" },
+            { name: "Studio", path: "/studio" },
             { name: project.title, path: `/work/${project.slug}` },
           ]),
         )}
@@ -109,10 +109,10 @@ export default async function ProjectPage({ params }: Props) {
           </div>
           <p className="mt-12">
             <Link
-              href="/work"
+              href="/studio#work"
               className="text-fluid-sm tracking-widest text-muted uppercase hover:text-foreground"
             >
-              ← All work
+              ← Studio work
             </Link>
           </p>
         </div>

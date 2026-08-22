@@ -102,7 +102,7 @@ export async function saveProjectAction(
 
   revalidatePath("/admin/projects");
   revalidatePath(`/work/${parsed.data.slug}`);
-  revalidatePath("/work");
+  revalidatePath("/studio");
   revalidatePath("/");
   redirect(`/admin/projects/${parsed.data.slug}`);
 }

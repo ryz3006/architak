@@ -27,10 +27,10 @@ export default function NotFound() {
             Homepage
           </Link>
           <Link
-            href="/work"
+            href="/studio#work"
             className="border border-border px-6 py-3 text-fluid-sm tracking-widest uppercase transition-colors duration-[var(--duration-micro)] hover:border-accent hover:text-accent"
           >
-            Browse work
+            Browse studio
           </Link>
         </nav>
       </section>

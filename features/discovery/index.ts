@@ -47,32 +47,25 @@ export function getStaticRoutes(): DiscoveryRoute[] {
       priority: 1,
     },
     {
-      path: "/work",
-      title: "Work",
-      description: "Selected ARCHITAK interiors across residential, hospitality, and commercial.",
-      changeFrequency: "weekly",
-      priority: 0.9,
-    },
-    {
       path: "/studio",
       title: "Studio",
-      description: `Interiors practice in ${studio.location}. Concept, design, and development.`,
-      changeFrequency: "monthly",
-      priority: 0.7,
+      description: "Selected ARCHITAK interiors, client voices, and studio practice in Kochi.",
+      changeFrequency: "weekly",
+      priority: 0.9,
     },
     {
       path: "/services",
       title: "Services",
       description: "Hospitality, residential, corporate, restaurant, commercial, and industrial.",
       changeFrequency: "monthly",
-      priority: 0.7,
+      priority: 0.8,
     },
     {
       path: "/contact",
       title: "Contact",
       description: `Reach ARCHITAK at ${studio.phone} or ${studio.email}.`,
       changeFrequency: "monthly",
-      priority: 0.8,
+      priority: 0.6,
     },
   ];
 }

@@ -6,7 +6,6 @@ import { MobileNav, type NavLink } from "@/components/layout/mobile-nav";
 import { getStaticSite } from "@/content/static";
 
 const links: readonly NavLink[] = [
-  { href: "/work", label: "Work" },
   { href: "/studio", label: "Studio" },
   { href: "/services", label: "Services" },
 ] as const;

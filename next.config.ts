@@ -78,13 +78,18 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/projects",
-        destination: "/work",
+        destination: "/studio",
         permanent: true,
       },
       {
         source: "/project/:slug*",
         destination: "/work/:slug*",
         permanent: true,
+      },
+      {
+        source: "/work",
+        destination: "/studio#work",
+        permanent: false,
       },
       {
         source: "/about",

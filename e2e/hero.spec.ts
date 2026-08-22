@@ -13,7 +13,7 @@ const HERO_HEADLINES = [
 ] as const;
 
 test.describe("hero composition", () => {
-  test("exposes all three headlines and chapter-one CTA", async ({ page }) => {
+  test("exposes all three headlines and studio tagline in header", async ({ page }) => {
     await page.goto("/");
 
     for (const headline of HERO_HEADLINES) {
@@ -23,7 +23,8 @@ test.describe("hero composition", () => {
       }
     }
 
-    await expect(page.getByRole("link", { name: /view work/i })).toBeInViewport();
+    await expect(page.locator(".site-brand .brand-lockup-tagline")).toContainText(/created to create/i);
+    await expect(page.locator(".hero-cta")).toHaveCount(0);
   });
 
   test("hero images use concrete alt text", async ({ page }) => {
@@ -64,12 +65,9 @@ test.describe("hero composition", () => {
       await expect(node).toBeVisible();
     }
 
-    // Stacked, not pinned: the stage scrolls with the page instead of sticking.
     const stagePosition = await page
       .locator(".hero-stage")
       .evaluate((node) => getComputedStyle(node).position);
     expect(stagePosition).toBe("relative");
-
-    await expect(page.getByRole("link", { name: /view work/i })).toBeVisible();
   });
 });

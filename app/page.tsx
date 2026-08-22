@@ -32,10 +32,10 @@ export default async function HomePage() {
   return (
     <main id="main-content" className="relative flex min-h-dvh flex-col">
       <SmoothScroll />
-      <SiteHeader />
+      <SiteHeader brandMorph />
       <OptionalThreeMark enabled={threeEnabled} />
 
-      <HeroChapters journey={journey} chapters={chapters} tagline={site.studio.tagline} />
+      <HeroChapters journey={journey} chapters={chapters} />
 
       <Reveal>
         <section className="page-frame py-fluid-xl">

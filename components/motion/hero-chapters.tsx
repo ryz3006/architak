@@ -1,10 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { BrandLockup } from "@/components/layout/brand-lockup";
 import type { HeroChapter, HeroImage, HeroJourneyResolved } from "@/content/static";
+import { getStaticSite } from "@/content/static";
 import { useReducedMotion } from "@/lib/a11y/use-reduced-motion";
 import { persistHeroJourneyCookie } from "@/lib/hero/cookie-client";
 import { computeHeroComposition } from "@/lib/hero/scroll-math";
@@ -16,11 +17,17 @@ type ChapterId = "experience" | "space" | "feel";
 type HeroChaptersProps = {
   journey: HeroJourneyResolved;
   chapters: HeroChapter[];
-  tagline: string;
 };
 
 /** Matches the pinning breakpoint in styles/hero-chapters.css. */
 const PINNED_QUERY = "(min-width: 64rem)";
+
+const BRAND_CSS_VARS = [
+  "--hero-brand-morph",
+  "--hero-brand-opacity",
+  "--hero-brand-blur",
+  "--hero-brand-scale",
+] as const;
 
 function chapterImage(journey: HeroJourneyResolved, chapterId: string): HeroImage {
   if (chapterId === "space") return journey.space;
@@ -28,24 +35,30 @@ function chapterImage(journey: HeroJourneyResolved, chapterId: string): HeroImag
   return journey.experience;
 }
 
+function syncBrandVars(values: Record<(typeof BRAND_CSS_VARS)[number], string>) {
+  const root = document.documentElement;
+  for (const name of BRAND_CSS_VARS) {
+    root.style.setProperty(name, values[name]);
+  }
+}
+
+function clearBrandVars() {
+  const root = document.documentElement;
+  for (const name of BRAND_CSS_VARS) {
+    root.style.removeProperty(name);
+  }
+}
+
 function HeroScene({
   chapter,
   image,
-  tagline,
-  showTopTagline,
   priority,
   showEntrance,
-  showCta,
-  ctaInert,
 }: {
   chapter: HeroChapter;
   image: HeroImage;
-  tagline?: string;
-  showTopTagline?: boolean;
   priority: boolean;
   showEntrance: boolean;
-  showCta: boolean;
-  ctaInert: boolean;
 }) {
   const [focusX, focusY] = image.focus.desktop.split(" ");
   const Headline = chapter.id === "experience" ? "h1" : "h2";
@@ -53,12 +66,6 @@ function HeroScene({
   return (
     <article className="hero-scene" data-chapter={chapter.id as ChapterId}>
       <div className="hero-scene-text">
-        {showTopTagline && tagline ? (
-          <p className="hero-tagline">{tagline}</p>
-        ) : (
-          <span aria-hidden="true" />
-        )}
-
         <div className={`hero-copy${showEntrance ? " hero-headline-enter" : ""}`}>
           <p className="hero-chapter-label">{chapter.label}</p>
           <Headline className="hero-chapter-headline">
@@ -69,25 +76,6 @@ function HeroScene({
           </Headline>
           <p className="hero-chapter-support">{chapter.support}</p>
         </div>
-
-        {showCta ? (
-          <div className="hero-cta" data-inert={ctaInert ? "true" : undefined}>
-            <Link
-              href="/work"
-              className="border border-foreground bg-foreground px-6 py-3 text-fluid-sm tracking-widest text-background uppercase"
-            >
-              View work
-            </Link>
-            <Link
-              href="/contact"
-              className="border border-border px-6 py-3 text-fluid-sm tracking-widest uppercase transition-colors duration-[var(--duration-micro)] hover:border-accent hover:text-accent"
-            >
-              Enquire
-            </Link>
-          </div>
-        ) : (
-          <span aria-hidden="true" />
-        )}
       </div>
 
       <div className="hero-scene-image">
@@ -116,11 +104,10 @@ function HeroScene({
   );
 }
 
-export function HeroChapters({ journey, chapters, tagline }: HeroChaptersProps) {
+export function HeroChapters({ journey, chapters }: HeroChaptersProps) {
   const rootRef = useRef<HTMLElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const compositionRef = useRef<HTMLDivElement>(null);
-  const activeChapterRef = useRef(0);
   const preloadedSpace = useRef(false);
   const preloadedFeel = useRef(false);
 
@@ -128,7 +115,9 @@ export function HeroChapters({ journey, chapters, tagline }: HeroChaptersProps) 
   const [mounted, setMounted] = useState(false);
   const [pinned, setPinned] = useState(false);
   const [finePointer, setFinePointer] = useState(false);
-  const [activeChapter, setActiveChapter] = useState(0);
+
+  const tagline = getStaticSite().studio.tagline;
+  const animated = pinned && !reduced;
 
   useEffect(() => {
     setMounted(true);
@@ -155,7 +144,16 @@ export function HeroChapters({ journey, chapters, tagline }: HeroChaptersProps) 
     };
   }, [journey.feel.src, journey.id, journey.space.src]);
 
-  const animated = pinned && !reduced;
+  useEffect(() => {
+    if (animated) return;
+    clearBrandVars();
+  }, [animated]);
+
+  useEffect(() => {
+    return () => {
+      clearBrandVars();
+    };
+  }, []);
 
   const applyComposition = useCallback(
     (progress: number) => {
@@ -172,7 +170,6 @@ export function HeroChapters({ journey, chapters, tagline }: HeroChaptersProps) 
       style.setProperty("--hero-type-scale", String(vars.typeScale));
       style.setProperty("--hero-type-max", `${vars.typeMaxWidth}rem`);
       style.setProperty("--hero-overlay", String(vars.overlayStrength));
-      style.setProperty("--hero-cta-opacity", String(vars.ctaOpacity));
       style.setProperty("--hero-release", String(vars.release));
       style.setProperty("--hero-exp-weight", String(vars.expWeight));
       style.setProperty("--hero-space-weight", String(vars.spaceWeight));
@@ -183,13 +180,18 @@ export function HeroChapters({ journey, chapters, tagline }: HeroChaptersProps) 
       );
       style.setProperty("--hero-space-scale", String(vars.spaceScale * journey.space.motion.zoom));
       style.setProperty("--hero-feel-scale", String(vars.feelScale * journey.feel.motion.zoom));
+      style.setProperty("--hero-brand-morph", String(vars.brandMorph));
+      style.setProperty("--hero-brand-opacity", String(vars.brandOpacity));
+      style.setProperty("--hero-brand-blur", `${vars.brandBlur}px`);
+      style.setProperty("--hero-brand-scale", String(vars.brandScale));
 
-      if (vars.activeChapter !== activeChapterRef.current) {
-        activeChapterRef.current = vars.activeChapter;
-        setActiveChapter(vars.activeChapter);
-      }
+      syncBrandVars({
+        "--hero-brand-morph": String(vars.brandMorph),
+        "--hero-brand-opacity": String(vars.brandOpacity),
+        "--hero-brand-blur": `${vars.brandBlur}px`,
+        "--hero-brand-scale": String(vars.brandScale),
+      });
 
-      // Decode the next still before its scene is composed, never all at once.
       if (progress > 0.1 && !preloadedSpace.current) {
         preloadedSpace.current = true;
         new window.Image().src = journey.space.src;
@@ -257,7 +259,6 @@ export function HeroChapters({ journey, chapters, tagline }: HeroChaptersProps) 
 
     const onMove = (event: MouseEvent) => {
       const rect = composition.getBoundingClientRect();
-      // Clamped to +/-2% so the frame gains depth without reading as parallax.
       x = Math.max(-2, Math.min(2, ((event.clientX - rect.left) / rect.width - 0.5) * 4));
       y = Math.max(-2, Math.min(2, ((event.clientY - rect.top) / rect.height - 0.5) * 4));
       if (!rafId) rafId = window.requestAnimationFrame(apply);
@@ -275,17 +276,18 @@ export function HeroChapters({ journey, chapters, tagline }: HeroChaptersProps) 
       <div className="hero-track" ref={trackRef}>
         <div className="hero-stage">
           <div className="hero-composition" ref={compositionRef}>
+            {animated ? (
+              <div className="hero-brand-watermark" aria-hidden="true">
+                <BrandLockup tagline={tagline} className="brand-lockup brand-lockup--watermark" />
+              </div>
+            ) : null}
             {chapters.map((chapter, index) => (
               <HeroScene
                 key={chapter.id}
                 chapter={chapter}
                 image={chapterImage(journey, chapter.id)}
-                tagline={index === 0 ? tagline : undefined}
-                showTopTagline={index === 0}
                 priority={index === 0}
                 showEntrance={mounted && !reduced && index === 0}
-                showCta={index === 0}
-                ctaInert={animated && activeChapter !== 0}
               />
             ))}
           </div>

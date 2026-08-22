@@ -1,7 +1,10 @@
-import Image from "next/image";
 import Link from "next/link";
 
+import { BrandLockup } from "@/components/layout/brand-lockup";
 import { MobileNav, type NavLink } from "@/components/layout/mobile-nav";
+import { getStaticSite } from "@/content/static";
+
+import "@/styles/site-brand.css";
 
 const links: readonly NavLink[] = [
   { href: "/work", label: "Work" },
@@ -10,22 +13,20 @@ const links: readonly NavLink[] = [
   { href: "/contact", label: "Contact" },
 ] as const;
 
-export function SiteHeader() {
+export function SiteHeader({ brandMorph = false }: { brandMorph?: boolean }) {
+  const tagline = getStaticSite().studio.tagline;
+
   return (
     <header
       className="page-frame relative z-[var(--z-header)] flex items-center justify-between py-6"
       style={{ paddingTop: "calc(var(--safe-top) + 1.5rem)" }}
     >
-      <Link href="/" className="inline-flex items-center gap-3" aria-label="ARCHITAK home">
-        <Image
-          src="/brand/logo.png"
-          alt=""
-          width={48}
-          height={48}
-          className="h-11 w-11 object-contain brightness-110 drop-shadow-[0_0_14px_rgba(255,255,255,0.22)]"
-          priority
-        />
-        <span className="display text-fluid-xl tracking-[0.2em]">ARCHITAK</span>
+      <Link
+        href="/"
+        className={`site-brand${brandMorph ? " site-brand--morph" : ""}`}
+        aria-label="ARCHITAK home"
+      >
+        <BrandLockup tagline={tagline} logoPriority />
       </Link>
 
       <nav aria-label="Primary" className="hidden gap-8 text-fluid-sm tracking-widest uppercase md:flex">

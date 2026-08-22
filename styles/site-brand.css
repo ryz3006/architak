@@ -1,0 +1,30 @@
+.brand-lockup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.brand-lockup-tagline {
+  padding-left: calc(3.5rem + 1rem);
+  font-size: 0.62rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+@media (min-width: 48rem) {
+  .brand-lockup-tagline {
+    padding-left: calc(4.5rem + 1.25rem);
+    font-size: 0.7rem;
+  }
+}
+
+.site-brand--morph {
+  opacity: calc(1 - var(--hero-brand-morph, 0));
+}
+
+@media (max-width: 63.99rem), (prefers-reduced-motion: reduce) {
+  .site-brand--morph {
+    opacity: 1;
+  }
+}

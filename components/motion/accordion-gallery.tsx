@@ -74,6 +74,7 @@ export function AccordionGallery({
   const gsapRef = useRef<typeof gsap | null>(null);
   const firstRunRef = useRef(true);
   const mediaSizeRef = useRef(320);
+  const stackedRef = useRef(false);
 
   const vertical = orientation === "vertical";
   const count = items.length;
@@ -81,7 +82,21 @@ export function AccordionGallery({
     count > 0 ? Math.min(Math.max(defaultIndex, 0), count - 1) : 0,
   );
   const [gsapReady, setGsapReady] = useState(false);
+  const [stacked, setStacked] = useState(false);
   const reduced = useReducedMotion();
+
+  const layoutVertical = vertical || stacked;
+
+  useEffect(() => {
+    const query = window.matchMedia("(max-width: 40rem)");
+    const sync = () => {
+      stackedRef.current = query.matches;
+      setStacked(query.matches);
+    };
+    sync();
+    query.addEventListener("change", sync);
+    return () => query.removeEventListener("change", sync);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -119,8 +134,8 @@ export function AccordionGallery({
         const bar = barRefs.current[index];
         const text = textRefs.current[index];
 
-        const rot = isActive ? 0 : index < active ? tilt : -tilt;
-        const rotProp = vertical ? { rotateX: -rot } : { rotateY: rot };
+        const rot = isActive || stacked ? 0 : index < active ? tilt : -tilt;
+        const rotProp = layoutVertical ? { rotateX: stacked ? 0 : -rot } : { rotateY: rot };
 
         tl.to(panel, { flexGrow: isActive ? grow : 1, ...rotProp, duration: dur, ease }, 0);
 
@@ -129,20 +144,37 @@ export function AccordionGallery({
           const shift = drift * parallax * mediaSize * 0.06;
           const gray = grayscale ? (isActive ? 0 : 1) : 0;
 
-          tl.to(
-            media,
-            {
-              xPercent: -50,
-              yPercent: -50,
-              x: vertical ? 0 : isActive ? 0 : shift,
-              y: vertical ? (isActive ? 0 : shift) : 0,
-              "--ag-gray": gray,
-              "--ag-dim": isActive ? 0 : 0.35,
-              duration: dur,
-              ease,
-            },
-            0,
-          );
+          if (stacked) {
+            tl.to(
+              media,
+              {
+                xPercent: 0,
+                yPercent: 0,
+                x: 0,
+                y: isActive ? 0 : shift,
+                "--ag-gray": gray,
+                "--ag-dim": isActive ? 0 : 0.35,
+                duration: dur,
+                ease,
+              },
+              0,
+            );
+          } else {
+            tl.to(
+              media,
+              {
+                xPercent: -50,
+                yPercent: -50,
+                x: layoutVertical ? 0 : isActive ? 0 : shift,
+                y: layoutVertical ? (isActive ? 0 : shift) : 0,
+                "--ag-gray": gray,
+                "--ag-dim": isActive ? 0 : 0.35,
+                duration: dur,
+                ease,
+              },
+              0,
+            );
+          }
         }
 
         if (showLabels && bar && text) {
@@ -177,8 +209,9 @@ export function AccordionGallery({
       reduced,
       showLabels,
       stagger,
+      stacked,
       tilt,
-      vertical,
+      layoutVertical,
     ],
   );
 
@@ -187,20 +220,43 @@ export function AccordionGallery({
     if (!el || count === 0) return;
 
     const measure = () => {
+      const isStacked = stackedRef.current;
       const rect = el.getBoundingClientRect();
-      const total = vertical ? rect.height : rect.width;
-      const usable = Math.max(total - gap * (count - 1), 120);
-      const size = Math.max(140, usable * Math.min(Math.max(expandRatio, 0.2), 0.9) * 1.22);
-      mediaSizeRef.current = size;
-      el.style.setProperty("--ag-media-size", `${size}px`);
+
+      if (isStacked) {
+        const collapsed = Math.max(72, Math.round(window.innerHeight * 0.09));
+        const expanded = Math.max(
+          240,
+          Math.min(window.innerHeight * 0.52, rect.width * 1.35),
+        );
+        const total = collapsed * (count - 1) + expanded + gap * (count - 1);
+
+        mediaSizeRef.current = expanded;
+        el.style.height = `${Math.round(total)}px`;
+        el.style.setProperty("--ag-media-size", `${Math.round(expanded)}px`);
+        el.style.setProperty("--ag-collapsed-size", `${collapsed}px`);
+      } else {
+        el.style.removeProperty("--ag-collapsed-size");
+        const total = layoutVertical ? rect.height : rect.width;
+        const usable = Math.max(total - gap * (count - 1), 120);
+        const size = Math.max(140, usable * Math.min(Math.max(expandRatio, 0.2), 0.9) * 1.22);
+        mediaSizeRef.current = size;
+        el.style.setProperty("--ag-media-size", `${size}px`);
+        el.style.height = layoutVertical ? `${Math.round(height * 1.6)}px` : `${height}px`;
+      }
+
       applyLayout(!firstRunRef.current);
     };
 
     measure();
     const ro = new ResizeObserver(measure);
     ro.observe(el);
-    return () => ro.disconnect();
-  }, [applyLayout, count, expandRatio, gap, vertical]);
+    window.addEventListener("resize", measure, { passive: true });
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, [applyLayout, count, expandRatio, gap, height, layoutVertical, stacked]);
 
   useEffect(() => {
     if (!gsapReady) return;
@@ -248,7 +304,7 @@ export function AccordionGallery({
   return (
     <div
       ref={rootRef}
-      className={`accordion-gallery${vertical ? " accordion-gallery--vertical" : ""}${className ? ` ${className}` : ""}`}
+      className={`accordion-gallery${layoutVertical ? " accordion-gallery--vertical" : ""}${stacked ? " accordion-gallery--stacked" : ""}${className ? ` ${className}` : ""}`}
       style={
         {
           "--ag-accent": accentColor,
@@ -256,7 +312,9 @@ export function AccordionGallery({
           "--ag-text": textColor,
           "--ag-gap": `${gap}px`,
           "--ag-radius": `${radius}px`,
-          height: vertical ? `${Math.round(height * 1.6)}px` : `${height}px`,
+          ...(stacked
+            ? {}
+            : { height: layoutVertical ? `${Math.round(height * 1.6)}px` : `${height}px` }),
         } as CSSProperties
       }
       role="list"

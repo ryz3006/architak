@@ -157,6 +157,10 @@ main.sphere-main {
   pointer-events: all;
 }
 
+.sphere-root[data-enlarging="true"] .viewer .enlarge {
+  pointer-events: auto;
+}
+
 .viewer .enlarge {
   position: absolute;
   z-index: 30;
@@ -216,6 +220,8 @@ main.sphere-main {
 }
 
 .dome-gallery__detail-link {
+  position: relative;
+  z-index: 1;
   margin-top: var(--space-2);
   font-size: var(--step-000);
   letter-spacing: 0.18em;

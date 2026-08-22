@@ -53,6 +53,14 @@ type DomeItem = DomeCoord & DomeGalleryImage;
 type Rotation = { x: number; y: number };
 type TileRect = { left: number; top: number; width: number; height: number };
 
+type EnlargedView = {
+  meta: DomeGalleryImage;
+  left: number;
+  top: number;
+  initialTransform: string;
+  open: boolean;
+};
+
 const DEFAULTS = {
   maxVerticalRotationDeg: 5,
   dragSensitivity: 20,
@@ -182,7 +190,7 @@ export function DomeGallery({
   const lastDragEndAt = useRef(0);
   const scrollLockedRef = useRef(false);
 
-  const [activeDetail, setActiveDetail] = useState<DomeGalleryImage | null>(null);
+  const [enlarged, setEnlarged] = useState<EnlargedView | null>(null);
 
   const items = useMemo(() => buildItems(images, segments), [images, segments]);
 
@@ -404,7 +412,6 @@ export function DomeGallery({
       }
 
       const meta = readItemMeta(parent);
-      setActiveDetail(meta);
 
       focusedElRef.current = element;
       element.setAttribute("data-focused", "true");
@@ -437,7 +444,6 @@ export function DomeGallery({
         openingRef.current = false;
         focusedElRef.current = null;
         refDiv.remove();
-        setActiveDetail(null);
         unlockScroll();
         return;
       }
@@ -452,55 +458,25 @@ export function DomeGallery({
       element.style.visibility = "hidden";
       element.style.zIndex = "0";
 
-      const overlay = document.createElement("div");
-      overlay.className = "enlarge enlarge--with-detail";
-      overlay.style.position = "absolute";
-      overlay.style.left = `${frameRect.left - mainRect.left}px`;
-      overlay.style.top = `${frameRect.top - mainRect.top}px`;
-      overlay.style.width = openedImageWidth;
-      overlay.style.height = openedImageHeight;
-      overlay.style.opacity = "0";
-      overlay.style.zIndex = "30";
-      overlay.style.transformOrigin = "top left";
-      overlay.style.transition = `transform ${enlargeTransitionMs}ms ease, opacity ${enlargeTransitionMs}ms ease`;
-
-      const img = document.createElement("img");
-      img.src = meta.src;
-      img.alt = meta.alt ?? meta.title ?? "";
-      overlay.appendChild(img);
-
-      const detail = document.createElement("div");
-      detail.className = "dome-gallery__detail";
-      detail.innerHTML = `
-        <p class="dome-gallery__detail-meta">${meta.category}${meta.location ? ` · ${meta.location}` : ""}</p>
-        <h3 class="dome-gallery__detail-title">${meta.title}</h3>
-        <p class="dome-gallery__detail-summary">${meta.summary}</p>
-      `;
-      if (meta.href) {
-        const link = document.createElement("a");
-        link.className = "dome-gallery__detail-link";
-        link.href = meta.href;
-        link.textContent = "View project";
-        detail.appendChild(link);
-      }
-      overlay.appendChild(detail);
-
-      viewerRef.current?.appendChild(overlay);
-
       const tx0 = tileRect.left - frameRect.left;
       const ty0 = tileRect.top - frameRect.top;
       const sx0 = tileRect.width / frameRect.width;
       const sy0 = tileRect.height / frameRect.height;
-      overlay.style.transform = `translate(${tx0}px, ${ty0}px) scale(${Number.isFinite(sx0) && sx0 > 0 ? sx0 : 1}, ${Number.isFinite(sy0) && sy0 > 0 ? sy0 : 1})`;
+
+      setEnlarged({
+        meta,
+        left: frameRect.left - mainRect.left,
+        top: frameRect.top - mainRect.top,
+        initialTransform: `translate(${tx0}px, ${ty0}px) scale(${Number.isFinite(sx0) && sx0 > 0 ? sx0 : 1}, ${Number.isFinite(sy0) && sy0 > 0 ? sy0 : 1})`,
+        open: false,
+      });
 
       requestAnimationFrame(() => {
-        if (!overlay.parentElement) return;
-        overlay.style.opacity = "1";
-        overlay.style.transform = "translate(0px, 0px) scale(1, 1)";
+        setEnlarged((current) => (current ? { ...current, open: true } : null));
         rootRef.current?.setAttribute("data-enlarging", "true");
       });
     },
-    [enlargeTransitionMs, lockScroll, openedImageHeight, openedImageWidth, segments, unlockScroll],
+    [enlargeTransitionMs, lockScroll, segments, unlockScroll],
   );
 
   const closeFocused = useCallback(() => {
@@ -510,10 +486,8 @@ export function DomeGallery({
     if (!element) return;
 
     const parent = element.parentElement;
-    const overlay = viewerRef.current?.querySelector(".enlarge");
-    if (!parent || !overlay) return;
+    if (!parent) return;
 
-    overlay.remove();
     parent.querySelector(".item__image--reference")?.remove();
     parent.style.setProperty("--rot-y-delta", "0deg");
     parent.style.setProperty("--rot-x-delta", "0deg");
@@ -524,7 +498,7 @@ export function DomeGallery({
     originalTilePositionRef.current = null;
     rootRef.current?.removeAttribute("data-enlarging");
     openingRef.current = false;
-    setActiveDetail(null);
+    setEnlarged(null);
     unlockScroll();
   }, [unlockScroll]);
 
@@ -646,12 +620,46 @@ export function DomeGallery({
         <div className="viewer" ref={viewerRef}>
           <div ref={scrimRef} className="scrim" aria-hidden="true" />
           <div ref={frameRef} className="frame" aria-hidden="true" />
+          {enlarged ? (
+            <div
+              className="enlarge enlarge--with-detail"
+              style={{
+                position: "absolute",
+                left: enlarged.left,
+                top: enlarged.top,
+                width: openedImageWidth,
+                height: openedImageHeight,
+                opacity: enlarged.open ? 1 : 0,
+                transform: enlarged.open ? "translate(0px, 0px) scale(1, 1)" : enlarged.initialTransform,
+                zIndex: 30,
+                transformOrigin: "top left",
+                transition: `transform ${enlargeTransitionMs}ms ease, opacity ${enlargeTransitionMs}ms ease`,
+              }}
+              onClick={(event) => event.stopPropagation()}
+              onPointerDown={(event) => event.stopPropagation()}
+            >
+              <img src={enlarged.meta.src} alt={enlarged.meta.alt ?? enlarged.meta.title ?? ""} />
+              <div className="dome-gallery__detail">
+                <p className="dome-gallery__detail-meta">
+                  {enlarged.meta.category}
+                  {enlarged.meta.location ? ` · ${enlarged.meta.location}` : ""}
+                </p>
+                <h3 className="dome-gallery__detail-title">{enlarged.meta.title}</h3>
+                <p className="dome-gallery__detail-summary">{enlarged.meta.summary}</p>
+                {enlarged.meta.href ? (
+                  <Link href={enlarged.meta.href} className="dome-gallery__detail-link">
+                    View project
+                  </Link>
+                ) : null}
+              </div>
+            </div>
+          ) : null}
         </div>
       </main>
 
-      {activeDetail?.href ? (
+      {enlarged?.meta.href ? (
         <div className="dome-gallery__sr-link">
-          <Link href={activeDetail.href}>View {activeDetail.title}</Link>
+          <Link href={enlarged.meta.href}>View {enlarged.meta.title}</Link>
         </div>
       ) : null}
     </div>

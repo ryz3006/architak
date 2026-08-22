@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { SiteFooter, SiteHeader } from "@/components/layout/site-chrome";
 import { FeaturedWorkAccordion } from "@/components/motion/featured-work-accordion";
 import { HeroChapters } from "@/components/motion/hero-chapters";
+import { OptionalSplashCursor } from "@/components/motion/optional-splash-cursor";
 import { OptionalThreeMark } from "@/components/motion/optional-three";
 import { Reveal } from "@/components/motion/reveal";
 import { SmoothScroll } from "@/components/motion/smooth-scroll";
@@ -29,10 +30,12 @@ export default async function HomePage() {
   const manifesto = getManifesto();
   const featuredWork = await getFeaturedAccordionItems();
   const threeEnabled = process.env.FEATURE_THREE_D === "true";
+  const splashCursorEnabled = process.env.FEATURE_SPLASH_CURSOR !== "false";
 
   return (
     <main id="main-content" className="relative flex min-h-dvh flex-col">
       <SmoothScroll />
+      <OptionalSplashCursor enabled={splashCursorEnabled} />
       <SiteHeader homeHero />
       <OptionalThreeMark enabled={threeEnabled} />
 

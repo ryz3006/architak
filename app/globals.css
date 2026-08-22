@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "../styles/tokens.css";
+@import "../styles/site-brand.css";
 
 /*
  * Tailwind theme registration.

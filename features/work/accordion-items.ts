@@ -12,18 +12,13 @@ export type AccordionGalleryItem = {
 };
 
 function resolveStorageKeyUrl(storageKey: string): string | null {
-  const storage = getStorageService();
-  const cdnUrl = storage.getPublicUrl(storageKey);
-  if (cdnUrl) {
-    return cdnUrl;
-  }
-
   const legacyMatch = storageKey.match(/^public\/legacy\/(.+)$/);
   if (legacyMatch) {
     return `/media/${legacyMatch[1]}`;
   }
 
-  return null;
+  const storage = getStorageService();
+  return storage.getPublicUrl(storageKey);
 }
 
 function resolveCoverUrl(coverImage: string): string {
@@ -122,8 +117,33 @@ export async function getFeaturedAccordionItems(): Promise<AccordionGalleryItem[
       })
       .filter((item): item is AccordionGalleryItem => item !== null);
 
-    return items.length > 0 ? items : staticFeaturedItems();
+    if (items.length > 0) {
+      return mergeStaticCoverFallback(items);
+    }
+
+    return staticFeaturedItems();
   } catch {
     return staticFeaturedItems();
   }
+}
+
+/** Keep CMS ordering but swap in bundled covers when CDN keys are missing locally. */
+function mergeStaticCoverFallback(items: AccordionGalleryItem[]): AccordionGalleryItem[] {
+  const staticBySlug = new Map(
+    staticFeaturedItems().map((item) => [item.link.replace(/^\/work\//, ""), item] as const),
+  );
+
+  return items.map((item) => {
+    const slug = item.link.replace(/^\/work\//, "");
+    const fallback = staticBySlug.get(slug);
+    if (!fallback) {
+      return item;
+    }
+
+    return {
+      ...item,
+      image: fallback.image,
+      alt: item.alt || fallback.alt,
+    };
+  });
 }

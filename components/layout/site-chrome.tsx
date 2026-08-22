@@ -4,8 +4,6 @@ import { BrandLockup } from "@/components/layout/brand-lockup";
 import { MobileNav, type NavLink } from "@/components/layout/mobile-nav";
 import { getStaticSite } from "@/content/static";
 
-import "@/styles/site-brand.css";
-
 const links: readonly NavLink[] = [
   { href: "/work", label: "Work" },
   { href: "/studio", label: "Studio" },

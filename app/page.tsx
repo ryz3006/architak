@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { PageCta } from "@/components/pages/page-cta";
 import { SiteFooter, SiteHeader } from "@/components/layout/site-chrome";
 import { FeaturedWorkAccordion } from "@/components/motion/featured-work-accordion";
 import { HeroChapters } from "@/components/motion/hero-chapters";
@@ -35,6 +36,7 @@ export default async function HomePage() {
   const driftImages = getDriftWallImages();
   const featuredWork = await getFeaturedAccordionItems();
   const studioWork = getStudioPageContent().work;
+  const studioCta = getStudioPageContent().cta;
   const threeEnabled = process.env.FEATURE_THREE_D === "true";
 
   return (
@@ -62,6 +64,13 @@ export default async function HomePage() {
       </Reveal>
 
       <SpaceStorySection story={spaceStory} images={driftImages} />
+
+      <PageCta
+        eyebrow={studioCta.eyebrow}
+        headline={studioCta.headline}
+        support={studioCta.support}
+        showContactLink={false}
+      />
 
       <SiteFooter />
     </main>

@@ -5,9 +5,16 @@ import { BrandLockup } from "@/components/layout/brand-lockup";
 import { MobileNav, type NavLink } from "@/components/layout/mobile-nav";
 import { getStaticSite } from "@/content/static";
 
+import "@/styles/site-footer.css";
+
 const links: readonly NavLink[] = [
   { href: "/studio", label: "Studio" },
   { href: "/services", label: "Services" },
+] as const;
+
+const footerLinks: readonly NavLink[] = [
+  ...links,
+  { href: "/contact", label: "Contact" },
 ] as const;
 
 export function SiteHeader({ homeHero = false }: { homeHero?: boolean }) {
@@ -43,25 +50,47 @@ export function SiteHeader({ homeHero = false }: { homeHero?: boolean }) {
 }
 
 export function SiteFooter() {
+  const { studio } = getStaticSite();
+  const phoneHref = `tel:${studio.phone.replace(/\s/g, "")}`;
+  const year = new Date().getFullYear();
+
   return (
-    <footer
-      className="page-frame mt-auto border-t border-border py-10"
-      style={{ paddingBottom: "calc(var(--safe-bottom) + 2.5rem)" }}
-    >
-      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-        <div>
-          <p className="display text-fluid-xl tracking-[0.15em]">ARCHITAK</p>
-          <p className="mt-2 text-fluid-sm text-muted">CREATED TO CREATE · Vyttila, Kochi</p>
+    <footer className="site-footer">
+      <div className="site-footer__inner page-frame">
+        <div className="site-footer__brand-block">
+          <p className="site-footer__brand display">ARCHITAK</p>
+          <p className="site-footer__tagline">{studio.tagline}</p>
+          <p className="site-footer__location">{studio.location}</p>
         </div>
-        <p className="text-fluid-sm text-muted">
-          <a href="tel:+918891991999" className="hover:text-foreground">
-            +91 88919 91999
-          </a>
-          {" · "}
-          <a href="mailto:architak336@gmail.com" className="hover:text-foreground">
-            architak336@gmail.com
-          </a>
-        </p>
+
+        <div className="site-footer__aside">
+          <nav aria-label="Footer">
+            <ul className="site-footer__nav-list">
+              {footerLinks.map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href} className="site-footer__nav-link">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          <address className="site-footer__contact">
+            <p className="site-footer__contact-line">
+              <a href={phoneHref} className="site-footer__contact-link">
+                {studio.phone}
+              </a>
+            </p>
+            <p className="site-footer__contact-line">
+              <a href={`mailto:${studio.email}`} className="site-footer__contact-link">
+                {studio.email}
+              </a>
+            </p>
+          </address>
+
+          <p className="site-footer__fineprint">© {year} ARCHITAK</p>
+        </div>
       </div>
     </footer>
   );

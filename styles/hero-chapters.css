@@ -86,6 +86,7 @@
 }
 
 .hero-tagline {
+  flex-shrink: 0;
   font-size: var(--step-000);
   letter-spacing: 0.35em;
   text-transform: uppercase;
@@ -130,17 +131,6 @@
 .hero-headline-line {
   display: block;
   line-height: 1.06;
-}
-
-.hero-headline-bridge {
-  display: block;
-  font-family: var(--font-sans);
-  font-size: var(--step-000);
-  font-weight: 400;
-  letter-spacing: 0.28em;
-  line-height: 1.5;
-  text-transform: uppercase;
-  color: var(--color-accent);
 }
 
 .hero-scene[data-chapter="space"] .hero-chapter-headline {
@@ -240,7 +230,7 @@
   animation: heroHeadlineIn var(--duration-page) var(--ease-entrance) both;
 }
 
-.hero-headline-enter .hero-headline-line:nth-child(3) {
+.hero-headline-enter .hero-headline-line:nth-child(2) {
   animation-delay: 80ms;
 }
 
@@ -304,10 +294,6 @@
     display: block;
     padding: 0;
     transform: none;
-  }
-
-  .hero-headline-bridge {
-    display: none;
   }
 
   .hero-copy {

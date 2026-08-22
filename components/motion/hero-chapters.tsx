@@ -63,9 +63,6 @@ function HeroScene({
           <p className="hero-chapter-label">{chapter.label}</p>
           <Headline className="hero-chapter-headline">
             <span className="hero-headline-line">{chapter.headline}</span>
-            {chapter.id === "experience" && tagline ? (
-              <span className="hero-headline-bridge">{tagline}</span>
-            ) : null}
             {chapter.headlineLine2 ? (
               <span className="hero-headline-line">{chapter.headlineLine2}</span>
             ) : null}
@@ -108,6 +105,7 @@ function HeroScene({
             alt={image.alt}
             fill
             priority={priority}
+            loading={priority ? undefined : "eager"}
             sizes="(max-width: 64rem) 100vw, 60vw"
             className="object-cover"
           />
@@ -136,6 +134,11 @@ export function HeroChapters({ journey, chapters, tagline }: HeroChaptersProps) 
     setMounted(true);
     persistHeroJourneyCookie(journey.id);
 
+    for (const src of [journey.space.src, journey.feel.src]) {
+      const img = new window.Image();
+      img.src = src;
+    }
+
     const pinnedQuery = window.matchMedia(PINNED_QUERY);
     const pointerQuery = window.matchMedia("(pointer: fine)");
     const sync = () => {
@@ -150,7 +153,7 @@ export function HeroChapters({ journey, chapters, tagline }: HeroChaptersProps) 
       pinnedQuery.removeEventListener("change", sync);
       pointerQuery.removeEventListener("change", sync);
     };
-  }, [journey.id]);
+  }, [journey.feel.src, journey.id, journey.space.src]);
 
   const animated = pinned && !reduced;
 
@@ -278,7 +281,7 @@ export function HeroChapters({ journey, chapters, tagline }: HeroChaptersProps) 
                 chapter={chapter}
                 image={chapterImage(journey, chapter.id)}
                 tagline={index === 0 ? tagline : undefined}
-                showTopTagline={index === 0 && !animated}
+                showTopTagline={index === 0}
                 priority={index === 0}
                 showEntrance={mounted && !reduced && index === 0}
                 showCta={index === 0}

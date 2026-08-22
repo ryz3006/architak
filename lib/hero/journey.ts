@@ -37,8 +37,8 @@ function resolveJourneyImages(journeyId: string): HeroJourneyResolved | null {
 /**
  * Resolves the hero journey for this request (read-only).
  *
- * The cookie is set by `proxy.ts` on `/`, which also forwards the chosen id on
- * a request header so the homepage can read it on the first visit.
+ * The cookie is set by `proxy.ts` on each homepage visit, which also forwards the
+ * chosen id on a request header so the homepage can read it on that render.
  */
 export async function resolveHeroJourney(): Promise<HeroJourneyResolved> {
   const headerStore = await headers();

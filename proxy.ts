@@ -5,7 +5,6 @@ import {
   HERO_JOURNEY_COOKIE,
   HERO_JOURNEY_COOKIE_MAX_AGE,
   HERO_JOURNEY_HEADER,
-  isHeroJourneyId,
   pickRandomHeroJourneyId,
 } from "@/lib/hero/constants";
 
@@ -22,11 +21,7 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const existing = request.cookies.get(HERO_JOURNEY_COOKIE)?.value;
-  if (isHeroJourneyId(existing)) {
-    return NextResponse.next();
-  }
-
+  // Fresh curated stills on every homepage load; the header keeps the render in sync.
   const journeyId = pickRandomHeroJourneyId();
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set(HERO_JOURNEY_HEADER, journeyId);

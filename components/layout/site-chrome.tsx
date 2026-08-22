@@ -18,11 +18,11 @@ export function SiteHeader() {
     >
       <Link href="/" className="inline-flex items-center gap-3" aria-label="ARCHITAK home">
         <Image
-          src="/brand/logo-no-bg.png"
+          src="/brand/logo.png"
           alt=""
-          width={40}
-          height={40}
-          className="h-10 w-10 object-contain"
+          width={48}
+          height={48}
+          className="h-11 w-11 object-contain brightness-110 drop-shadow-[0_0_14px_rgba(255,255,255,0.22)]"
           priority
         />
         <span className="display text-fluid-xl tracking-[0.2em]">ARCHITAK</span>

@@ -3,11 +3,10 @@ import type { Metadata } from "next";
 import { PageCta } from "@/components/pages/page-cta";
 import { PageHero } from "@/components/pages/page-hero";
 import { SiteFooter, SiteHeader } from "@/components/layout/site-chrome";
-import { FeaturedWorkAccordion } from "@/components/motion/featured-work-accordion";
 import { Reveal } from "@/components/motion/reveal";
 import { SmoothScroll } from "@/components/motion/smooth-scroll";
+import { StudioWorkDome } from "@/components/studio/studio-work-dome";
 import { TestimonialsSection } from "@/components/studio/testimonials-section";
-import { StudioWorkGrid } from "@/components/studio/work-grid";
 import {
   getStaticProjects,
   getStaticSite,
@@ -16,7 +15,6 @@ import {
 } from "@/content/static";
 import { absoluteUrl } from "@/features/discovery";
 import { buildBreadcrumbJsonLd, jsonLdScript } from "@/features/discovery/structured-data";
-import { getFeaturedAccordionItems } from "@/features/work/accordion-items";
 
 export const metadata: Metadata = {
   title: "Studio — ARCHITAK | Work, Voices & Practice",
@@ -30,7 +28,6 @@ export default async function StudioPage() {
   const page = getStudioPageContent();
   const projects = getStaticProjects();
   const testimonials = getTestimonials();
-  const featuredWork = await getFeaturedAccordionItems();
 
   return (
     <main id="main-content" className="flex min-h-dvh flex-col">
@@ -70,13 +67,7 @@ export default async function StudioPage() {
           <p className="text-fluid-sm tracking-[0.3em] text-muted uppercase">{page.workHeading}</p>
           <p className="measure mt-4 max-w-2xl text-muted">{page.workSupport}</p>
 
-          <div className="mt-fluid-md hidden lg:block">
-            <FeaturedWorkAccordion items={featuredWork} />
-          </div>
-
-          <div className="mt-fluid-md lg:hidden">
-            <StudioWorkGrid projects={projects} />
-          </div>
+          <StudioWorkDome projects={projects} />
         </section>
       </Reveal>
 

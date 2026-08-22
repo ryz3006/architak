@@ -116,7 +116,9 @@ export function DriftWall({ items, className = "", style }: DriftWallProps) {
     const node = containerRef.current;
     if (!node) return;
 
-    const ro = new ResizeObserver(([entry]) => {
+    const ro = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (!entry) return;
       setContainerHeight(entry.contentRect.height || 720);
     });
     ro.observe(node);

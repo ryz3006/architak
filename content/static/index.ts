@@ -2,6 +2,16 @@ import site from "@/content/static/site.json";
 
 export type StaticProject = (typeof site.featuredProjects)[number];
 export type StaticService = (typeof site.services)[number];
+export type HeroChapter = (typeof site.heroChapters)[number];
+export type HeroImage = (typeof site.heroImages)[number];
+export type HeroJourney = (typeof site.heroJourneys)[number];
+
+export type HeroJourneyResolved = {
+  id: string;
+  experience: HeroImage;
+  space: HeroImage;
+  feel: HeroImage;
+};
 
 export function getStaticSite() {
   return site;
@@ -17,4 +27,28 @@ export function getStaticProjectBySlug(slug: string): StaticProject | undefined 
 
 export function getStaticServices(): StaticService[] {
   return site.services;
+}
+
+export function getHeroChapters(): HeroChapter[] {
+  return site.heroChapters;
+}
+
+export function getHeroImages(): HeroImage[] {
+  return site.heroImages;
+}
+
+export function getHeroImageById(id: string): HeroImage | undefined {
+  return site.heroImages.find((image) => image.id === id);
+}
+
+export function getHeroJourneys(): HeroJourney[] {
+  return site.heroJourneys;
+}
+
+export function getHeroJourneyById(id: string): HeroJourney | undefined {
+  return site.heroJourneys.find((journey) => journey.id === id);
+}
+
+export function getManifesto(): string {
+  return site.manifesto;
 }

@@ -3,24 +3,30 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { SiteFooter, SiteHeader } from "@/components/layout/site-chrome";
+import { HeroChapters } from "@/components/motion/hero-chapters";
 import { OptionalThreeMark } from "@/components/motion/optional-three";
 import { Reveal } from "@/components/motion/reveal";
 import { SmoothScroll } from "@/components/motion/smooth-scroll";
-import { getStaticSite } from "@/content/static";
+import { getHeroChapters, getManifesto, getStaticSite } from "@/content/static";
+import { resolveHeroJourney } from "@/lib/hero/journey";
 
 export const metadata: Metadata = {
-  title: "ARCHITAK — Interiors Studio, Kochi",
+  title: "ARCHITAK — Created to Create | Interior Design, Kochi",
   description:
-    "CREATED TO CREATE. ARCHITAK is an interiors studio in Vyttila, Kochi crafting residential, hospitality, corporate, and commercial spaces.",
+    "CREATED TO CREATE. Interior design studio in Vyttila, Kochi — residential, hospitality, corporate, and commercial spaces that become part of how you live.",
   alternates: { canonical: "/" },
   openGraph: {
     title: "ARCHITAK — CREATED TO CREATE",
-    description: "Interiors studio based in Kochi. Spatial craft, precise material, lasting presence.",
+    description:
+      "We create experiences, spaces, and feel — interior design studio in Kochi.",
   },
 };
 
-export default function HomePage() {
+export default async function HomePage() {
   const site = getStaticSite();
+  const journey = await resolveHeroJourney();
+  const chapters = getHeroChapters();
+  const manifesto = getManifesto();
   const threeEnabled = process.env.FEATURE_THREE_D === "true";
 
   return (
@@ -29,51 +35,12 @@ export default function HomePage() {
       <SiteHeader />
       <OptionalThreeMark enabled={threeEnabled} />
 
-      <section
-        className="relative w-full"
-        style={{ minHeight: "max(var(--hero-height), var(--hero-height-min))" }}
-      >
-        <Image
-          src={site.heroImage}
-          alt="ARCHITAK interior design — modern living room"
-          fill
-          priority
-          className="object-cover"
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/55 to-background/20" />
-        <div
-          className="page-frame relative z-10 flex flex-col justify-end pb-fluid-lg"
-          style={{ minHeight: "max(var(--hero-height), var(--hero-height-min))" }}
-        >
-          <p className="mb-4 text-fluid-sm tracking-[0.35em] text-accent uppercase">
-            Kochi · Interiors
-          </p>
-          <h1 className="display max-w-4xl text-display-xl text-foreground">
-            {site.studio.tagline}
-          </h1>
-          <p className="measure mt-6 text-fluid-lg text-foreground/85">{site.studio.statement}</p>
-          <div className="mt-10 flex flex-wrap gap-4">
-            <Link
-              href="/work"
-              className="border border-foreground bg-foreground px-6 py-3 text-fluid-sm tracking-widest text-background uppercase"
-            >
-              View work
-            </Link>
-            <Link
-              href="/contact"
-              className="border border-border px-6 py-3 text-fluid-sm tracking-widest uppercase transition-colors duration-[var(--duration-micro)] hover:border-accent hover:text-accent"
-            >
-              Enquire
-            </Link>
-          </div>
-        </div>
-      </section>
+      <HeroChapters journey={journey} chapters={chapters} tagline={site.studio.tagline} />
 
       <Reveal>
         <section className="page-frame py-fluid-xl">
-          <p className="text-fluid-sm tracking-[0.3em] text-muted uppercase">Featured work</p>
-          <h2 className="display mt-3 text-display-md">Selected projects</h2>
+          <p className="measure max-w-3xl text-fluid-lg text-muted">{manifesto}</p>
+          <h2 className="display mt-fluid-md text-display-md">Work</h2>
           <ul className="mt-12 grid gap-fluid-md [grid-template-columns:repeat(auto-fit,minmax(min(18rem,100%),1fr))]">
             {site.featuredProjects.map((project) => (
               <li key={project.slug} className="@container">
@@ -100,7 +67,7 @@ export default function HomePage() {
 
       <Reveal>
         <section className="page-frame border-t border-border py-fluid-xl">
-          <p className="text-fluid-sm tracking-[0.3em] text-muted uppercase">How we work</p>
+          <p className="text-fluid-sm tracking-[0.3em] text-muted uppercase">How a space is made</p>
           <ol className="mt-10 grid gap-fluid-md [grid-template-columns:repeat(auto-fit,minmax(min(16rem,100%),1fr))]">
             {site.studio.process.map((item) => (
               <li key={item.step}>

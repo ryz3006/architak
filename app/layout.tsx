@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     default: "ARCHITAK",
     template: "%s · ARCHITAK",
   },
-  description: "CREATED TO CREATE — interiors studio based in Kochi.",
+  description: "CREATED TO CREATE — interior design studio in Vyttila, Kochi.",
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
   openGraph: {
     type: "website",

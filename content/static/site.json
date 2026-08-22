@@ -2,7 +2,7 @@
   "studio": {
     "name": "ARCHITAK",
     "tagline": "CREATED TO CREATE",
-    "statement": "Welcome to Architak, where creativity meets functionality to transform spaces into stunning works of art. As a premier interior designing company in Kochi, we craft environments that reflect your vision, style, and personality.",
+    "statement": "We create experiences, spaces, and feel — so luxury is how you live, not what you display.",
     "location": "Vyttila, Kochi, Kerala",
     "address": "ARCK Tower, Neelamuri Line, Ponnurunni, Vyttila, Kochi 682019",
     "phone": "+91 88919 91999",
@@ -10,54 +10,204 @@
     "process": [
       {
         "step": "01",
-        "title": "Concept",
-        "description": "Transforming ideas into creative visions that reflect your style and purpose."
+        "title": "Listen",
+        "description": "How you live, host, and work. That is the brief."
       },
       {
         "step": "02",
-        "title": "Design",
-        "description": "Crafting detailed plans that blend aesthetics with functionality for stunning spaces."
+        "title": "Compose",
+        "description": "Light, material, and plan, held in one idea."
       },
       {
         "step": "03",
-        "title": "Development",
-        "description": "Bringing concepts to life with precision, quality craftsmanship, and timely execution."
+        "title": "Make",
+        "description": "Craft on site until the room feels inevitable."
       }
     ]
   },
+  "manifesto": "Each view, a fresh experience. A new space. An enchanting feel.",
+  "heroChapters": [
+    {
+      "id": "experience",
+      "index": "01",
+      "label": "EXPERIENCE",
+      "headline": "Experiences that stay",
+      "headlineLine2": "",
+      "support": "We create experiences. They become part of your life."
+    },
+    {
+      "id": "space",
+      "index": "02",
+      "label": "SPACE",
+      "headline": "Spaces that think",
+      "headlineLine2": "like you",
+      "support": "We create spaces. They become the reflection of your mind."
+    },
+    {
+      "id": "feel",
+      "index": "03",
+      "label": "FEEL",
+      "headline": "A feel that defines",
+      "headlineLine2": "luxury",
+      "support": "We create the feel. It becomes your definition of luxury."
+    }
+  ],
+  "heroImages": [
+    {
+      "id": "experience-dining",
+      "src": "/media/hero/experience-dining.jpg",
+      "alt": "Night dining room with walnut table and linear chandelier",
+      "focus": { "desktop": "62% 50%", "mobile": "50% 42%" },
+      "motion": { "zoom": 1.035, "drift": "up" }
+    },
+    {
+      "id": "experience-kitchen",
+      "src": "/media/hero/experience-kitchen.jpg",
+      "alt": "Modern kitchen with marble island and warm under-cabinet lighting",
+      "focus": { "desktop": "55% 48%", "mobile": "50% 40%" },
+      "motion": { "zoom": 1.03, "drift": "up" }
+    },
+    {
+      "id": "experience-living",
+      "src": "/media/hero/experience-living.jpg",
+      "alt": "Open-plan living room with staircase and layered warm lighting",
+      "focus": { "desktop": "50% 45%", "mobile": "50% 38%" },
+      "motion": { "zoom": 1.025, "drift": "horizontal" }
+    },
+    {
+      "id": "experience-bedroom",
+      "src": "/media/hero/experience-bedroom.jpg",
+      "alt": "Master bedroom with wood slat wall and backlit fabric panels",
+      "focus": { "desktop": "58% 50%", "mobile": "50% 45%" },
+      "motion": { "zoom": 1.02, "drift": "none" }
+    },
+    {
+      "id": "space-villa-01",
+      "src": "/media/hero/space-villa-01.jpg",
+      "alt": "Modern two-storey villa exterior with warm architectural lighting at night",
+      "focus": { "desktop": "50% 55%", "mobile": "50% 50%" },
+      "motion": { "zoom": 1.04, "drift": "horizontal" }
+    },
+    {
+      "id": "space-villa-02",
+      "src": "/media/hero/space-villa-02.jpg",
+      "alt": "Contemporary villa with cantilevered volumes and illuminated entrance steps",
+      "focus": { "desktop": "48% 52%", "mobile": "50% 48%" },
+      "motion": { "zoom": 1.035, "drift": "horizontal" }
+    },
+    {
+      "id": "space-villa-03",
+      "src": "/media/hero/space-villa-03.jpg",
+      "alt": "Luxury residence with glass balcony and integrated landscape lighting",
+      "focus": { "desktop": "52% 50%", "mobile": "50% 50%" },
+      "motion": { "zoom": 1.03, "drift": "horizontal" }
+    },
+    {
+      "id": "space-commercial-summit",
+      "src": "/media/hero/space-commercial-summit.jpg",
+      "alt": "Summit corporate hub building with vertical fins and warm facade lighting",
+      "focus": { "desktop": "50% 48%", "mobile": "50% 45%" },
+      "motion": { "zoom": 1.04, "drift": "horizontal" }
+    },
+    {
+      "id": "space-commercial-astra",
+      "src": "/media/hero/space-commercial-astra.jpg",
+      "alt": "Astra commercial spaces building with glass offices and lit entrance stairs",
+      "focus": { "desktop": "55% 50%", "mobile": "50% 48%" },
+      "motion": { "zoom": 1.035, "drift": "horizontal" }
+    },
+    {
+      "id": "space-commercial-elevate",
+      "src": "/media/hero/space-commercial-elevate.jpg",
+      "alt": "Elevate business center with tiered balconies and illuminated signage",
+      "focus": { "desktop": "50% 52%", "mobile": "50% 50%" },
+      "motion": { "zoom": 1.03, "drift": "horizontal" }
+    },
+    {
+      "id": "feel-lobby",
+      "src": "/media/hero/feel-lobby.jpg",
+      "alt": "Commercial lobby with marble reception desk and wood slat feature wall",
+      "focus": { "desktop": "60% 50%", "mobile": "50% 42%" },
+      "motion": { "zoom": 1.02, "drift": "none" }
+    },
+    {
+      "id": "feel-office",
+      "src": "/media/hero/feel-office.jpg",
+      "alt": "Corporate office lounge with wood panel wall and warm cove lighting",
+      "focus": { "desktop": "55% 48%", "mobile": "50% 40%" },
+      "motion": { "zoom": 1.025, "drift": "up" }
+    }
+  ],
+  "heroJourneys": [
+    {
+      "id": "journey-01",
+      "experience": "experience-dining",
+      "space": "space-villa-01",
+      "feel": "feel-lobby"
+    },
+    {
+      "id": "journey-02",
+      "experience": "experience-kitchen",
+      "space": "space-commercial-astra",
+      "feel": "feel-office"
+    },
+    {
+      "id": "journey-03",
+      "experience": "experience-living",
+      "space": "space-villa-02",
+      "feel": "feel-lobby"
+    },
+    {
+      "id": "journey-04",
+      "experience": "experience-bedroom",
+      "space": "space-commercial-summit",
+      "feel": "feel-office"
+    },
+    {
+      "id": "journey-05",
+      "experience": "experience-dining",
+      "space": "space-villa-03",
+      "feel": "feel-office"
+    },
+    {
+      "id": "journey-06",
+      "experience": "experience-kitchen",
+      "space": "space-commercial-elevate",
+      "feel": "feel-lobby"
+    }
+  ],
   "services": [
     {
       "slug": "hospitality",
       "title": "Hospitality Design",
-      "description": "Immersive spaces for hotels, resorts, and leisure destinations — comfort balanced with elegance."
+      "description": "Arrival, stay, and memory, held in one atmosphere."
     },
     {
       "slug": "residential",
       "title": "Residential Design",
-      "description": "Homes shaped as personal havens with aesthetic appeal and functional layouts."
+      "description": "Homes that feel like the people who live in them."
     },
     {
       "slug": "corporate",
       "title": "Corporate Design",
-      "description": "Workspaces that foster collaboration and professionalism while reflecting brand identity."
+      "description": "Workplaces with identity, not just desks."
     },
     {
       "slug": "restaurant",
       "title": "Restaurant Design",
-      "description": "Dining environments that express culinary identity, ambiance, and style."
+      "description": "Rooms that taste like the kitchen's intent."
     },
     {
       "slug": "commercial",
       "title": "Commercial Design",
-      "description": "Retail and business environments that balance form, function, and engagement."
+      "description": "Retail and business space that invites and converts."
     },
     {
       "slug": "industrial",
       "title": "Industrial Design",
-      "description": "Efficient, streamlined spaces that integrate robust functionality with thoughtful design."
+      "description": "Clear, durable rooms where process can breathe."
     }
   ],
-  "heroImage": "/media/architak-in/2025__03__interior-of-modern-design-living-room-3d-rendering-e1604308696322.jpg",
   "featuredProjects": [
     {
       "slug": "living-room-atelier",

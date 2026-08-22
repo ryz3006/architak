@@ -19,10 +19,9 @@ export default function WorkPage() {
       <SiteHeader />
       <section className="page-frame py-fluid-xl">
         <p className="text-fluid-sm tracking-[0.3em] text-muted uppercase">Portfolio</p>
-        <h1 className="display mt-3 text-display-lg">Work</h1>
+        <h1 className="display mt-3 text-display-lg">Selected spaces</h1>
         <p className="measure mt-4 text-muted">
-          Project photography mirrored locally so this site remains available and crawlable without
-          external media services.
+          Residential, hospitality, and commercial work from Kochi.
         </p>
         <ul className="mt-14 grid gap-fluid-lg [grid-template-columns:repeat(auto-fit,minmax(min(24rem,100%),1fr))]">
           {projects.map((project) => (

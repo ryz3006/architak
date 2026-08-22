@@ -6,7 +6,7 @@ import { getStaticSite } from "@/content/static";
 export const metadata: Metadata = {
   title: "Studio",
   description:
-    "ARCHITAK studio — interiors practice in Vyttila, Kochi. Concept, design, and development with craft and precision.",
+    "ARCHITAK studio — interiors practice in Vyttila, Kochi. Listen, compose, and make spaces with craft and precision.",
 };
 
 export default function StudioPage() {
@@ -17,8 +17,11 @@ export default function StudioPage() {
       <SiteHeader />
       <section className="page-frame py-fluid-xl">
         <p className="text-fluid-sm tracking-[0.3em] text-muted uppercase">Studio</p>
-        <h1 className="display mt-3 max-w-3xl text-display-lg">{studio.tagline}</h1>
-        <p className="measure mt-8 text-fluid-lg text-muted">{studio.statement}</p>
+        <h1 className="display mt-3 max-w-3xl text-display-lg">Created to create</h1>
+        <p className="measure mt-8 text-fluid-lg text-muted">
+          We do not decorate rooms. We shape how a life is lived.
+        </p>
+        <p className="measure mt-6 text-fluid-base text-muted">{studio.statement}</p>
         <p className="mt-6 text-fluid-sm text-muted">
           {studio.address}
           <br />

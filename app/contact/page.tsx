@@ -34,10 +34,9 @@ export default function ContactPage() {
       <section className="page-frame grid gap-fluid-lg py-fluid-xl lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
         <div>
           <p className="text-fluid-sm tracking-[0.3em] text-muted uppercase">Contact</p>
-          <h1 className="display mt-3 text-display-lg">Get in touch</h1>
+          <h1 className="display mt-3 text-display-lg">Begin here</h1>
           <p className="measure mt-6 text-muted">
-            A passionate group of creative minds dedicated to transforming spaces with innovation and
-            style.
+            Tell us how you live. We will shape the space around it.
           </p>
 
           <address className="mt-12 not-italic">
@@ -74,9 +73,7 @@ export default function ContactPage() {
 
         <div className="border border-border bg-surface p-6 md:p-8">
           <h2 className="display text-display-sm">Project enquiry</h2>
-          <p className="mt-3 text-fluid-sm text-muted">
-            Prefer a form? Leave the brief here — phone, email, and WhatsApp remain equal options.
-          </p>
+          <p className="mt-3 text-fluid-sm text-muted">A short brief is enough.</p>
           <div className="mt-8">
             <EnquiryForm />
           </div>

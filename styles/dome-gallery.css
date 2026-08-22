@@ -262,7 +262,7 @@ main.sphere-main {
   clip: rect(0 0 0 0);
 }
 
-.studio-work-section {
+.studio-page .studio-work-section {
   width: 100%;
   max-width: none;
   overflow: hidden;
@@ -325,11 +325,24 @@ main.sphere-main {
   left: 50%;
   z-index: 6;
   transform: translateX(-50%);
+  text-align: center;
+  pointer-events: none;
+}
+
+.studio-work-dome__hint-primary {
+  margin: 0;
   font-size: var(--step-000);
-  letter-spacing: 0.18em;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-foreground);
+}
+
+.studio-work-dome__hint-secondary {
+  margin: var(--space-1) 0 0;
+  font-size: var(--step-000);
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--color-muted);
-  pointer-events: none;
 }
 
 body.dg-scroll-lock {

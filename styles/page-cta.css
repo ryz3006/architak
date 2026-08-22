@@ -10,7 +10,15 @@
   padding-inline: max(var(--gutter), var(--safe-left)) max(var(--gutter), var(--safe-right));
 }
 
+.page-cta__eyebrow {
+  font-size: var(--step-000);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
 .page-cta__headline {
+  margin-top: var(--space-fluid-sm);
   max-width: 16ch;
   font-size: clamp(1.75rem, 4vw, 3rem);
   line-height: var(--leading-tight);

@@ -104,10 +104,35 @@ function useDomeLayout(containerRef: React.RefObject<HTMLDivElement | null>): Do
   return layout;
 }
 
+function useDomeInteractionHint(): { primary: string; secondary: string } {
+  const [hint, setHint] = useState({
+    primary: "Explore the spaces",
+    secondary: "Drag to move through the work",
+  });
+
+  useEffect(() => {
+    const finePointer = window.matchMedia("(pointer: fine)").matches;
+    setHint(
+      finePointer
+        ? {
+            primary: "Explore the spaces",
+            secondary: "Drag to move through the work",
+          }
+        : {
+            primary: "Swipe to explore",
+            secondary: "Tap a space to enter",
+          },
+    );
+  }, []);
+
+  return hint;
+}
+
 export function StudioWorkDome({ projects }: StudioWorkDomeProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
   const layout = useDomeLayout(containerRef);
+  const hint = useDomeInteractionHint();
   const items = getStudioDomeGalleryItems(projects);
 
   if (reduced) {
@@ -139,7 +164,10 @@ export function StudioWorkDome({ projects }: StudioWorkDomeProps) {
         openedImageHeight="auto"
         className="sphere-root--studio-fill"
       />
-      <p className="studio-work-dome__hint">Drag to explore · Tap to view</p>
+      <div className="studio-work-dome__hint" aria-hidden="true">
+        <p className="studio-work-dome__hint-primary">{hint.primary}</p>
+        <p className="studio-work-dome__hint-secondary">{hint.secondary}</p>
+      </div>
     </div>
   );
 }

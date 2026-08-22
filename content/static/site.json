@@ -249,14 +249,117 @@
     }
   ],
   "studioPage": {
-    "eyebrow": "Studio",
-    "headline": "Created to create.",
-    "support": "We do not decorate rooms. We shape how a life is lived.",
-    "heroImage": "/media/hero/feel-lobby.jpg",
-    "workHeading": "Selected work",
-    "workSupport": "Residential, hospitality, and commercial interiors from Kochi — each space shaped around the life inside it.",
-    "voicesHeading": "Client voices",
-    "voicesSupport": "What clients say after the drawings disappear and the room simply feels right."
+    "hero": {
+      "eyebrow": "The Studio",
+      "headline": ["Created", "to", "create."],
+      "lead": ["We begin with life.", "Then give it space."],
+      "support": "We shape interiors around the people who live, gather, work and remember inside them.",
+      "image": "/media/hero/feel-lobby.jpg",
+      "imageAlt": "ARCHITAK studio — hospitality lobby interior"
+    },
+    "manifesto": {
+      "eyebrow": "What we believe",
+      "statement": "A room is never just a room.",
+      "lines": [
+        "It is where mornings begin.",
+        "Where conversations stay longer.",
+        "Where ideas become work.",
+        "Where people gather.",
+        "Where life leaves its mark."
+      ],
+      "closing": "That is where we begin."
+    },
+    "creates": {
+      "eyebrow": "We create",
+      "pillars": [
+        {
+          "title": "Experience",
+          "tagline": "The moments that happen inside a space.",
+          "progression": "becomes part of your life."
+        },
+        {
+          "title": "Space",
+          "tagline": "The form that holds them.",
+          "progression": "becomes a reflection of your mind."
+        },
+        {
+          "title": "Feel",
+          "tagline": "The part you remember after you leave.",
+          "progression": "becomes your definition of luxury."
+        }
+      ]
+    },
+    "work": {
+      "eyebrow": "The Work",
+      "headline": "Every space begins somewhere.",
+      "support": "These are the places where an idea found its form."
+    },
+    "workBridge": {
+      "lines": [
+        "But the finished room is only half the story.",
+        "The other half is what happens inside it."
+      ]
+    },
+    "voices": {
+      "eyebrow": "After the drawings",
+      "headline": "Then the space becomes theirs.",
+      "support": "And this is what they noticed."
+    },
+    "compliment": {
+      "headline": "The best compliment is when a space stops feeling new.",
+      "support": "And starts feeling like it always belonged there."
+    },
+    "process": {
+      "eyebrow": "From life to space",
+      "headline": "Nothing begins with a drawing.",
+      "steps": [
+        {
+          "step": "01",
+          "title": "Listen",
+          "lines": [
+            "We begin with the life inside the space.",
+            "How you live.",
+            "How you gather.",
+            "How you work."
+          ]
+        },
+        {
+          "step": "02",
+          "title": "Compose",
+          "lines": [
+            "Ideas begin finding their place.",
+            "Light.",
+            "Material.",
+            "Movement.",
+            "Proportion."
+          ]
+        },
+        {
+          "step": "03",
+          "title": "Make",
+          "lines": [
+            "Until the space stops feeling imagined.",
+            "And starts feeling inevitable."
+          ]
+        }
+      ]
+    },
+    "location": {
+      "eyebrow": "Find us",
+      "name": "ARCHITAK",
+      "lines": [
+        "ARCK Tower",
+        "Neelamuri Line, Ponnurunni",
+        "Vyttila, Kochi 682019",
+        "Kerala, India"
+      ],
+      "visitLabel": "Visit the studio"
+    },
+    "cta": {
+      "eyebrow": "The next space",
+      "headline": "Every space begins with a conversation.",
+      "support": "Tell us about the life waiting to happen inside it."
+    }
   },
   "servicesPage": {
     "eyebrow": "Practice",

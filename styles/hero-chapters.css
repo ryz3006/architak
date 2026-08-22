@@ -16,10 +16,6 @@
   --hero-type-max: 34rem;
   --hero-overlay: 0.18;
   --hero-release: 0;
-  --hero-brand-morph: 0;
-  --hero-brand-opacity: 0;
-  --hero-brand-blur: 0px;
-  --hero-brand-scale: 1;
   --hero-exp-weight: 1;
   --hero-space-weight: 0;
   --hero-feel-weight: 0;
@@ -52,32 +48,6 @@
   height: 100%;
 }
 
-.hero-brand-watermark {
-  position: absolute;
-  z-index: 2;
-  top: 50%;
-  left: calc(var(--gutter) + var(--safe-left));
-  width: min(calc(var(--hero-split) * 100% - var(--gutter) - var(--safe-left)), 36rem);
-  pointer-events: none;
-  opacity: var(--hero-brand-opacity);
-  filter: blur(var(--hero-brand-blur));
-  transform: translateY(-46%) scale(var(--hero-brand-scale));
-  transform-origin: left center;
-}
-
-.brand-lockup--watermark .brand-lockup-logo {
-  height: clamp(3.5rem, 8vw, 5rem);
-  width: clamp(3.5rem, 8vw, 5rem);
-}
-
-.brand-lockup--watermark .brand-lockup-name {
-  font-size: clamp(1.75rem, 4vw, 2.75rem);
-}
-
-.brand-lockup--watermark .brand-lockup-tagline {
-  font-size: clamp(0.55rem, 1vw, 0.7rem);
-}
-
 .hero-scene-text {
   position: relative;
   z-index: 3;
@@ -89,6 +59,12 @@
   padding-block: clamp(1.5rem, 4vh, 2.75rem);
   padding-inline: calc(var(--gutter) + var(--safe-left)) var(--space-fluid-sm);
   transform: translate3d(var(--hero-type-x), var(--hero-type-y), 0);
+}
+
+@media (min-width: 64rem) {
+  .hero-scene-text {
+    padding-top: clamp(6.5rem, 15vh, 9rem);
+  }
 }
 
 .hero-scene {
@@ -276,10 +252,6 @@
     height: auto;
     display: grid;
     gap: var(--space-fluid-xl);
-  }
-
-  .hero-brand-watermark {
-    display: none;
   }
 
   .hero-scene {

@@ -3,9 +3,7 @@
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { BrandLockup } from "@/components/layout/brand-lockup";
 import type { HeroChapter, HeroImage, HeroJourneyResolved } from "@/content/static";
-import { getStaticSite } from "@/content/static";
 import { useReducedMotion } from "@/lib/a11y/use-reduced-motion";
 import { persistHeroJourneyCookie } from "@/lib/hero/cookie-client";
 import { computeHeroComposition } from "@/lib/hero/scroll-math";
@@ -22,31 +20,10 @@ type HeroChaptersProps = {
 /** Matches the pinning breakpoint in styles/hero-chapters.css. */
 const PINNED_QUERY = "(min-width: 64rem)";
 
-const BRAND_CSS_VARS = [
-  "--hero-brand-morph",
-  "--hero-brand-opacity",
-  "--hero-brand-blur",
-  "--hero-brand-scale",
-] as const;
-
 function chapterImage(journey: HeroJourneyResolved, chapterId: string): HeroImage {
   if (chapterId === "space") return journey.space;
   if (chapterId === "feel") return journey.feel;
   return journey.experience;
-}
-
-function syncBrandVars(values: Record<(typeof BRAND_CSS_VARS)[number], string>) {
-  const root = document.documentElement;
-  for (const name of BRAND_CSS_VARS) {
-    root.style.setProperty(name, values[name]);
-  }
-}
-
-function clearBrandVars() {
-  const root = document.documentElement;
-  for (const name of BRAND_CSS_VARS) {
-    root.style.removeProperty(name);
-  }
 }
 
 function HeroScene({
@@ -116,7 +93,6 @@ export function HeroChapters({ journey, chapters }: HeroChaptersProps) {
   const [pinned, setPinned] = useState(false);
   const [finePointer, setFinePointer] = useState(false);
 
-  const tagline = getStaticSite().studio.tagline;
   const animated = pinned && !reduced;
 
   useEffect(() => {
@@ -144,17 +120,6 @@ export function HeroChapters({ journey, chapters }: HeroChaptersProps) {
     };
   }, [journey.feel.src, journey.id, journey.space.src]);
 
-  useEffect(() => {
-    if (animated) return;
-    clearBrandVars();
-  }, [animated]);
-
-  useEffect(() => {
-    return () => {
-      clearBrandVars();
-    };
-  }, []);
-
   const applyComposition = useCallback(
     (progress: number) => {
       const root = rootRef.current;
@@ -180,17 +145,6 @@ export function HeroChapters({ journey, chapters }: HeroChaptersProps) {
       );
       style.setProperty("--hero-space-scale", String(vars.spaceScale * journey.space.motion.zoom));
       style.setProperty("--hero-feel-scale", String(vars.feelScale * journey.feel.motion.zoom));
-      style.setProperty("--hero-brand-morph", String(vars.brandMorph));
-      style.setProperty("--hero-brand-opacity", String(vars.brandOpacity));
-      style.setProperty("--hero-brand-blur", `${vars.brandBlur}px`);
-      style.setProperty("--hero-brand-scale", String(vars.brandScale));
-
-      syncBrandVars({
-        "--hero-brand-morph": String(vars.brandMorph),
-        "--hero-brand-opacity": String(vars.brandOpacity),
-        "--hero-brand-blur": `${vars.brandBlur}px`,
-        "--hero-brand-scale": String(vars.brandScale),
-      });
 
       if (progress > 0.1 && !preloadedSpace.current) {
         preloadedSpace.current = true;
@@ -276,11 +230,6 @@ export function HeroChapters({ journey, chapters }: HeroChaptersProps) {
       <div className="hero-track" ref={trackRef}>
         <div className="hero-stage">
           <div className="hero-composition" ref={compositionRef}>
-            {animated ? (
-              <div className="hero-brand-watermark" aria-hidden="true">
-                <BrandLockup tagline={tagline} className="brand-lockup brand-lockup--watermark" />
-              </div>
-            ) : null}
             {chapters.map((chapter, index) => (
               <HeroScene
                 key={chapter.id}

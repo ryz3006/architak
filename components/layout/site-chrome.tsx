@@ -13,19 +13,15 @@ const links: readonly NavLink[] = [
   { href: "/contact", label: "Contact" },
 ] as const;
 
-export function SiteHeader({ brandMorph = false }: { brandMorph?: boolean }) {
+export function SiteHeader({ homeHero = false }: { homeHero?: boolean }) {
   const tagline = getStaticSite().studio.tagline;
 
   return (
     <header
-      className="page-frame relative z-[var(--z-header)] flex items-center justify-between py-6"
+      className={`page-frame relative z-[var(--z-header)] flex items-start justify-between py-6${homeHero ? " site-header--home" : ""}`}
       style={{ paddingTop: "calc(var(--safe-top) + 1.5rem)" }}
     >
-      <Link
-        href="/"
-        className={`site-brand${brandMorph ? " site-brand--morph" : ""}`}
-        aria-label="ARCHITAK home"
-      >
+      <Link href="/" className="site-brand" aria-label="ARCHITAK home">
         <BrandLockup tagline={tagline} logoPriority />
       </Link>
 

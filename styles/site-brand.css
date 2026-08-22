@@ -1,30 +1,62 @@
 .brand-lockup {
   display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.875rem;
+}
+
+.brand-lockup-logo-wrap {
+  display: block;
+  flex-shrink: 0;
+  height: clamp(4.25rem, 9vw, 5.75rem);
+  width: clamp(4.25rem, 9vw, 5.75rem);
+  overflow: hidden;
+}
+
+.brand-lockup-logo {
+  display: block;
+  height: 138%;
+  width: 100%;
+  object-fit: contain;
+  object-position: top center;
+}
+
+.brand-lockup-text {
+  display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.125rem;
+}
+
+.brand-lockup-name {
+  font-size: clamp(1.35rem, 2.4vw, 1.85rem);
+  line-height: 1.05;
 }
 
 .brand-lockup-tagline {
-  padding-left: calc(3.5rem + 1rem);
-  font-size: 0.62rem;
-  letter-spacing: 0.32em;
+  margin: 0;
+  padding: 0;
+  font-size: clamp(0.54rem, 0.95vw, 0.62rem);
+  letter-spacing: 0.28em;
+  line-height: 1.35;
   text-transform: uppercase;
   color: var(--color-accent);
 }
 
-@media (min-width: 48rem) {
-  .brand-lockup-tagline {
-    padding-left: calc(4.5rem + 1.25rem);
-    font-size: 0.7rem;
-  }
-}
-
-.site-brand--morph {
-  opacity: calc(1 - var(--hero-brand-morph, 0));
+.site-header--home {
+  position: fixed;
+  inset-inline: 0;
+  top: 0;
+  z-index: var(--z-header);
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--color-background) 88%, transparent),
+    transparent 88%
+  );
 }
 
 @media (max-width: 63.99rem), (prefers-reduced-motion: reduce) {
-  .site-brand--morph {
-    opacity: 1;
+  .site-header--home {
+    position: relative;
+    background: none;
   }
 }

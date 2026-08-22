@@ -32,7 +32,7 @@ export default async function HomePage() {
   return (
     <main id="main-content" className="relative flex min-h-dvh flex-col">
       <SmoothScroll />
-      <SiteHeader brandMorph />
+      <SiteHeader homeHero />
       <OptionalThreeMark enabled={threeEnabled} />
 
       <HeroChapters journey={journey} chapters={chapters} />

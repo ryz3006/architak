@@ -35,10 +35,6 @@ export interface HeroCompositionVars {
   progress01: number;
   progress02: number;
   progress03: number;
-  brandMorph: number;
-  brandOpacity: number;
-  brandBlur: number;
-  brandScale: number;
 }
 
 export function computeHeroComposition(progress: number): HeroCompositionVars {
@@ -76,11 +72,6 @@ export function computeHeroComposition(progress: number): HeroCompositionVars {
   const progress02 = activeChapter === 1 ? 1 : 0.35;
   const progress03 = activeChapter === 2 ? 1 : 0.35;
 
-  const brandMorph = clamp(smoothstep(0, 0.14, p), 0, 1);
-  const brandOpacity = brandMorph * 0.13;
-  const brandBlur = brandMorph * 14;
-  const brandScale = lerp(1, 2.6, brandMorph);
-
   return {
     progress: p,
     split,
@@ -102,9 +93,5 @@ export function computeHeroComposition(progress: number): HeroCompositionVars {
     progress01,
     progress02,
     progress03,
-    brandMorph,
-    brandOpacity,
-    brandBlur,
-    brandScale,
   };
 }

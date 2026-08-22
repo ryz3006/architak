@@ -25,6 +25,34 @@
       }
     ]
   },
+  "spaceStory": {
+    "eyebrow": "HOW A SPACE IS MADE",
+    "headline": "A space doesn't begin with walls.",
+    "support": "It begins with the life waiting to happen inside them.",
+    "steps": [
+      {
+        "step": "01",
+        "phrase": "First, we listen.",
+        "copy": "Before we shape the space, we understand the life inside it.",
+        "fragments": ["How you live.", "How you gather.", "How you work."],
+        "align": "left"
+      },
+      {
+        "step": "02",
+        "phrase": "Then, it takes shape.",
+        "copy": "Light finds direction. Materials find meaning. Ideas begin to belong together.",
+        "closing": "A space starts imagining itself.",
+        "align": "center"
+      },
+      {
+        "step": "03",
+        "phrase": "Finally, it becomes real.",
+        "copy": "Crafted until the drawings disappear and the details simply feel right.",
+        "fragments": ["Not just designed.", "Felt."],
+        "align": "right"
+      }
+    ]
+  },
   "manifesto": "Each view, a fresh experience. A new space. An enchanting feel.",
   "heroChapters": [
     {

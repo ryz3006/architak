@@ -7,7 +7,9 @@ import { OptionalSplashCursor } from "@/components/motion/optional-splash-cursor
 import { OptionalThreeMark } from "@/components/motion/optional-three";
 import { Reveal } from "@/components/motion/reveal";
 import { SmoothScroll } from "@/components/motion/smooth-scroll";
-import { getHeroChapters, getManifesto, getStaticSite } from "@/content/static";
+import { SpaceStorySection } from "@/components/motion/space-story";
+import { getHeroChapters, getManifesto, getSpaceStory } from "@/content/static";
+import { getDriftWallImages } from "@/features/story/drift-images";
 import { getFeaturedAccordionItems } from "@/features/work/accordion-items";
 import { resolveHeroJourney } from "@/lib/hero/journey";
 
@@ -24,10 +26,11 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  const site = getStaticSite();
   const journey = await resolveHeroJourney();
   const chapters = getHeroChapters();
   const manifesto = getManifesto();
+  const spaceStory = getSpaceStory();
+  const driftImages = getDriftWallImages();
   const featuredWork = await getFeaturedAccordionItems();
   const threeEnabled = process.env.FEATURE_THREE_D === "true";
   const splashCursorEnabled = process.env.FEATURE_SPLASH_CURSOR !== "false";
@@ -49,20 +52,7 @@ export default async function HomePage() {
         </section>
       </Reveal>
 
-      <Reveal>
-        <section className="page-frame border-t border-border py-fluid-xl">
-          <p className="text-fluid-sm tracking-[0.3em] text-muted uppercase">How a space is made</p>
-          <ol className="mt-10 grid gap-fluid-md [grid-template-columns:repeat(auto-fit,minmax(min(16rem,100%),1fr))]">
-            {site.studio.process.map((item) => (
-              <li key={item.step}>
-                <p className="text-accent">{item.step}</p>
-                <h3 className="display mt-2 text-fluid-xl">{item.title}</h3>
-                <p className="measure-narrow mt-3 text-fluid-sm text-muted">{item.description}</p>
-              </li>
-            ))}
-          </ol>
-        </section>
-      </Reveal>
+      <SpaceStorySection story={spaceStory} images={driftImages} />
 
       <SiteFooter />
     </main>

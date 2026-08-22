@@ -52,3 +52,11 @@ export function getHeroJourneyById(id: string): HeroJourney | undefined {
 export function getManifesto(): string {
   return site.manifesto;
 }
+
+export type SpaceStoryStep = (typeof site.spaceStory.steps)[number];
+
+export type SpaceStory = typeof site.spaceStory;
+
+export function getSpaceStory(): SpaceStory {
+  return site.spaceStory;
+}

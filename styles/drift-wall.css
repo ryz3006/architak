@@ -1,0 +1,123 @@
+.drift-wall {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  perspective: var(--dw-perspective, 1800px);
+  perspective-origin: 50% 50%;
+  --dw-tile-w: clamp(7.5rem, 14vw, 16.25rem);
+  --dw-tile-h: clamp(5rem, 9vw, 10.5rem);
+  --dw-gap: clamp(0.625rem, 1.2vw, 1.25rem);
+  --dw-radius: 0.5rem;
+  --dw-dim: 0.14;
+  --dw-gray: 1;
+  --dw-blur: 18px;
+  --dw-brightness: 0.62;
+  --dw-contrast: 0.88;
+  --dw-overlay: #0a0a0a;
+  --dw-edge: 72%;
+  pointer-events: none;
+  -webkit-mask-image:
+    radial-gradient(ellipse 82% 78% at 50% 48%, #000 var(--dw-edge), transparent 100%),
+    linear-gradient(to top, #000 55%, transparent 100%);
+  mask-image:
+    radial-gradient(ellipse 82% 78% at 50% 48%, #000 var(--dw-edge), transparent 100%),
+    linear-gradient(to top, #000 55%, transparent 100%);
+  mask-composite: intersect;
+  -webkit-mask-composite: source-in;
+}
+
+.drift-wall__plane {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  flex-direction: row;
+  transform-style: preserve-3d;
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+
+.drift-wall__col {
+  position: relative;
+  width: calc(var(--dw-tile-w) + var(--dw-gap));
+  transform-style: preserve-3d;
+}
+
+.drift-wall__track {
+  display: flex;
+  flex-direction: column;
+  will-change: transform;
+  transform-style: preserve-3d;
+}
+
+.drift-wall__tile {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: calc(var(--dw-tile-h) + var(--dw-gap));
+  flex: 0 0 auto;
+}
+
+.drift-wall__inner {
+  position: absolute;
+  inset: calc(var(--dw-gap) / 2);
+  display: block;
+  border-radius: var(--dw-radius);
+  overflow: hidden;
+  background: var(--color-surface, #121212);
+  opacity: var(--dw-dim);
+  transform: translateZ(0);
+  pointer-events: none;
+}
+
+.drift-wall__media {
+  width: 100%;
+  height: 100%;
+  filter: blur(var(--dw-blur)) grayscale(var(--dw-gray)) brightness(var(--dw-brightness))
+    contrast(var(--dw-contrast));
+}
+
+.drift-wall__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none;
+}
+
+.drift-wall__overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--dw-overlay);
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.drift-wall--reduced .drift-wall__plane,
+.drift-wall--reduced .drift-wall__track {
+  will-change: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drift-wall__plane,
+  .drift-wall__track {
+    will-change: auto;
+  }
+}
+
+@media (max-width: 40rem) {
+  .drift-wall {
+    --dw-blur: 14px;
+    --dw-dim: 0.1;
+    --dw-edge: 78%;
+  }
+}
+
+@media (min-width: 120rem) {
+  .drift-wall {
+    --dw-edge: 68%;
+  }
+}

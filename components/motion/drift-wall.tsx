@@ -16,23 +16,36 @@ import "@/styles/drift-wall.css";
 
 export type DriftWallItem = {
   image: string;
-  alt: string;
-};
-
-type DriftProfile = {
-  columns: number;
-  speed: number;
-  tilt: number;
-  turn: number;
-  depth: number;
-  parallax: number;
-  scale: number;
+  title?: string;
+  href?: string;
 };
 
 type DriftWallProps = {
   items: DriftWallItem[];
+  columns?: number;
+  tileWidth?: number;
+  tileHeight?: number;
+  gap?: number;
+  radius?: number;
+  tilt?: number;
+  turn?: number;
+  roll?: number;
+  perspective?: number;
+  depth?: number;
+  speed?: number;
+  direction?: "up" | "down";
+  variance?: number;
+  parallax?: number;
+  pauseOnHover?: boolean;
+  lift?: number;
+  fade?: number;
+  dim?: number;
+  grayscale?: boolean;
+  overlayColor?: string;
   className?: string;
   style?: CSSProperties;
+  /** Decorative background — no tile hover, lift, or pointer interaction. */
+  ambient?: boolean;
 };
 
 function columnFactor(index: number, variance: number): number {
@@ -40,29 +53,32 @@ function columnFactor(index: number, variance: number): number {
   return 1 + variance * pseudo;
 }
 
-function resolveProfile(width: number, height: number, coarse: boolean): DriftProfile {
-  const aspect = width / Math.max(height, 1);
-
-  if (width < 480 || (width < 720 && aspect < 0.85)) {
-    return { columns: 2, speed: 5, tilt: 2, turn: -2, depth: 40, parallax: 0, scale: 1.06 };
-  }
-
-  if (width < 768) {
-    return { columns: 3, speed: 6, tilt: 3, turn: -3, depth: 50, parallax: 0, scale: 1.08 };
-  }
-
-  if (width < 1024 || (aspect > 1.4 && height < 720)) {
-    return { columns: 4, speed: 7, tilt: 4, turn: -4, depth: 60, parallax: coarse ? 0 : 0.04, scale: 1.1 };
-  }
-
-  if (width < 1600) {
-    return { columns: 5, speed: 8, tilt: 5, turn: -5, depth: 70, parallax: coarse ? 0 : 0.06, scale: 1.12 };
-  }
-
-  return { columns: 6, speed: 8, tilt: 6, turn: -5, depth: 80, parallax: coarse ? 0 : 0.08, scale: 1.14 };
-}
-
-export function DriftWall({ items, className = "", style }: DriftWallProps) {
+export function DriftWall({
+  items,
+  columns = 5,
+  tileWidth = 200,
+  tileHeight = 132,
+  gap = 18,
+  radius = 14,
+  tilt = 16,
+  turn = -14,
+  roll = 0,
+  perspective = 1200,
+  depth = 120,
+  speed = 42,
+  direction = "up",
+  variance = 0.45,
+  parallax = 0.6,
+  pauseOnHover = false,
+  lift = 64,
+  fade = 0.6,
+  dim = 0.55,
+  grayscale = false,
+  overlayColor = "#060010",
+  className = "",
+  style,
+  ambient = false,
+}: DriftWallProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const planeRef = useRef<HTMLDivElement>(null);
   const trackRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -70,19 +86,19 @@ export function DriftWall({ items, className = "", style }: DriftWallProps) {
 
   const offsetsRef = useRef<number[]>([]);
   const velocitiesRef = useRef<number[]>([]);
+  const hoveredColRef = useRef(-1);
+  const wallHoveredRef = useRef(false);
   const pointerRef = useRef({ x: 0, y: 0 });
   const pointerDampedRef = useRef({ x: 0, y: 0 });
   const lastTsRef = useRef<number | null>(null);
-  const profileRef = useRef<DriftProfile>(resolveProfile(1280, 800, false));
+  const activeIdRef = useRef<string | null>(null);
 
   const reduced = useReducedMotion();
-  const [containerHeight, setContainerHeight] = useState(720);
-  const [profile, setProfile] = useState<DriftProfile>(() => resolveProfile(1280, 800, false));
+  const [containerHeight, setContainerHeight] = useState(600);
+  const [activeId, setActiveId] = useState<string | null>(null);
 
-  const columns = profile.columns;
-  const variance = 0.25;
-  const gap = 20;
-  const tileHeight = 145;
+  const effectiveParallax = ambient ? Math.min(parallax, 0.12) : parallax;
+  const effectiveLift = ambient ? 0 : lift;
 
   const columnItems = useMemo(() => {
     if (items.length === 0) return [];
@@ -97,20 +113,10 @@ export function DriftWall({ items, className = "", style }: DriftWallProps) {
     const unit = tileHeight + gap;
     return columnItems.map((col) => {
       const copyHeight = Math.max(unit, col.length * unit);
-      const copies =
-        profile.columns <= 3
-          ? Math.max(2, Math.ceil((containerHeight * 1.2) / copyHeight) + 1)
-          : Math.max(2, Math.ceil((containerHeight * 1.45) / copyHeight) + 1);
+      const copies = Math.max(2, Math.ceil((containerHeight * 1.6) / copyHeight) + 1);
       return { copyHeight, copies };
     });
-  }, [columnItems, containerHeight, profile.columns]);
-
-  const baseVelocities = useMemo(() => {
-    return columnItems.map((_, columnIndex) => {
-      const altSign = columnIndex % 2 === 0 ? 1 : -1;
-      return profile.speed * columnFactor(columnIndex, variance) * altSign;
-    });
-  }, [columnItems, profile.speed]);
+  }, [columnItems, containerHeight, gap, tileHeight]);
 
   useLayoutEffect(() => {
     const node = containerRef.current;
@@ -119,73 +125,50 @@ export function DriftWall({ items, className = "", style }: DriftWallProps) {
     const ro = new ResizeObserver((entries) => {
       const entry = entries[0];
       if (!entry) return;
-      setContainerHeight(entry.contentRect.height || 720);
+      setContainerHeight(entry.contentRect.height || 600);
     });
     ro.observe(node);
     return () => ro.disconnect();
   }, []);
 
-  useEffect(() => {
-    const syncProfile = () => {
-      const coarse = window.matchMedia("(pointer: coarse)").matches;
-      const next = resolveProfile(window.innerWidth, window.innerHeight, coarse);
-      profileRef.current = next;
-      setProfile(next);
-    };
-
-    syncProfile();
-    window.addEventListener("resize", syncProfile, { passive: true });
-    window.addEventListener("orientationchange", syncProfile);
-    return () => {
-      window.removeEventListener("resize", syncProfile);
-      window.removeEventListener("orientationchange", syncProfile);
-    };
-  }, []);
+  const baseVelocities = useMemo(() => {
+    const dirSign = direction === "up" ? 1 : -1;
+    return columnItems.map((_, columnIndex) => {
+      const altSign = columnIndex % 2 === 0 ? 1 : -1;
+      return speed * columnFactor(columnIndex, variance) * dirSign * altSign;
+    });
+  }, [columnItems, direction, speed, variance]);
 
   useEffect(() => {
     offsetsRef.current = columnMeta.map((meta, columnIndex) => meta.copyHeight * ((columnIndex * 0.37) % 1));
     velocitiesRef.current = columnItems.map(() => 0);
   }, [columnItems, columnMeta]);
 
-  const applyPlaneTransform = useCallback((px: number, py: number) => {
-    const plane = planeRef.current;
-    const p = profileRef.current;
-    if (!plane) return;
+  const applyPlaneTransform = useCallback(
+    (px: number, py: number) => {
+      const plane = planeRef.current;
+      if (!plane) return;
 
-    plane.style.transform =
-      `translate(-50%, -50%) scale(${p.scale}) ` +
-      `rotateX(${p.tilt + py}deg) rotateY(${p.turn + px}deg) ` +
-      `translateZ(${-p.depth}px)`;
-  }, []);
+      plane.style.transform =
+        `translate(-50%, -50%) scale(1.18) ` +
+        `rotateX(${tilt + py}deg) rotateY(${turn + px}deg) rotateZ(${roll}deg) ` +
+        `translateZ(${-depth}px)`;
+    },
+    [depth, roll, tilt, turn],
+  );
 
   useEffect(() => {
     applyPlaneTransform(0, 0);
-
-    const onPointerMove = (event: PointerEvent) => {
-      const p = profileRef.current;
-      if (p.parallax <= 0 || reduced) return;
-
-      const rect = containerRef.current?.getBoundingClientRect();
-      if (!rect) return;
-
-      pointerRef.current = {
-        x: (event.clientX - rect.left) / rect.width - 0.5,
-        y: (event.clientY - rect.top) / rect.height - 0.5,
-      };
-    };
-
-    window.addEventListener("pointermove", onPointerMove, { passive: true });
 
     const animate = (timestamp: number) => {
       if (lastTsRef.current === null) lastTsRef.current = timestamp;
       const dt = Math.min(0.05, Math.max(0, timestamp - lastTsRef.current) / 1000);
       lastTsRef.current = timestamp;
 
-      const p = profileRef.current;
-      const maxTilt = p.parallax * 4;
+      const maxTilt = effectiveParallax * 8;
       const targetX = pointerRef.current.x * maxTilt;
       const targetY = -pointerRef.current.y * maxTilt;
-      const damp = 1 - Math.exp(-dt / 0.14);
+      const damp = 1 - Math.exp(-dt / 0.12);
       pointerDampedRef.current.x += (targetX - pointerDampedRef.current.x) * damp;
       pointerDampedRef.current.y += (targetY - pointerDampedRef.current.y) * damp;
       applyPlaneTransform(pointerDampedRef.current.x, pointerDampedRef.current.y);
@@ -195,8 +178,11 @@ export function DriftWall({ items, className = "", style }: DriftWallProps) {
           const meta = columnMeta[columnIndex];
           if (!meta) continue;
 
-          const target = baseVelocities[columnIndex] ?? 0;
-          const ease = 1 - Math.exp(-dt / 0.28);
+          const paused = wallHoveredRef.current && pauseOnHover;
+          const factor = paused || hoveredColRef.current === columnIndex ? 0 : 1;
+          const target = (baseVelocities[columnIndex] ?? 0) * factor;
+
+          const ease = 1 - Math.exp(-dt / (target === 0 ? 0.16 : 0.28));
           velocitiesRef.current[columnIndex] =
             (velocitiesRef.current[columnIndex] ?? 0) +
             (target - (velocitiesRef.current[columnIndex] ?? 0)) * ease;
@@ -208,6 +194,14 @@ export function DriftWall({ items, className = "", style }: DriftWallProps) {
           const track = trackRefs.current[columnIndex];
           if (track) track.style.transform = `translate3d(0, ${-next}px, 0)`;
         }
+      } else {
+        for (let columnIndex = 0; columnIndex < trackRefs.current.length; columnIndex += 1) {
+          const track = trackRefs.current[columnIndex];
+          const meta = columnMeta[columnIndex];
+          if (track && meta) {
+            track.style.transform = `translate3d(0, ${-(offsetsRef.current[columnIndex] ?? 0)}px, 0)`;
+          }
+        }
       }
 
       rafRef.current = requestAnimationFrame(animate);
@@ -216,28 +210,146 @@ export function DriftWall({ items, className = "", style }: DriftWallProps) {
     rafRef.current = requestAnimationFrame(animate);
 
     return () => {
-      window.removeEventListener("pointermove", onPointerMove);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
       lastTsRef.current = null;
     };
-  }, [applyPlaneTransform, baseVelocities, columnMeta, reduced]);
+  }, [applyPlaneTransform, baseVelocities, columnMeta, effectiveParallax, pauseOnHover, reduced]);
+
+  const activate = useCallback(
+    (id: string, columnIndex: number) => {
+      if (ambient) return;
+      activeIdRef.current = id;
+      hoveredColRef.current = columnIndex;
+      setActiveId(id);
+    },
+    [ambient],
+  );
+
+  const release = useCallback(() => {
+    if (ambient) return;
+    activeIdRef.current = null;
+    hoveredColRef.current = -1;
+    setActiveId(null);
+  }, [ambient]);
+
+  const handlePointerMove = useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      const rect = containerRef.current?.getBoundingClientRect();
+      if (!rect) return;
+
+      if (effectiveParallax > 0 && !reduced) {
+        pointerRef.current = {
+          x: (event.clientX - rect.left) / rect.width - 0.5,
+          y: (event.clientY - rect.top) / rect.height - 0.5,
+        };
+      }
+
+      if (ambient) return;
+
+      const hit = document.elementFromPoint(event.clientX, event.clientY);
+      const tile = hit instanceof Element ? hit.closest("[data-tile-id]") : null;
+      if (!tile || !(tile instanceof HTMLElement)) return;
+
+      const id = tile.dataset.tileId;
+      if (!id || id === activeIdRef.current) return;
+
+      activeIdRef.current = id;
+      hoveredColRef.current = Number(tile.dataset.col);
+      setActiveId(id);
+    },
+    [ambient, effectiveParallax, reduced],
+  );
+
+  const handlePointerLeaveWall = useCallback(() => {
+    wallHoveredRef.current = false;
+    pointerRef.current = { x: 0, y: 0 };
+    release();
+  }, [release]);
+
+  const cssVars = useMemo(
+    () =>
+      ({
+        "--dw-tile-w": `${tileWidth}px`,
+        "--dw-tile-h": `${tileHeight}px`,
+        "--dw-gap": `${gap}px`,
+        "--dw-radius": `${radius}px`,
+        "--dw-perspective": `${perspective}px`,
+        "--dw-lift": `${effectiveLift}px`,
+        "--dw-dim": dim,
+        "--dw-gray": grayscale ? 1 : 0,
+        "--dw-overlay": overlayColor,
+        "--dw-edge": `${Math.max(0, (1 - fade) * 100)}%`,
+        ...style,
+      }) as CSSProperties,
+    [dim, effectiveLift, fade, gap, grayscale, overlayColor, perspective, radius, style, tileHeight, tileWidth],
+  );
+
+  const renderTile = (item: DriftWallItem, id: string, columnIndex: number) => {
+    const inner = (
+      <span className="drift-wall__inner">
+        <img src={item.image} alt={item.title ?? ""} loading="lazy" decoding="async" draggable={false} />
+        <span className="drift-wall__overlay" aria-hidden="true" />
+      </span>
+    );
+
+    const commonProps = {
+      className: `drift-wall__tile${activeId === id ? " is-active" : ""}`,
+      "data-tile-id": id,
+      "data-col": columnIndex,
+      onFocus: () => activate(id, columnIndex),
+      onBlur: release,
+    };
+
+    if (item.href) {
+      return (
+        <a key={id} href={item.href} target="_blank" rel="noreferrer noopener" {...commonProps}>
+          {inner}
+        </a>
+      );
+    }
+
+    if (ambient) {
+      return (
+        <div key={id} className={commonProps.className} data-tile-id={id} data-col={columnIndex}>
+          {inner}
+        </div>
+      );
+    }
+
+    return (
+      <div key={id} tabIndex={0} role="button" aria-label={item.title ?? "tile"} {...commonProps}>
+        {inner}
+      </div>
+    );
+  };
 
   if (items.length === 0) {
     return null;
   }
 
-  const cssVars = {
-    "--dw-perspective": "1800px",
-    ...style,
-  } as CSSProperties;
+  const rootClass = [
+    "drift-wall",
+    reduced ? "drift-wall--reduced" : "",
+    ambient ? "drift-wall--ambient" : "",
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <div
       ref={containerRef}
-      className={`drift-wall${reduced ? " drift-wall--reduced" : ""}${className ? ` ${className}` : ""}`}
+      className={rootClass}
       style={cssVars}
-      aria-hidden="true"
+      onPointerMove={handlePointerMove}
+      onPointerEnter={() => {
+        wallHoveredRef.current = true;
+      }}
+      onPointerLeave={handlePointerLeaveWall}
+      role="group"
+      aria-hidden={ambient ? true : undefined}
+      aria-label={ambient ? undefined : "Drifting wall of tiles"}
     >
       <div ref={planeRef} className="drift-wall__plane">
         {columnItems.map((column, columnIndex) => {
@@ -253,19 +365,9 @@ export function DriftWall({ items, className = "", style }: DriftWallProps) {
                 className="drift-wall__track"
               >
                 {Array.from({ length: meta.copies }).flatMap((_, copyIndex) =>
-                  column.map((item, itemIndex) => {
-                    const key = `${columnIndex}-${copyIndex}-${itemIndex}`;
-                    return (
-                      <div key={key} className="drift-wall__tile">
-                        <span className="drift-wall__inner">
-                          <span className="drift-wall__media">
-                            <img src={item.image} alt="" loading="lazy" decoding="async" draggable={false} />
-                          </span>
-                          <span className="drift-wall__overlay" />
-                        </span>
-                      </div>
-                    );
-                  }),
+                  column.map((item, itemIndex) =>
+                    renderTile(item, `${columnIndex}-${copyIndex}-${itemIndex}`, columnIndex),
+                  ),
                 )}
               </div>
             </div>

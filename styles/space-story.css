@@ -10,7 +10,7 @@
   position: absolute;
   inset: 0;
   z-index: 0;
-  pointer-events: none;
+  min-height: 100%;
 }
 
 .space-story__atmosphere {
@@ -19,8 +19,14 @@
   z-index: 1;
   pointer-events: none;
   background:
-    linear-gradient(180deg, var(--color-background) 0%, rgb(10 10 10 / 0.72) 18%, rgb(10 10 10 / 0.55) 48%, rgb(10 10 10 / 0.82) 100%),
-    radial-gradient(ellipse 90% 70% at 50% 42%, rgb(10 10 10 / 0.35) 0%, rgb(10 10 10 / 0.92) 78%);
+    linear-gradient(
+      180deg,
+      var(--color-background) 0%,
+      rgb(10 10 10 / 0.35) 14%,
+      rgb(10 10 10 / 0.2) 42%,
+      rgb(10 10 10 / 0.45) 100%
+    ),
+    radial-gradient(ellipse 88% 72% at 50% 44%, rgb(10 10 10 / 0.15) 0%, rgb(10 10 10 / 0.55) 82%);
 }
 
 .space-story__content {

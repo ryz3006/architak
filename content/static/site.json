@@ -353,7 +353,9 @@
         "Vyttila, Kochi 682019",
         "Kerala, India"
       ],
-      "visitLabel": "Visit the studio"
+      "visitLabel": "Open in Google Maps",
+      "mapUrl": "https://maps.app.goo.gl/y1ErBX2vYBp4daFJA",
+      "mapEmbedUrl": "https://maps.google.com/maps?q=9.9839674,76.3184254&hl=en&z=17&output=embed"
     },
     "cta": {
       "eyebrow": "The next space",

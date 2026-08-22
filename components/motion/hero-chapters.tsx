@@ -7,6 +7,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { HeroChapter, HeroImage, HeroJourneyResolved } from "@/content/static";
 import { useReducedMotion } from "@/lib/a11y/use-reduced-motion";
 import { computeHeroComposition } from "@/lib/hero/scroll-math";
+import { persistHeroJourneyCookie } from "@/lib/hero/cookie-client";
 
 import "@/styles/hero-chapters.css";
 
@@ -136,6 +137,7 @@ export function HeroChapters({ journey, chapters, tagline }: HeroChaptersProps) 
 
   useEffect(() => {
     setMounted(true);
+    persistHeroJourneyCookie(journey.id);
     const mobileQuery = window.matchMedia("(max-width: 47.99rem)");
     const pointerQuery = window.matchMedia("(pointer: fine)");
     const sync = () => {
@@ -149,7 +151,7 @@ export function HeroChapters({ journey, chapters, tagline }: HeroChaptersProps) 
       mobileQuery.removeEventListener("change", sync);
       pointerQuery.removeEventListener("change", sync);
     };
-  }, []);
+  }, [journey.id]);
 
   const applyComposition = useCallback(
     (progress: number) => {

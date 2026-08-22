@@ -1,4 +1,4 @@
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 
 import {
   getHeroImageById,
@@ -7,9 +7,12 @@ import {
   type HeroImage,
   type HeroJourneyResolved,
 } from "@/content/static";
-
-const COOKIE_NAME = "architak-hero-journey";
-const COOKIE_MAX_AGE = 86_400;
+import {
+  HERO_JOURNEY_COOKIE,
+  HERO_JOURNEY_HEADER,
+  isHeroJourneyId,
+  pickRandomHeroJourneyId,
+} from "@/lib/hero/constants";
 
 function resolveJourneyImages(journeyId: string): HeroJourneyResolved | null {
   const journey = getHeroJourneyById(journeyId);
@@ -31,39 +34,30 @@ function resolveJourneyImages(journeyId: string): HeroJourneyResolved | null {
   };
 }
 
-function pickRandomJourneyId(): string {
-  const journeys = getHeroJourneys();
-  const index = Math.floor(Math.random() * journeys.length);
-  return journeys[index]?.id ?? journeys[0]!.id;
-}
-
 /**
- * Resolves the hero journey for this request.
+ * Resolves the hero journey for this request (read-only).
  *
- * Server picks (or reuses) a journey id via cookie so SSR and client agree on
- * the same three images — no hydration flash.
+ * Cookie is set in middleware on `/`. The middleware also forwards the chosen
+ * id on a request header so the homepage can read it on the first visit.
  */
 export async function resolveHeroJourney(): Promise<HeroJourneyResolved> {
+  const headerStore = await headers();
   const cookieStore = await cookies();
-  const stored = cookieStore.get(COOKIE_NAME)?.value;
 
-  let journeyId = stored ?? "";
-  let resolved = journeyId ? resolveJourneyImages(journeyId) : null;
+  const fromHeader = headerStore.get(HERO_JOURNEY_HEADER) ?? undefined;
+  const fromCookie = cookieStore.get(HERO_JOURNEY_COOKIE)?.value;
+
+  let journeyId: string = isHeroJourneyId(fromHeader)
+    ? fromHeader
+    : isHeroJourneyId(fromCookie)
+      ? fromCookie
+      : pickRandomHeroJourneyId();
+
+  let resolved = resolveJourneyImages(journeyId);
 
   if (!resolved) {
-    journeyId = pickRandomJourneyId();
-    resolved = resolveJourneyImages(journeyId);
-    if (!resolved) {
-      journeyId = getHeroJourneys()[0]!.id;
-      resolved = resolveJourneyImages(journeyId)!;
-    }
-
-    cookieStore.set(COOKIE_NAME, journeyId, {
-      path: "/",
-      maxAge: COOKIE_MAX_AGE,
-      sameSite: "lax",
-      httpOnly: false,
-    });
+    journeyId = getHeroJourneys()[0]!.id;
+    resolved = resolveJourneyImages(journeyId)!;
   }
 
   return resolved;

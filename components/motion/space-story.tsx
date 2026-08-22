@@ -1,22 +1,48 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import dynamic from "next/dynamic";
+import { useEffect, useRef, useState } from "react";
 
-import { DriftWall, type DriftWallItem } from "@/components/motion/drift-wall";
+import type { DriftWallItem } from "@/components/motion/drift-wall";
 import type { SpaceStory } from "@/content/static";
 import { useReducedMotion } from "@/lib/a11y/use-reduced-motion";
 
 import "@/styles/space-story.css";
+
+const DriftWall = dynamic(
+  () => import("@/components/motion/drift-wall").then((mod) => mod.DriftWall),
+  { ssr: false, loading: () => null },
+);
 
 type SpaceStoryProps = {
   story: SpaceStory;
   images: DriftWallItem[];
 };
 
+function useDriftColumns(): number {
+  const [columns, setColumns] = useState(5);
+
+  useEffect(() => {
+    const sync = () => {
+      const width = window.innerWidth;
+      if (width < 480) setColumns(3);
+      else if (width < 768) setColumns(4);
+      else setColumns(5);
+    };
+
+    sync();
+    window.addEventListener("resize", sync, { passive: true });
+    return () => window.removeEventListener("resize", sync);
+  }, []);
+
+  return columns;
+}
+
 export function SpaceStorySection({ story, images }: SpaceStoryProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const stepRefs = useRef<(HTMLLIElement | null)[]>([]);
   const reduced = useReducedMotion();
+  const driftColumns = useDriftColumns();
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -66,26 +92,28 @@ export function SpaceStorySection({ story, images }: SpaceStoryProps) {
   return (
     <section ref={sectionRef} className="space-story" aria-labelledby="space-story-title">
       <div className="space-story__background">
-        <DriftWall
-          items={images}
-          ambient
-          columns={5}
-          tileWidth={200}
-          tileHeight={132}
-          gap={18}
-          tilt={16}
-          turn={-14}
-          perspective={1200}
-          depth={120}
-          speed={42}
-          direction="up"
-          variance={0.45}
-          parallax={0.6}
-          lift={64}
-          fade={0.6}
-          dim={0.55}
-          overlayColor="#060010"
-        />
+        {images.length > 0 ? (
+          <DriftWall
+            items={images}
+            ambient
+            columns={driftColumns}
+            tileWidth={200}
+            tileHeight={132}
+            gap={18}
+            tilt={16}
+            turn={-14}
+            perspective={1200}
+            depth={120}
+            speed={42}
+            direction="up"
+            variance={0.45}
+            parallax={0.6}
+            lift={64}
+            fade={0.6}
+            dim={0.55}
+            overlayColor="#060010"
+          />
+        ) : null}
       </div>
       <div className="space-story__atmosphere" aria-hidden="true" />
 

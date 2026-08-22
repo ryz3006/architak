@@ -8,8 +8,7 @@ export type DriftWallItem = {
   href?: string;
 };
 
-const MAX_DRIFT_IMAGES = 24;
-const MIN_DRIFT_IMAGES = 15;
+const MAX_DRIFT_IMAGES = 15;
 
 /**
  * Derived archive for the process-section Drift Wall.
@@ -36,16 +35,5 @@ export function getDriftWallImages(): DriftWallItem[] {
     }
   }
 
-  // Ensure enough tiles for column drift when project media is not mirrored yet.
-  const heroes = getHeroImages();
-  let cycle = 0;
-  while (items.length < MIN_DRIFT_IMAGES && heroes.length > 0) {
-    const hero = heroes[cycle % heroes.length];
-    if (hero) {
-      items.push({ image: hero.src, title: hero.alt });
-    }
-    cycle += 1;
-  }
-
-  return items.slice(0, MAX_DRIFT_IMAGES);
+  return items;
 }

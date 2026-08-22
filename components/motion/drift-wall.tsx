@@ -53,6 +53,8 @@ function columnFactor(index: number, variance: number): number {
   return 1 + variance * pseudo;
 }
 
+const MAX_TRACK_COPIES = 8;
+
 export function DriftWall({
   items,
   columns = 5,
@@ -111,12 +113,14 @@ export function DriftWall({
 
   const columnMeta = useMemo(() => {
     const unit = tileHeight + gap;
+    const maxCopies = ambient ? 6 : MAX_TRACK_COPIES;
     return columnItems.map((col) => {
       const copyHeight = Math.max(unit, col.length * unit);
-      const copies = Math.max(2, Math.ceil((containerHeight * 1.6) / copyHeight) + 1);
+      const needed = Math.max(2, Math.ceil((containerHeight * 1.6) / copyHeight) + 1);
+      const copies = Math.min(maxCopies, needed);
       return { copyHeight, copies };
     });
-  }, [columnItems, containerHeight, gap, tileHeight]);
+  }, [ambient, columnItems, containerHeight, gap, tileHeight]);
 
   useLayoutEffect(() => {
     const node = containerRef.current;
@@ -125,7 +129,8 @@ export function DriftWall({
     const ro = new ResizeObserver((entries) => {
       const entry = entries[0];
       if (!entry) return;
-      setContainerHeight(entry.contentRect.height || 600);
+      const nextHeight = entry.contentRect.height || 600;
+      setContainerHeight((current) => (Math.abs(current - nextHeight) < 48 ? current : nextHeight));
     });
     ro.observe(node);
     return () => ro.disconnect();
@@ -276,8 +281,8 @@ export function DriftWall({
         "--dw-radius": `${radius}px`,
         "--dw-perspective": `${perspective}px`,
         "--dw-lift": `${effectiveLift}px`,
-        "--dw-dim": dim,
-        "--dw-gray": grayscale ? 1 : 0,
+        "--dw-dim": String(dim),
+        "--dw-gray": grayscale ? "1" : "0",
         "--dw-overlay": overlayColor,
         "--dw-edge": `${Math.max(0, (1 - fade) * 100)}%`,
         ...style,

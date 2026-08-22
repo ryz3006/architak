@@ -2,30 +2,38 @@ import type { Metadata } from "next";
 
 import { ContactConnect } from "@/components/contact/contact-connect";
 import { ContactHero } from "@/components/contact/contact-hero";
+import { ContactSocial } from "@/components/contact/contact-social";
 import { SiteFooter, SiteHeader } from "@/components/layout/site-chrome";
 import { SmoothScroll } from "@/components/motion/smooth-scroll";
 import { StudioAtmosphere } from "@/components/studio/studio-atmosphere";
 import { StudioBridge } from "@/components/studio/studio-bridge";
 import { StudioLocation } from "@/components/studio/studio-location";
 import { StudioReveal } from "@/components/studio/studio-reveal";
-import { getContactPageContent, getStaticSite, getStudioPageContent } from "@/content/static";
-import { absoluteUrl } from "@/features/discovery";
-import { buildBreadcrumbJsonLd, jsonLdScript } from "@/features/discovery/structured-data";
+import { getContactPageContent, getSocialProfiles, getStaticSite, getStudioPageContent } from "@/content/static";
+import { buildPageMetadata } from "@/features/discovery/metadata";
+import { getPageSeo } from "@/features/discovery/page-seo";
+import {
+  buildBreadcrumbJsonLd,
+  buildContactPageJsonLd,
+  jsonLdScript,
+} from "@/features/discovery/structured-data";
 
 import "@/styles/contact-page.css";
 import "@/styles/studio-page.css";
 
-export const metadata: Metadata = {
-  title: "Contact — ARCHITAK | Let's Connect",
-  description:
-    "Contact ARCHITAK in Vyttila, Kochi — phone, email, WhatsApp, and project enquiry. Every space starts with a conversation.",
-  alternates: { canonical: absoluteUrl("/contact") },
-};
+const contactSeo = getPageSeo("/contact")!;
+
+export const metadata: Metadata = buildPageMetadata({
+  path: "/contact",
+  title: contactSeo.title,
+  description: contactSeo.description,
+});
 
 export default function ContactPage() {
   const { studio } = getStaticSite();
   const page = getContactPageContent();
   const studioPage = getStudioPageContent();
+  const socialProfiles = getSocialProfiles();
 
   return (
     <main id="main-content" className="studio-page contact-page flex min-h-dvh flex-col">
@@ -37,6 +45,10 @@ export default function ContactPage() {
             { name: "Contact", path: "/contact" },
           ]),
         )}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={jsonLdScript(buildContactPageJsonLd())}
       />
       <StudioAtmosphere />
       <SmoothScroll />
@@ -58,6 +70,10 @@ export default function ContactPage() {
             email={studio.email}
             address={studio.address}
           />
+        </StudioReveal>
+
+        <StudioReveal variant="center">
+          <ContactSocial section={page.social} profiles={socialProfiles} />
         </StudioReveal>
 
         <StudioReveal variant="right">

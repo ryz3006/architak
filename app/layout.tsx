@@ -5,6 +5,7 @@ import {
   buildLocalBusinessJsonLd,
   jsonLdScript,
 } from "@/features/discovery/structured-data";
+import { getMetadataBase } from "@/features/discovery/metadata";
 
 import { SiteEffects } from "@/components/layout/site-effects";
 
@@ -28,11 +29,18 @@ export const metadata: Metadata = {
     template: "%s · ARCHITAK",
   },
   description: "CREATED TO CREATE — interior design studio in Vyttila, Kochi.",
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+  metadataBase: getMetadataBase(),
+  icons: {
+    icon: [{ url: "/brand/logo.png", type: "image/png" }],
+    apple: [{ url: "/brand/logo.png", type: "image/png" }],
+  },
   openGraph: {
     type: "website",
     locale: "en_IN",
     siteName: "ARCHITAK",
+  },
+  twitter: {
+    card: "summary_large_image",
   },
 };
 

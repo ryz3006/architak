@@ -13,7 +13,8 @@ import { StudioProcess } from "@/components/studio/studio-process";
 import { StudioReveal } from "@/components/studio/studio-reveal";
 import { StudioWorkIntro } from "@/components/studio/studio-work-intro";
 import { getServicesPageContent, getStaticServices } from "@/content/static";
-import { absoluteUrl } from "@/features/discovery";
+import { buildPageMetadata } from "@/features/discovery/metadata";
+import { getPageSeo } from "@/features/discovery/page-seo";
 import {
   buildBreadcrumbJsonLd,
   buildServiceListJsonLd,
@@ -23,12 +24,13 @@ import {
 import "@/styles/services-page.css";
 import "@/styles/studio-page.css";
 
-export const metadata: Metadata = {
-  title: "Services — ARCHITAK | Interior Design Practice",
-  description:
-    "ARCHITAK services — hospitality, residential, corporate, restaurant, commercial, and industrial interior design in Kochi.",
-  alternates: { canonical: absoluteUrl("/services") },
-};
+const servicesSeo = getPageSeo("/services")!;
+
+export const metadata: Metadata = buildPageMetadata({
+  path: "/services",
+  title: servicesSeo.title,
+  description: servicesSeo.description,
+});
 
 export default function ServicesPage() {
   const services = getStaticServices();

@@ -16,7 +16,7 @@ import {
   getStaticProjects,
   getStudioPageContent,
 } from "@/content/static";
-import { absoluteUrl } from "@/features/discovery";
+import { buildPageMetadata } from "@/features/discovery/metadata";
 import {
   buildBreadcrumbJsonLd,
   buildProjectJsonLd,
@@ -39,17 +39,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const project = getStaticProjectBySlug(slug);
   if (!project) return {};
 
-  return {
-    title: `${project.title} — ARCHITAK`,
+  return buildPageMetadata({
+    path: `/work/${project.slug}`,
+    title: project.title,
     description: project.summary,
-    alternates: { canonical: absoluteUrl(`/work/${project.slug}`) },
-    openGraph: {
-      title: `${project.title} · ARCHITAK`,
-      description: project.summary,
-      url: absoluteUrl(`/work/${project.slug}`),
-      type: "article",
-    },
-  };
+    ogType: "article",
+  });
 }
 
 export default async function ProjectPage({ params }: Props) {
@@ -103,6 +98,9 @@ export default async function ProjectPage({ params }: Props) {
             eyebrow={pageCopy.galleryEyebrow}
             title={project.title}
             images={project.gallery}
+            projectTitle={project.title}
+            category={project.category}
+            location={project.location}
           />
         </StudioReveal>
 

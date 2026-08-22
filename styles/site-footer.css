@@ -90,6 +90,35 @@
   color: var(--color-foreground);
 }
 
+.site-footer__social-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+@media (min-width: 48rem) {
+  .site-footer__social-list {
+    justify-content: flex-end;
+  }
+}
+
+.site-footer__social-link {
+  font-size: var(--step-000);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  text-decoration: none;
+  transition: color var(--duration-micro) var(--ease-standard);
+}
+
+.site-footer__social-link:hover,
+.site-footer__social-link:focus-visible {
+  color: var(--color-foreground);
+}
+
 .site-footer__contact {
   display: grid;
   gap: var(--space-2);

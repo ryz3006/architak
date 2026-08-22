@@ -44,7 +44,7 @@ function HeroScene({
 }) {
   const focus = mobileFocus ? image.focus.mobile : image.focus.desktop;
   const [focusX, focusY] = focus.split(" ");
-  const Headline = chapter.id === "experience" ? "h1" : "h2";
+  const Headline = "h2";
 
   return (
     <article className="hero-scene" data-chapter={chapter.id as ChapterId}>
@@ -120,11 +120,6 @@ export function HeroChapters({ journey, chapters }: HeroChaptersProps) {
   useEffect(() => {
     setMounted(true);
     persistHeroJourneyCookie(journey.id);
-
-    for (const src of [journey.space.src, journey.feel.src]) {
-      const img = new window.Image();
-      img.src = src;
-    }
 
     syncViewport();
     window.addEventListener("resize", syncViewport, { passive: true });

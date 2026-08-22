@@ -8,6 +8,7 @@ import {
   type CSSProperties,
   type KeyboardEvent,
 } from "react";
+import Image from "next/image";
 import type gsap from "gsap";
 
 import { useReducedMotion } from "@/lib/a11y/use-reduced-motion";
@@ -385,7 +386,13 @@ export function AccordionGallery({
                   mediaRefs.current[index] = el;
                 }}
               >
-                <img src={item.image} alt={item.alt ?? item.label ?? ""} draggable={false} />
+                <Image
+                  src={item.image}
+                  alt={item.alt ?? item.label ?? ""}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 48rem) 50vw, 33vw"
+                />
               </span>
               <span className="ag-panel__overlay" aria-hidden="true" />
             </span>

@@ -7,6 +7,12 @@
     "address": "ARCK Tower, Neelamuri Line, Ponnurunni, Vyttila, Kochi 682019",
     "phone": "+91 88919 91999",
     "email": "architak336@gmail.com",
+    "social": {
+      "linkedin": "https://www.linkedin.com/company/architak",
+      "youtube": "https://www.youtube.com/@architak",
+      "instagram": "https://www.instagram.com/architak.in",
+      "facebook": "https://www.facebook.com/architak.in"
+    },
     "process": [
       {
         "step": "01",
@@ -465,6 +471,11 @@
       "eyebrow": "Project enquiry",
       "headline": "A short brief is enough.",
       "support": "Rooms, timeline, and how you imagine living inside the space."
+    },
+    "social": {
+      "eyebrow": "Follow the studio",
+      "headline": "See the work in progress.",
+      "support": "Projects, process, and studio life — across our channels."
     }
   },
   "projectPage": {

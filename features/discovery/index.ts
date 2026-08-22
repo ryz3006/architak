@@ -1,5 +1,7 @@
 import { getStaticProjects, getStaticServices, getStaticSite } from "@/content/static";
 
+import { PAGE_SEO } from "@/features/discovery/page-seo";
+
 /**
  * Single discovery index.
  *
@@ -36,38 +38,13 @@ export function absoluteUrl(path: string): string {
 }
 
 export function getStaticRoutes(): DiscoveryRoute[] {
-  const { studio } = getStaticSite();
-
-  return [
-    {
-      path: "/",
-      title: "ARCHITAK — Interiors Studio, Kochi",
-      description: studio.statement,
-      changeFrequency: "weekly",
-      priority: 1,
-    },
-    {
-      path: "/studio",
-      title: "Studio",
-      description: "Selected ARCHITAK interiors, client voices, and studio practice in Kochi.",
-      changeFrequency: "weekly",
-      priority: 0.9,
-    },
-    {
-      path: "/services",
-      title: "Services",
-      description: "Hospitality, residential, corporate, restaurant, commercial, and industrial.",
-      changeFrequency: "monthly",
-      priority: 0.8,
-    },
-    {
-      path: "/contact",
-      title: "Contact",
-      description: `Reach ARCHITAK at ${studio.phone} or ${studio.email}.`,
-      changeFrequency: "monthly",
-      priority: 0.6,
-    },
-  ];
+  return PAGE_SEO.map((entry) => ({
+    path: entry.path,
+    title: entry.title,
+    description: entry.description,
+    changeFrequency: entry.changeFrequency,
+    priority: entry.priority,
+  }));
 }
 
 export function getPublishedProjects(): DiscoveryProject[] {
@@ -174,6 +151,15 @@ export function buildLlmsText(options: { full: boolean }): string {
       "",
       ...site.studio.process.map((step) => `### ${step.step} ${step.title}\n\n${step.description}`),
     );
+  }
+
+  const social = site.studio.social;
+  if (social) {
+    lines.push("", "## Social profiles", "");
+    if (social.linkedin) lines.push(`- LinkedIn: ${social.linkedin}`);
+    if (social.youtube) lines.push(`- YouTube: ${social.youtube}`);
+    if (social.instagram) lines.push(`- Instagram: ${social.instagram}`);
+    if (social.facebook) lines.push(`- Facebook: ${social.facebook}`);
   }
 
   lines.push(

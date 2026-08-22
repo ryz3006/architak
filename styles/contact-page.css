@@ -154,3 +154,78 @@
     linear-gradient(180deg, rgb(10 10 10 / 0.15) 0%, rgb(10 10 10 / 0.45) 100%),
     radial-gradient(ellipse 70% 80% at 50% 100%, color-mix(in srgb, var(--color-accent) 12%, transparent), transparent);
 }
+
+.contact-social {
+  padding-block: var(--space-fluid-lg);
+  border-top: 1px solid var(--color-border);
+  text-align: center;
+}
+
+@media (min-width: 48rem) {
+  .contact-social {
+    text-align: right;
+    margin-inline-start: auto;
+    max-width: min(36rem, 100%);
+  }
+}
+
+.contact-social__headline {
+  margin: var(--space-fluid-sm) 0 0;
+  font-size: clamp(1.5rem, 3vw, 2.35rem);
+  line-height: var(--leading-tight);
+}
+
+.contact-social__support {
+  margin: var(--space-3) 0 0;
+  font-size: var(--step-00);
+  line-height: var(--leading-normal);
+  color: var(--color-muted);
+}
+
+@media (min-width: 48rem) {
+  .contact-social__support {
+    margin-inline-start: auto;
+    max-width: 32ch;
+  }
+}
+
+.contact-social__list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3);
+  list-style: none;
+  margin: var(--space-fluid-md) 0 0;
+  padding: 0;
+}
+
+@media (min-width: 48rem) {
+  .contact-social__list {
+    justify-content: flex-end;
+  }
+}
+
+.contact-social__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0 var(--space-4);
+  border: 1px solid color-mix(in srgb, var(--color-border) 85%, transparent);
+  background: rgb(10 10 10 / 0.18);
+  font-size: var(--step-000);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  text-decoration: none;
+  transition:
+    border-color var(--duration-micro) var(--ease-standard),
+    color var(--duration-micro) var(--ease-standard),
+    background var(--duration-micro) var(--ease-standard);
+}
+
+.contact-social__link:hover,
+.contact-social__link:focus-visible {
+  border-color: var(--color-accent);
+  color: var(--color-foreground);
+  background: rgb(196 165 116 / 0.08);
+}

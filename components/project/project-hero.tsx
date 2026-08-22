@@ -43,12 +43,14 @@ export function ProjectHero({ project }: ProjectHeroProps) {
     };
   }, [reduced]);
 
+  const coverAlt = `${project.title} — ${project.category} interior, ${project.location}`;
+
   return (
     <header ref={rootRef} className="project-hero studio-hero studio-section studio-section--hero">
-      <div className="studio-hero__media" aria-hidden="true">
+      <div className="studio-hero__media">
         <Image
           src={project.coverImage}
-          alt=""
+          alt={coverAlt}
           fill
           priority
           className="studio-hero__image"

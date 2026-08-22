@@ -20,17 +20,23 @@ import {
   getStudioPageContent,
   getTestimonials,
 } from "@/content/static";
-import { absoluteUrl } from "@/features/discovery";
-import { buildBreadcrumbJsonLd, jsonLdScript } from "@/features/discovery/structured-data";
+import { buildPageMetadata } from "@/features/discovery/metadata";
+import { getPageSeo } from "@/features/discovery/page-seo";
+import {
+  buildBreadcrumbJsonLd,
+  buildStudioWorkListJsonLd,
+  jsonLdScript,
+} from "@/features/discovery/structured-data";
 
 import "@/styles/studio-page.css";
 
-export const metadata: Metadata = {
-  title: "Studio — ARCHITAK | Belief, Work & Practice",
-  description:
-    "Enter the ARCHITAK studio — what we believe, what we create, the spaces we have shaped, and how life becomes form in Vyttila, Kochi.",
-  alternates: { canonical: absoluteUrl("/studio") },
-};
+const studioSeo = getPageSeo("/studio")!;
+
+export const metadata: Metadata = buildPageMetadata({
+  path: "/studio",
+  title: studioSeo.title,
+  description: studioSeo.description,
+});
 
 export default async function StudioPage() {
   const page = getStudioPageContent();
@@ -47,6 +53,10 @@ export default async function StudioPage() {
             { name: "Studio", path: "/studio" },
           ]),
         )}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={jsonLdScript(buildStudioWorkListJsonLd())}
       />
       <StudioAtmosphere />
       <SmoothScroll />

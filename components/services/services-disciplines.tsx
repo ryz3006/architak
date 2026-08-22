@@ -72,7 +72,7 @@ export function ServicesDisciplines({ services }: ServicesDisciplinesProps) {
             <div className="services-disciplines__media">
               <Image
                 src={service.image}
-                alt=""
+                alt={`${service.title} — ${service.description}`}
                 fill
                 className="services-disciplines__image"
                 sizes="(max-width: 48rem) 100vw, 46vw"

@@ -6,9 +6,19 @@ type ProjectGalleryProps = {
   eyebrow: string;
   title: string;
   images: string[];
+  projectTitle: string;
+  category: string;
+  location: string;
 };
 
-export function ProjectGallery({ eyebrow, title, images }: ProjectGalleryProps) {
+export function ProjectGallery({
+  eyebrow,
+  title,
+  images,
+  projectTitle,
+  category,
+  location,
+}: ProjectGalleryProps) {
   if (images.length === 0) return null;
 
   return (
@@ -30,7 +40,7 @@ export function ProjectGallery({ eyebrow, title, images }: ProjectGalleryProps) 
             <div className="project-gallery__media">
               <Image
                 src={src}
-                alt=""
+                alt={`${projectTitle} — ${category} interior in ${location}, view ${index + 1}`}
                 fill
                 className="project-gallery__image"
                 sizes="(max-width: 48rem) 100vw, 50vw"

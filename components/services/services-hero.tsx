@@ -53,10 +53,10 @@ export function ServicesHero({ hero }: ServicesHeroProps) {
 
   return (
     <header ref={rootRef} className="studio-hero studio-section studio-section--hero">
-      <div className="studio-hero__media" aria-hidden="true">
+      <div className="studio-hero__media">
         <Image
           src={hero.image}
-          alt=""
+          alt={hero.imageAlt}
           fill
           priority
           className="studio-hero__image"

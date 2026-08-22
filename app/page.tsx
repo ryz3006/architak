@@ -10,23 +10,26 @@ import { Reveal } from "@/components/motion/reveal";
 import { SmoothScroll } from "@/components/motion/smooth-scroll";
 import { SpaceStorySection } from "@/components/motion/space-story";
 import { getHeroChapters, getManifesto, getSpaceStory, getStudioPageContent } from "@/content/static";
+import { buildPageMetadata } from "@/features/discovery/metadata";
+import { getPageSeo } from "@/features/discovery/page-seo";
+import {
+  buildWebPageJsonLd,
+  buildWebSiteJsonLd,
+  jsonLdScript,
+} from "@/features/discovery/structured-data";
 import { getDriftWallImages } from "@/features/story/drift-images";
 import { getFeaturedAccordionItems } from "@/features/work/accordion-items";
-import { resolveHeroJourney } from "@/lib/hero/journey";
+import { resolveHeroJourney, preloadHeroImageHints } from "@/lib/hero/journey";
 
 import "@/styles/home-work.css";
 
-export const metadata: Metadata = {
-  title: "ARCHITAK — Created to Create | Interior Design, Kochi",
-  description:
-    "CREATED TO CREATE. Interior design studio in Vyttila, Kochi — residential, hospitality, corporate, and commercial spaces that become part of how you live.",
-  alternates: { canonical: "/" },
-  openGraph: {
-    title: "ARCHITAK — CREATED TO CREATE",
-    description:
-      "We create experiences, spaces, and feel — interior design studio in Kochi.",
-  },
-};
+const homeSeo = getPageSeo("/")!;
+
+export const metadata: Metadata = buildPageMetadata({
+  path: "/",
+  title: homeSeo.title,
+  description: homeSeo.description,
+});
 
 export default async function HomePage() {
   const journey = await resolveHeroJourney();
@@ -38,9 +41,23 @@ export default async function HomePage() {
   const studioWork = getStudioPageContent().work;
   const studioCta = getStudioPageContent().cta;
   const threeEnabled = process.env.FEATURE_THREE_D === "true";
+  const lcpImage = preloadHeroImageHints(journey)[0]?.src;
 
   return (
+    <>
+      {lcpImage ? <link rel="preload" as="image" href={lcpImage} /> : null}
     <main id="main-content" className="relative flex min-h-dvh flex-col">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={jsonLdScript(buildWebSiteJsonLd())}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={jsonLdScript(
+          buildWebPageJsonLd("/", homeSeo.title, homeSeo.description),
+        )}
+      />
+      <h1 className="sr-only">ARCHITAK — Interior Design Studio, Kochi</h1>
       <SmoothScroll />
       <SiteHeader homeHero />
       <OptionalThreeMark enabled={threeEnabled} />
@@ -74,5 +91,6 @@ export default async function HomePage() {
 
       <SiteFooter />
     </main>
+    </>
   );
 }

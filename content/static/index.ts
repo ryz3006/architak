@@ -73,6 +73,7 @@ export type EditorialBridge = StudioPageContent["workBridge"];
 export type EditorialProcess = StudioPageContent["process"];
 export type EditorialCompliment = StudioPageContent["compliment"];
 export type Testimonial = (typeof site.testimonials)[number];
+export type SocialProfiles = (typeof site.studio.social);
 
 export function getStudioPageContent(): StudioPageContent {
   return site.studioPage;
@@ -92,4 +93,8 @@ export function getProjectPageContent(): ProjectPageContent {
 
 export function getTestimonials(): Testimonial[] {
   return site.testimonials;
+}
+
+export function getSocialProfiles(): SocialProfiles {
+  return site.studio.social;
 }

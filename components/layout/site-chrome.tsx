@@ -3,7 +3,7 @@ import Link from "next/link";
 import { EnquireButton } from "@/components/layout/enquire-button";
 import { BrandLockup } from "@/components/layout/brand-lockup";
 import { MobileNav, type NavLink } from "@/components/layout/mobile-nav";
-import { getStaticSite } from "@/content/static";
+import { getSocialProfiles, getStaticSite } from "@/content/static";
 
 import "@/styles/site-footer.css";
 
@@ -14,8 +14,16 @@ const links: readonly NavLink[] = [
 
 const footerLinks: readonly NavLink[] = [
   ...links,
+  { href: "/studio#work", label: "Work" },
   { href: "/contact", label: "Contact" },
 ] as const;
+
+const SOCIAL_LABELS = {
+  linkedin: "LinkedIn",
+  youtube: "YouTube",
+  instagram: "Instagram",
+  facebook: "Facebook",
+} as const;
 
 export function SiteHeader({ homeHero = false }: { homeHero?: boolean }) {
   const tagline = getStaticSite().studio.tagline;
@@ -51,8 +59,17 @@ export function SiteHeader({ homeHero = false }: { homeHero?: boolean }) {
 
 export function SiteFooter() {
   const { studio } = getStaticSite();
+  const social = getSocialProfiles();
   const phoneHref = `tel:${studio.phone.replace(/\s/g, "")}`;
   const year = new Date().getFullYear();
+
+  const socialLinks = (
+    Object.entries(SOCIAL_LABELS) as Array<[keyof typeof SOCIAL_LABELS, string]>
+  )
+    .map(([key, label]) => ({ key, label, href: social[key] }))
+    .filter((entry): entry is { key: keyof typeof SOCIAL_LABELS; label: string; href: string } =>
+      Boolean(entry.href),
+    );
 
   return (
     <footer className="site-footer">
@@ -75,6 +92,25 @@ export function SiteFooter() {
               ))}
             </ul>
           </nav>
+
+          {socialLinks.length > 0 ? (
+            <nav aria-label="Social profiles">
+              <ul className="site-footer__social-list">
+                {socialLinks.map((entry) => (
+                  <li key={entry.key}>
+                    <a
+                      href={entry.href}
+                      className="site-footer__social-link"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {entry.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          ) : null}
 
           <address className="site-footer__contact">
             <p className="site-footer__contact-line">

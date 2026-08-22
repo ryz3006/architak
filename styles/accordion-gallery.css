@@ -66,6 +66,7 @@
   transform: translate(-50%, -50%);
   filter: grayscale(var(--ag-gray));
   will-change: transform, filter;
+  overflow: hidden;
 }
 
 .accordion-gallery--vertical .ag-panel__media {

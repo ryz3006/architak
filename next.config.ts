@@ -90,7 +90,7 @@ const nextConfig: NextConfig = {
       {
         source: "/work",
         destination: "/studio#work",
-        permanent: false,
+        permanent: true,
       },
       {
         source: "/about",

@@ -44,12 +44,17 @@ export function computeHeroComposition(progress: number): HeroCompositionVars {
   const spaceWeight = clamp(smoothstep(0.28, 0.42, p) * (1 - smoothstep(0.52, 0.66, p)), 0, 1);
   const feelWeight = clamp(smoothstep(0.58, 0.72, p), 0, 1);
 
-  const split = lerp(0.42, lerp(0.3, 0.12, smoothstep(0.38, 0.72, p)), smoothstep(0, 0.72, p));
-  const typeX = lerp(0, lerp(8, 42, smoothstep(0.38, 0.82, p)), smoothstep(0, 0.82, p));
-  const typeY = lerp(0, lerp(0, 18, smoothstep(0.58, 0.82, p)), smoothstep(0.38, 0.82, p));
-  const typeScale = lerp(1, lerp(0.94, 0.88, smoothstep(0.38, 0.82, p)), smoothstep(0, 0.82, p));
-  const typeMaxWidth = lerp(36, lerp(28, 22, smoothstep(0.38, 0.82, p)), smoothstep(0, 0.82, p));
-  const overlayStrength = lerp(0.15, lerp(0.35, 0.55, smoothstep(0.58, 0.82, p)), smoothstep(0.38, 0.82, p));
+  /*
+   * Dominance shifts from text-led to image-led. The type column never drops
+   * below a readable share, and the panel only drifts far enough to sit on the
+   * image seam — further would clip the display line against the gutter.
+   */
+  const split = lerp(0.4, lerp(0.32, 0.24, smoothstep(0.4, 0.75, p)), smoothstep(0, 0.75, p));
+  const typeX = lerp(0, lerp(3, 12, smoothstep(0.4, 0.8, p)), smoothstep(0.18, 0.8, p));
+  const typeY = lerp(0, 6, smoothstep(0.58, 0.85, p));
+  const typeScale = lerp(1, lerp(0.96, 0.92, smoothstep(0.4, 0.82, p)), smoothstep(0.18, 0.82, p));
+  const typeMaxWidth = lerp(34, lerp(30, 26, smoothstep(0.4, 0.82, p)), smoothstep(0.18, 0.82, p));
+  const overlayStrength = lerp(0.18, lerp(0.38, 0.58, smoothstep(0.58, 0.85, p)), smoothstep(0.35, 0.85, p));
 
   const ctaOpacity = clamp(1 - smoothstep(0.18, 0.32, p), 0, 1);
   const stillness = smoothstep(0.82, 0.92, p) * (1 - smoothstep(0.92, 1, p));

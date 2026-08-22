@@ -10,13 +10,14 @@ import {
 } from "@/lib/hero/constants";
 
 /**
- * Assign a curated hero journey before the homepage renders.
- * Next.js only allows cookie writes in middleware, route handlers, or actions.
+ * Assigns a curated hero journey before the homepage renders.
  *
- * The same-request page read uses the request header; the Set-Cookie on the
- * response persists the choice for later visits.
+ * Cookies can only be written from proxy, route handlers, or Server Actions —
+ * never during a page render. The chosen id is also forwarded on a request
+ * header because a cookie set on the response is not readable by the same
+ * render pass.
  */
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   if (request.nextUrl.pathname !== "/") {
     return NextResponse.next();
   }

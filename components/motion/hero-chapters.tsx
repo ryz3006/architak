@@ -6,10 +6,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import type { HeroChapter, HeroImage, HeroJourneyResolved } from "@/content/static";
 import { useReducedMotion } from "@/lib/a11y/use-reduced-motion";
-import { computeHeroComposition } from "@/lib/hero/scroll-math";
 import { persistHeroJourneyCookie } from "@/lib/hero/cookie-client";
+import { computeHeroComposition } from "@/lib/hero/scroll-math";
 
 import "@/styles/hero-chapters.css";
+
+type ChapterId = "experience" | "space" | "feel";
 
 type HeroChaptersProps = {
   journey: HeroJourneyResolved;
@@ -17,7 +19,11 @@ type HeroChaptersProps = {
   tagline: string;
 };
 
+/** Scroll progress at which each chapter is fully composed. */
 const CHAPTER_TARGETS = [0, 0.43, 0.72] as const;
+
+/** Matches the pinning breakpoint in styles/hero-chapters.css. */
+const PINNED_QUERY = "(min-width: 64rem)";
 
 function chapterImage(journey: HeroJourneyResolved, chapterId: string): HeroImage {
   if (chapterId === "space") return journey.space;
@@ -25,133 +31,133 @@ function chapterImage(journey: HeroJourneyResolved, chapterId: string): HeroImag
   return journey.experience;
 }
 
-function HeroImageLayer({
+function HeroScene({
+  chapter,
   image,
-  chapter,
-  priority = false,
-  staticVisible = false,
-}: {
-  image: HeroImage;
-  chapter: "experience" | "space" | "feel";
-  priority?: boolean;
-  staticVisible?: boolean;
-}) {
-  const [focusX, focusY] = image.focus.desktop.split(" ");
-
-  return (
-    <div
-      className="hero-image-layer"
-      data-chapter={chapter}
-      data-static-visible={staticVisible ? "true" : undefined}
-      style={
-        {
-          "--hero-focal-x": focusX,
-          "--hero-focal-y": focusY,
-        } as React.CSSProperties
-      }
-    >
-      <Image
-        src={image.src}
-        alt={image.alt}
-        fill
-        priority={priority}
-        sizes="(max-width: 48rem) 100vw, 55vw"
-        className="hero-image-fill object-cover"
-      />
-    </div>
-  );
-}
-
-function HeroCta({ hidden }: { hidden?: boolean }) {
-  return (
-    <div className={`hero-cta flex flex-wrap gap-4${hidden ? " is-hidden" : ""}`}>
-      <Link
-        href="/work"
-        className="border border-foreground bg-foreground px-6 py-3 text-fluid-sm tracking-widest text-background uppercase"
-      >
-        View work
-      </Link>
-      <Link
-        href="/contact"
-        className="border border-border px-6 py-3 text-fluid-sm tracking-widest uppercase transition-colors duration-[var(--duration-micro)] hover:border-accent hover:text-accent"
-      >
-        Enquire
-      </Link>
-    </div>
-  );
-}
-
-function ChapterCopy({
-  chapter,
+  tagline,
+  showTopTagline,
+  priority,
   showEntrance,
-  mobileActive,
+  showCta,
+  ctaInert,
 }: {
   chapter: HeroChapter;
-  showEntrance?: boolean;
-  mobileActive?: boolean;
+  image: HeroImage;
+  tagline?: string;
+  showTopTagline?: boolean;
+  priority: boolean;
+  showEntrance: boolean;
+  showCta: boolean;
+  ctaInert: boolean;
 }) {
+  const [focusX, focusY] = image.focus.desktop.split(" ");
+  const Headline = chapter.id === "experience" ? "h1" : "h2";
+
   return (
-    <div
-      className={`hero-chapter-copy${mobileActive ? " is-mobile-active" : ""}${showEntrance ? " hero-headline-enter" : ""}`}
-      data-chapter={chapter.id}
-    >
-      <p className="hero-chapter-label">
-        {chapter.index} / {chapter.label}
-      </p>
-      {chapter.id === "experience" ? (
-        <h1 className="hero-chapter-headline">
-          <span className="hero-headline-line block">{chapter.headline}</span>
-          {chapter.headlineLine2 ? (
-            <span className="hero-headline-line block">{chapter.headlineLine2}</span>
-          ) : null}
-        </h1>
-      ) : (
-        <h2 className="hero-chapter-headline">
-          <span className="hero-headline-line block">{chapter.headline}</span>
-          {chapter.headlineLine2 ? (
-            <span className="hero-headline-line block">{chapter.headlineLine2}</span>
-          ) : null}
-        </h2>
-      )}
-      <p className="hero-chapter-support">{chapter.support}</p>
-    </div>
+    <article className="hero-scene" data-chapter={chapter.id as ChapterId}>
+      <div className="hero-scene-text">
+        {showTopTagline && tagline ? (
+          <p className="hero-tagline">{tagline}</p>
+        ) : (
+          <span aria-hidden="true" />
+        )}
+
+        <div className={`hero-copy${showEntrance ? " hero-headline-enter" : ""}`}>
+          <p className="hero-chapter-label">
+            {chapter.index} / {chapter.label}
+          </p>
+          <Headline className="hero-chapter-headline">
+            <span className="hero-headline-line block">{chapter.headline}</span>
+            {chapter.id === "experience" && tagline ? (
+              <span className="hero-headline-bridge block">{tagline}</span>
+            ) : null}
+            {chapter.headlineLine2 ? (
+              <span className="hero-headline-line block">{chapter.headlineLine2}</span>
+            ) : null}
+          </Headline>
+          <p className="hero-chapter-support">{chapter.support}</p>
+        </div>
+
+        {showCta ? (
+          <div className="hero-cta" data-inert={ctaInert ? "true" : undefined}>
+            <Link
+              href="/work"
+              className="border border-foreground bg-foreground px-6 py-3 text-fluid-sm tracking-widest text-background uppercase"
+            >
+              View work
+            </Link>
+            <Link
+              href="/contact"
+              className="border border-border px-6 py-3 text-fluid-sm tracking-widest uppercase transition-colors duration-[var(--duration-micro)] hover:border-accent hover:text-accent"
+            >
+              Enquire
+            </Link>
+          </div>
+        ) : (
+          <span aria-hidden="true" />
+        )}
+      </div>
+
+      <div className="hero-scene-image">
+        <div
+          className="hero-image-layer"
+          style={
+            {
+              "--hero-focal-x": focusX,
+              "--hero-focal-y": focusY,
+            } as React.CSSProperties
+          }
+        >
+          <Image
+            src={image.src}
+            alt={image.alt}
+            fill
+            priority={priority}
+            sizes="(max-width: 64rem) 100vw, 60vw"
+            className="object-cover"
+          />
+        </div>
+        <div className="hero-scrim" aria-hidden="true" />
+      </div>
+    </article>
   );
 }
 
 export function HeroChapters({ journey, chapters, tagline }: HeroChaptersProps) {
-  const rootRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
-  const imagePanelRef = useRef<HTMLDivElement>(null);
-  const reduced = useReducedMotion();
+  const compositionRef = useRef<HTMLDivElement>(null);
+  const activeChapterRef = useRef(0);
   const preloadedSpace = useRef(false);
   const preloadedFeel = useRef(false);
-  const activeChapterRef = useRef(0);
 
+  const reduced = useReducedMotion();
   const [mounted, setMounted] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const [pinned, setPinned] = useState(false);
   const [finePointer, setFinePointer] = useState(false);
-  const [mobileActive, setMobileActive] = useState(0);
   const [activeChapter, setActiveChapter] = useState(0);
-
-  const isStatic = reduced;
 
   useEffect(() => {
     setMounted(true);
     persistHeroJourneyCookie(journey.id);
-    const mobileQuery = window.matchMedia("(max-width: 47.99rem)");
+
+    const pinnedQuery = window.matchMedia(PINNED_QUERY);
     const pointerQuery = window.matchMedia("(pointer: fine)");
     const sync = () => {
-      setIsMobile(mobileQuery.matches);
+      setPinned(pinnedQuery.matches);
       setFinePointer(pointerQuery.matches);
     };
+
     sync();
-    mobileQuery.addEventListener("change", sync);
+    pinnedQuery.addEventListener("change", sync);
     pointerQuery.addEventListener("change", sync);
     return () => {
-      mobileQuery.removeEventListener("change", sync);
+      pinnedQuery.removeEventListener("change", sync);
       pointerQuery.removeEventListener("change", sync);
     };
   }, [journey.id]);
+
+  const animated = pinned && !reduced;
 
   const applyComposition = useCallback(
     (progress: number) => {
@@ -159,68 +165,68 @@ export function HeroChapters({ journey, chapters, tagline }: HeroChaptersProps) 
       if (!root) return;
 
       const vars = computeHeroComposition(progress);
-      root.style.setProperty("--hero-progress", String(vars.progress));
-      root.style.setProperty("--hero-split", String(vars.split));
-      root.style.setProperty("--hero-type-x", `${vars.typeX}%`);
-      root.style.setProperty("--hero-type-y", `${vars.typeY}%`);
-      root.style.setProperty("--hero-type-scale", String(vars.typeScale));
-      root.style.setProperty("--hero-type-max", `${vars.typeMaxWidth}rem`);
-      root.style.setProperty("--hero-overlay", String(vars.overlayStrength));
-      root.style.setProperty("--hero-cta-opacity", String(vars.ctaOpacity));
-      root.style.setProperty("--hero-release", String(vars.release));
-      root.style.setProperty("--hero-stillness", String(vars.stillness));
-      root.style.setProperty("--hero-exp-weight", String(vars.expWeight));
-      root.style.setProperty("--hero-space-weight", String(vars.spaceWeight));
-      root.style.setProperty("--hero-feel-weight", String(vars.feelWeight));
-      root.style.setProperty("--hero-exp-scale", String(vars.expScale * journey.experience.motion.zoom));
-      root.style.setProperty(
-        "--hero-space-scale",
-        String(vars.spaceScale * journey.space.motion.zoom),
+      const style = root.style;
+
+      style.setProperty("--hero-progress", String(vars.progress));
+      style.setProperty("--hero-split", String(vars.split));
+      style.setProperty("--hero-type-x", `${vars.typeX}%`);
+      style.setProperty("--hero-type-y", `${vars.typeY}%`);
+      style.setProperty("--hero-type-scale", String(vars.typeScale));
+      style.setProperty("--hero-type-max", `${vars.typeMaxWidth}rem`);
+      style.setProperty("--hero-overlay", String(vars.overlayStrength));
+      style.setProperty("--hero-cta-opacity", String(vars.ctaOpacity));
+      style.setProperty("--hero-release", String(vars.release));
+      style.setProperty("--hero-exp-weight", String(vars.expWeight));
+      style.setProperty("--hero-space-weight", String(vars.spaceWeight));
+      style.setProperty("--hero-feel-weight", String(vars.feelWeight));
+      style.setProperty(
+        "--hero-exp-scale",
+        String(vars.expScale * journey.experience.motion.zoom),
       );
-      root.style.setProperty("--hero-feel-scale", String(vars.feelScale * journey.feel.motion.zoom));
+      style.setProperty("--hero-space-scale", String(vars.spaceScale * journey.space.motion.zoom));
+      style.setProperty("--hero-feel-scale", String(vars.feelScale * journey.feel.motion.zoom));
 
       if (vars.activeChapter !== activeChapterRef.current) {
         activeChapterRef.current = vars.activeChapter;
         setActiveChapter(vars.activeChapter);
       }
 
-      if (progress > 0.12 && !preloadedSpace.current) {
+      // Decode the next still before its scene is composed, never all at once.
+      if (progress > 0.1 && !preloadedSpace.current) {
         preloadedSpace.current = true;
-        const img = new window.Image();
-        img.src = journey.space.src;
+        new window.Image().src = journey.space.src;
       }
-      if (progress > 0.32 && !preloadedFeel.current) {
+      if (progress > 0.3 && !preloadedFeel.current) {
         preloadedFeel.current = true;
-        const img = new window.Image();
-        img.src = journey.feel.src;
+        new window.Image().src = journey.feel.src;
       }
     },
-    [journey.experience.motion.zoom, journey.feel.motion.zoom, journey.feel.src, journey.space.motion.zoom, journey.space.src],
+    [
+      journey.experience.motion.zoom,
+      journey.feel.motion.zoom,
+      journey.feel.src,
+      journey.space.motion.zoom,
+      journey.space.src,
+    ],
   );
 
   useEffect(() => {
-    if (isStatic || isMobile) return;
+    if (!animated) return;
 
-    const root = rootRef.current;
     const track = trackRef.current;
-    if (!root || !track) return;
+    if (!track) return;
 
     let rafId = 0;
 
     const update = () => {
       rafId = 0;
-      const trackTop = track.offsetTop;
-      const trackHeight = track.offsetHeight;
-      const viewHeight = window.innerHeight;
-      const scrollable = Math.max(1, trackHeight - viewHeight);
-      const scrolled = window.scrollY - trackTop;
-      const progress = Math.min(1, Math.max(0, scrolled / scrollable));
-      applyComposition(progress);
+      const scrollable = Math.max(1, track.offsetHeight - window.innerHeight);
+      const scrolled = window.scrollY - track.offsetTop;
+      applyComposition(Math.min(1, Math.max(0, scrolled / scrollable)));
     };
 
     const onScroll = () => {
-      if (rafId) return;
-      rafId = window.requestAnimationFrame(update);
+      if (!rafId) rafId = window.requestAnimationFrame(update);
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -232,183 +238,91 @@ export function HeroChapters({ journey, chapters, tagline }: HeroChaptersProps) 
       window.removeEventListener("resize", onScroll);
       if (rafId) window.cancelAnimationFrame(rafId);
     };
-  }, [applyComposition, isMobile, isStatic]);
+  }, [animated, applyComposition]);
 
   useEffect(() => {
-    if (isStatic || !isMobile) return;
+    if (!animated || !finePointer) return;
 
-    const blocks = trackRef.current?.querySelectorAll<HTMLElement>("[data-mobile-chapter]");
-    if (!blocks?.length) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            const index = Number(entry.target.getAttribute("data-mobile-chapter"));
-            if (!Number.isNaN(index)) setMobileActive(index);
-          }
-        }
-      },
-      { threshold: 0.55 },
-    );
-
-    for (const block of blocks) observer.observe(block);
-    return () => observer.disconnect();
-  }, [isMobile, isStatic]);
-
-  useEffect(() => {
-    if (isStatic || !finePointer) return;
-
-    const panel = imagePanelRef.current;
+    const composition = compositionRef.current;
     const root = rootRef.current;
-    if (!panel || !root) return;
+    if (!composition || !root) return;
 
     let rafId = 0;
-    let targetX = 0;
-    let targetY = 0;
+    let x = 0;
+    let y = 0;
 
     const apply = () => {
       rafId = 0;
-      root.style.setProperty("--hero-pointer-x", String(targetX));
-      root.style.setProperty("--hero-pointer-y", String(targetY));
+      root.style.setProperty("--hero-pointer-x", String(x));
+      root.style.setProperty("--hero-pointer-y", String(y));
     };
 
     const onMove = (event: MouseEvent) => {
-      const rect = panel.getBoundingClientRect();
-      const nx = (event.clientX - rect.left) / rect.width - 0.5;
-      const ny = (event.clientY - rect.top) / rect.height - 0.5;
-      targetX = Math.min(2, Math.max(-2, nx * 4));
-      targetY = Math.min(2, Math.max(-2, ny * 4));
+      const rect = composition.getBoundingClientRect();
+      // Clamped to +/-2% so the frame gains depth without reading as parallax.
+      x = Math.max(-2, Math.min(2, ((event.clientX - rect.left) / rect.width - 0.5) * 4));
+      y = Math.max(-2, Math.min(2, ((event.clientY - rect.top) / rect.height - 0.5) * 4));
       if (!rafId) rafId = window.requestAnimationFrame(apply);
     };
 
-    panel.addEventListener("mousemove", onMove);
+    composition.addEventListener("mousemove", onMove);
     return () => {
-      panel.removeEventListener("mousemove", onMove);
+      composition.removeEventListener("mousemove", onMove);
       if (rafId) window.cancelAnimationFrame(rafId);
     };
-  }, [finePointer, isStatic]);
+  }, [animated, finePointer]);
 
   const scrollToChapter = (index: number) => {
     const track = trackRef.current;
     const target = CHAPTER_TARGETS[index];
-    if (!track || isStatic || isMobile || target === undefined) return;
-    const trackTop = track.offsetTop;
+    if (!track || !animated || target === undefined) return;
+
     const scrollable = Math.max(1, track.offsetHeight - window.innerHeight);
     window.scrollTo({
-      top: trackTop + scrollable * target,
+      top: track.offsetTop + scrollable * target,
       behavior: reduced ? "auto" : "smooth",
     });
   };
-
-  if (isStatic) {
-    return (
-      <section className="hero-root hero-track is-static" aria-label="Hero">
-        <div className="hero-stage page-frame">
-          <p className="hero-tagline pt-fluid-lg">{tagline}</p>
-          {chapters.map((chapter, index) => (
-            <article key={chapter.id} className="hero-chapter-block">
-              <div className="hero-text-panel">
-                <ChapterCopy chapter={chapter} />
-              </div>
-              <div className="hero-image-panel">
-                <HeroImageLayer
-                  image={chapterImage(journey, chapter.id)}
-                  chapter={chapter.id as "experience" | "space" | "feel"}
-                  priority={index === 0}
-                  staticVisible
-                />
-              </div>
-            </article>
-          ))}
-          <HeroCta />
-        </div>
-      </section>
-    );
-  }
-
-  if (isMobile) {
-    return (
-      <section className="hero-root" aria-label="Hero" ref={rootRef}>
-        <div className="hero-track is-static" ref={trackRef}>
-          <div className="hero-stage page-frame">
-            <p className="hero-tagline pt-fluid-lg">{tagline}</p>
-            {chapters.map((chapter, index) => (
-              <article
-                key={chapter.id}
-                className="hero-chapter-block"
-                data-mobile-chapter={index}
-                style={{ minHeight: index === 0 ? "min(100dvh, auto)" : "85vh" }}
-              >
-                <div
-                  className="hero-image-panel"
-                  style={index === 0 ? { minHeight: "42vh", maxHeight: "48vh" } : undefined}
-                >
-                  <HeroImageLayer
-                    image={chapterImage(journey, chapter.id)}
-                    chapter={chapter.id as "experience" | "space" | "feel"}
-                    priority={index === 0}
-                    staticVisible
-                  />
-                </div>
-                <div className="hero-text-panel">
-                  <ChapterCopy chapter={chapter} showEntrance={mounted && index === 0} />
-                  {index === 0 ? <HeroCta /> : null}
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-    );
-  }
 
   return (
     <section className="hero-root" aria-label="Hero" ref={rootRef}>
       <div className="hero-track" ref={trackRef}>
         <div className="hero-stage">
-          <nav className="hero-progress" aria-label="Hero chapters">
-            {chapters.map((chapter, index) => (
-              <div key={chapter.id}>
-                <button
-                  type="button"
-                  className={`hero-progress-item${activeChapter === index ? " is-active" : ""}`}
-                  aria-current={activeChapter === index ? "step" : undefined}
-                  onClick={() => scrollToChapter(index)}
-                >
-                  <span>{chapter.index}</span>
-                  <span className="hero-progress-bar" aria-hidden="true" />
-                </button>
-                {index < chapters.length - 1 ? (
-                  <span className="hero-progress-connector" aria-hidden="true" />
-                ) : null}
-              </div>
-            ))}
-          </nav>
-
-          <div className="hero-composition">
-            <div className="hero-text-panel">
-              <p className="hero-tagline">{tagline}</p>
+          {animated ? (
+            <nav className="hero-progress" aria-label="Hero chapters">
               {chapters.map((chapter, index) => (
-                <ChapterCopy
-                  key={chapter.id}
-                  chapter={chapter}
-                  showEntrance={mounted && index === 0}
-                />
+                <div className="hero-progress-step" key={chapter.id}>
+                  <button
+                    type="button"
+                    className="hero-progress-item"
+                    aria-current={activeChapter === index ? "step" : undefined}
+                    onClick={() => scrollToChapter(index)}
+                  >
+                    <span>{chapter.index}</span>
+                    <span className="hero-progress-bar" aria-hidden="true" />
+                  </button>
+                  {index < chapters.length - 1 ? (
+                    <span className="hero-progress-connector" aria-hidden="true" />
+                  ) : null}
+                </div>
               ))}
-              <HeroCta hidden={activeChapter !== 0} />
-            </div>
+            </nav>
+          ) : null}
 
-            <div className="hero-image-panel" ref={imagePanelRef}>
-              <div className="hero-scrim" aria-hidden="true" />
-              <HeroImageLayer
-                image={journey.experience}
-                chapter="experience"
-                priority
+          <div className="hero-composition" ref={compositionRef}>
+            {chapters.map((chapter, index) => (
+              <HeroScene
+                key={chapter.id}
+                chapter={chapter}
+                image={chapterImage(journey, chapter.id)}
+                tagline={index === 0 ? tagline : undefined}
+                showTopTagline={index === 0 && !animated}
+                priority={index === 0}
+                showEntrance={mounted && !reduced && index === 0}
+                showCta={index === 0}
+                ctaInert={animated && activeChapter !== 0}
               />
-              <HeroImageLayer image={journey.space} chapter="space" />
-              <HeroImageLayer image={journey.feel} chapter="feel" />
-            </div>
+            ))}
           </div>
         </div>
       </div>

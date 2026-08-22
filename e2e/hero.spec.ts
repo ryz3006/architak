@@ -1,9 +1,15 @@
 import { expect, test } from "@playwright/test";
 
 const HERO_HEADLINES = [
-  "Experiences that stay",
-  "Spaces that think",
-  "A feel that defines",
+  { selector: "h1.hero-chapter-headline", parts: ["Experiences", "that stay"] },
+  {
+    selector: '.hero-scene[data-chapter="space"] .hero-chapter-headline',
+    parts: ["Spaces that think", "like you"],
+  },
+  {
+    selector: '.hero-scene[data-chapter="feel"] .hero-chapter-headline',
+    parts: ["A feel that defines", "luxury"],
+  },
 ] as const;
 
 test.describe("hero composition", () => {
@@ -11,7 +17,10 @@ test.describe("hero composition", () => {
     await page.goto("/");
 
     for (const headline of HERO_HEADLINES) {
-      await expect(page.getByRole("heading", { name: new RegExp(headline, "i") })).toBeAttached();
+      const node = page.locator(headline.selector);
+      for (const part of headline.parts) {
+        await expect(node).toContainText(new RegExp(part, "i"));
+      }
     }
 
     await expect(page.getByRole("link", { name: /view work/i })).toBeInViewport();
@@ -20,9 +29,9 @@ test.describe("hero composition", () => {
   test("hero images use concrete alt text", async ({ page }) => {
     await page.goto("/");
 
-    const alts = await page.locator(".hero-image-panel img, .hero-image-layer img").evaluateAll(
-      (images) => images.map((img) => img.getAttribute("alt") ?? ""),
-    );
+    const alts = await page
+      .locator(".hero-image-layer img")
+      .evaluateAll((images) => images.map((img) => img.getAttribute("alt") ?? ""));
 
     expect(alts.length).toBeGreaterThan(0);
     for (const alt of alts) {
@@ -34,9 +43,9 @@ test.describe("hero composition", () => {
   test("journey images are unique within the hero", async ({ page }) => {
     await page.goto("/");
 
-    const srcs = await page.locator(".hero-image-layer img, .hero-chapter-block img").evaluateAll(
-      (images) => images.map((img) => img.getAttribute("src") ?? ""),
-    );
+    const srcs = await page
+      .locator(".hero-image-layer img")
+      .evaluateAll((images) => images.map((img) => img.getAttribute("src") ?? ""));
 
     const unique = new Set(srcs.filter(Boolean));
     expect(unique.size).toBeGreaterThanOrEqual(3);
@@ -48,10 +57,20 @@ test.describe("hero composition", () => {
     await page.goto("/");
 
     for (const headline of HERO_HEADLINES) {
-      await expect(page.getByRole("heading", { name: new RegExp(headline, "i") })).toBeVisible();
+      const node = page.locator(headline.selector);
+      for (const part of headline.parts) {
+        await expect(node).toContainText(new RegExp(part, "i"));
+      }
+      await expect(node).toBeVisible();
     }
 
-    await expect(page.locator(".hero-track.is-static")).toBeVisible();
+    // Stacked, not pinned: the stage scrolls with the page instead of sticking.
+    const stagePosition = await page
+      .locator(".hero-stage")
+      .evaluate((node) => getComputedStyle(node).position);
+    expect(stagePosition).toBe("relative");
+
+    await expect(page.locator(".hero-progress")).toHaveCount(0);
     await expect(page.getByRole("link", { name: /view work/i })).toBeVisible();
   });
 });

@@ -51,7 +51,7 @@ jobs:
       - run: pnpm build
 
       - name: Cache build output for the e2e job
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: next-build
           path: .next
@@ -93,7 +93,7 @@ jobs:
       - name: Run adaptive and accessibility suites
         run: pnpm exec playwright test --project=desktop-chromium
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: ${{ !cancelled() }}
         with:
           name: playwright-report

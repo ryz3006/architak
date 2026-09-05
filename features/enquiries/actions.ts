@@ -75,7 +75,7 @@ export async function submitEnquiryAction(
       message: parsed.data.message,
       source_page: parsed.data.sourcePage,
       consent: true,
-      status: "new",
+      // Do not send `status` — anon only has INSERT on safe columns; default is `new`.
     });
 
     if (error) {

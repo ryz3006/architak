@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
+    "test:admin": "node scripts/verify-admin-platform.mjs",
     "format": "prettier --write .",
     "media:scrape": "node scripts/scrape-architak-media.mjs",
     "media:manifest": "node scripts/rebuild-image-manifest.mjs",

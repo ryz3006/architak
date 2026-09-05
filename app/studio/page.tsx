@@ -21,33 +21,65 @@ import {
   getStudioPageContent,
   getTestimonials,
 } from "@/content/static";
+import { resolvePublishedProjects, fillToMinimum } from "@/features/content/resolver";
 import { buildPageMetadata } from "@/features/discovery/metadata";
-import { getPageSeo } from "@/features/discovery/page-seo";
+import { getPageSeoFromCms } from "@/features/discovery/page-seo-cms";
 import {
   buildBreadcrumbJsonLd,
   buildStudioWorkListJsonLd,
   jsonLdScript,
 } from "@/features/discovery/structured-data";
 import {
-  resolveFeaturedWorkVideos,
+  resolveFeaturedWorkVideosFromCms,
   toDepthCarouselItems,
 } from "@/features/work/featured-videos";
+import { getPublicWebsiteSectionConfig } from "@/features/website/public";
+import { listEnabledProjectTestimonials } from "@/features/projects/testimonials";
 
 import "@/styles/studio-page.css";
 
-const studioSeo = getPageSeo("/studio")!;
+export const revalidate = 60;
 
-export const metadata: Metadata = buildPageMetadata({
-  path: "/studio",
-  title: studioSeo.title,
-  description: studioSeo.description,
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const studioSeo = await getPageSeoFromCms("/studio");
+  return buildPageMetadata({
+    path: "/studio",
+    title: studioSeo.title,
+    description: studioSeo.description,
+  });
+}
 
 export default async function StudioPage() {
   const page = getStudioPageContent();
-  const projects = getStaticProjects();
-  const testimonials = getTestimonials();
-  const featuredVideos = toDepthCarouselItems(resolveFeaturedWorkVideos());
+  const config = await getPublicWebsiteSectionConfig();
+  const resolved = await resolvePublishedProjects();
+
+  const ordered =
+    config.studioDomeSlugs.length > 0
+      ? config.studioDomeSlugs
+          .map((slug) => resolved.find((p) => p.slug === slug))
+          .filter((p): p is NonNullable<typeof p> => Boolean(p))
+      : resolved;
+
+  const projects =
+    ordered.length > 0
+      ? fillToMinimum(
+          ordered.map((p) => ({
+            slug: p.slug,
+            title: p.title,
+            category: p.category,
+            location: p.location,
+            summary: p.summary,
+            coverImage: p.coverImage,
+            gallery: p.gallery,
+          })),
+          8,
+        )
+      : getStaticProjects();
+
+  const cmsTestimonials = await listEnabledProjectTestimonials();
+  const testimonials = cmsTestimonials.length > 0 ? cmsTestimonials : getTestimonials();
+  const featuredVideos = toDepthCarouselItems(await resolveFeaturedWorkVideosFromCms());
 
   return (
     <main id="main-content" className="studio-page flex min-h-dvh flex-col">
@@ -83,12 +115,14 @@ export default async function StudioPage() {
         <StudioReveal variant="rise">
           <section id="work" className="studio-work-section border-t border-border">
             <StudioWorkIntro work={page.work} />
-            <StudioFeaturedWorks
-              eyebrow={page.featuredWorks.eyebrow}
-              headline={page.featuredWorks.headline}
-              support={page.featuredWorks.support}
-              items={featuredVideos}
-            />
+            {config.featuredWorksEnabled ? (
+              <StudioFeaturedWorks
+                eyebrow={page.featuredWorks.eyebrow}
+                headline={page.featuredWorks.headline}
+                support={page.featuredWorks.support}
+                items={featuredVideos}
+              />
+            ) : null}
             <StudioWorkDome projects={projects} />
           </section>
         </StudioReveal>

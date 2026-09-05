@@ -10,12 +10,8 @@ import { ProjectSummary } from "@/components/project/project-summary";
 import { SmoothScroll } from "@/components/motion/smooth-scroll";
 import { StudioAtmosphere } from "@/components/studio/studio-atmosphere";
 import { StudioReveal } from "@/components/studio/studio-reveal";
-import {
-  getProjectPageContent,
-  getStaticProjectBySlug,
-  getStaticProjects,
-  getStudioPageContent,
-} from "@/content/static";
+import { getProjectPageContent, getStaticProjects, getStudioPageContent } from "@/content/static";
+import { resolvePublishedProject, resolvePublishedProjects } from "@/features/content/resolver";
 import { buildPageMetadata } from "@/features/discovery/metadata";
 import {
   buildBreadcrumbJsonLd,
@@ -26,17 +22,27 @@ import {
 import "@/styles/project-page.css";
 import "@/styles/studio-page.css";
 
+export const revalidate = 60;
+
 type Props = {
   params: Promise<{ slug: string }>;
 };
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  try {
+    const projects = await resolvePublishedProjects();
+    if (projects.length > 0) {
+      return projects.map((project) => ({ slug: project.slug }));
+    }
+  } catch {
+    // fall through
+  }
   return getStaticProjects().map((project) => ({ slug: project.slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const project = getStaticProjectBySlug(slug);
+  const project = await resolvePublishedProject(slug);
   if (!project) return {};
 
   return buildPageMetadata({
@@ -49,7 +55,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ProjectPage({ params }: Props) {
   const { slug } = await params;
-  const project = getStaticProjectBySlug(slug);
+  const project = await resolvePublishedProject(slug);
   if (!project) notFound();
 
   const pageCopy = getProjectPageContent();
@@ -63,6 +69,16 @@ export default async function ProjectPage({ params }: Props) {
     location: project.location,
     summary: project.summary,
     coverImage: project.coverImage,
+  };
+
+  const viewProject = {
+    slug: project.slug,
+    title: project.title,
+    category: project.category,
+    location: project.location,
+    summary: project.summary,
+    coverImage: project.coverImage,
+    gallery: project.gallery,
   };
 
   return (
@@ -87,7 +103,7 @@ export default async function ProjectPage({ params }: Props) {
       <div className="studio-page__content">
         <SiteHeader />
 
-        <ProjectHero project={project} />
+        <ProjectHero project={viewProject} />
 
         <StudioReveal variant="center">
           <ProjectSummary eyebrow={pageCopy.summaryEyebrow} summary={project.summary} />

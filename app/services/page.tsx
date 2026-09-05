@@ -14,7 +14,7 @@ import { StudioReveal } from "@/components/studio/studio-reveal";
 import { StudioWorkIntro } from "@/components/studio/studio-work-intro";
 import { getServicesPageContent, getStaticServices } from "@/content/static";
 import { buildPageMetadata } from "@/features/discovery/metadata";
-import { getPageSeo } from "@/features/discovery/page-seo";
+import { getPageSeoFromCms } from "@/features/discovery/page-seo-cms";
 import {
   buildBreadcrumbJsonLd,
   buildServiceListJsonLd,
@@ -24,15 +24,16 @@ import {
 import "@/styles/services-page.css";
 import "@/styles/studio-page.css";
 
-const servicesSeo = getPageSeo("/services")!;
+export async function generateMetadata(): Promise<Metadata> {
+  const servicesSeo = await getPageSeoFromCms("/services");
+  return buildPageMetadata({
+    path: "/services",
+    title: servicesSeo.title,
+    description: servicesSeo.description,
+  });
+}
 
-export const metadata: Metadata = buildPageMetadata({
-  path: "/services",
-  title: servicesSeo.title,
-  description: servicesSeo.description,
-});
-
-export default function ServicesPage() {
+export default async function ServicesPage() {
   const services = getStaticServices();
   const page = getServicesPageContent();
 

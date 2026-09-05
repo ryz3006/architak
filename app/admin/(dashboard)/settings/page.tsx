@@ -1,3 +1,4 @@
+import { TelegramSettings } from "@/components/admin/telegram-settings";
 import { requireAdminSession } from "@/features/auth/session";
 
 const REDACTED = [
@@ -14,6 +15,9 @@ const REDACTED = [
   "R2_BUCKET_NAME",
   "R2_ENDPOINT",
   "R2_PUBLIC_BASE_URL",
+  "TELEGRAM_NOTIFICATIONS_ENABLED",
+  "TELEGRAM_BOT_TOKEN",
+  "TELEGRAM_CHAT_ID",
 ] as const;
 
 export default async function AdminSettingsPage() {
@@ -40,6 +44,8 @@ export default async function AdminSettingsPage() {
           );
         })}
       </ul>
+
+      <TelegramSettings />
     </main>
   );
 }

@@ -53,6 +53,13 @@ const OPTIONAL = [
   "RATE_LIMIT_MAX",
   "FEATURE_JOURNAL_NAV",
   "FEATURE_THREE_D",
+  "FEATURE_SPLASH_CURSOR",
+  "TELEGRAM_NOTIFICATIONS_ENABLED",
+  "TELEGRAM_BOT_TOKEN",
+  "TELEGRAM_CHAT_ID",
+  "TELEGRAM_NOTIFICATION_TIMEOUT_MS",
+  "DATABASE_URL",
+  "SUPABASE_DB_PASSWORD",
 ];
 
 /** Minimum lengths enforced by lib/env.ts, checked here so failures surface early. */

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { EnquireButton } from "@/components/layout/enquire-button";
 import { BrandLockup } from "@/components/layout/brand-lockup";
 import { MobileNav, type NavLink } from "@/components/layout/mobile-nav";
+import { SOCIAL_PLATFORMS } from "@/components/icons/social-icon";
 import { getSocialProfiles, getStaticSite } from "@/content/static";
 
 import "@/styles/site-footer.css";
@@ -17,13 +18,6 @@ const footerLinks: readonly NavLink[] = [
   { href: "/studio#work", label: "Work" },
   { href: "/contact", label: "Contact" },
 ] as const;
-
-const SOCIAL_LABELS = {
-  linkedin: "LinkedIn",
-  youtube: "YouTube",
-  instagram: "Instagram",
-  facebook: "Facebook",
-} as const;
 
 export function SiteHeader({ homeHero = false }: { homeHero?: boolean }) {
   const tagline = getStaticSite().studio.tagline;
@@ -63,13 +57,12 @@ export function SiteFooter() {
   const phoneHref = `tel:${studio.phone.replace(/\s/g, "")}`;
   const year = new Date().getFullYear();
 
-  const socialLinks = (
-    Object.entries(SOCIAL_LABELS) as Array<[keyof typeof SOCIAL_LABELS, string]>
-  )
-    .map(([key, label]) => ({ key, label, href: social[key] }))
-    .filter((entry): entry is { key: keyof typeof SOCIAL_LABELS; label: string; href: string } =>
-      Boolean(entry.href),
-    );
+  const socialLinks = SOCIAL_PLATFORMS.map((entry) => ({
+    ...entry,
+    href: social[entry.key],
+  })).filter((entry): entry is (typeof SOCIAL_PLATFORMS)[number] & { href: string } =>
+    Boolean(entry.href),
+  );
 
   return (
     <footer className="site-footer">

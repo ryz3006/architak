@@ -37,6 +37,10 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  // Windows/local builds can OOM when Next spawns many static workers; override with NEXT_BUILD_CPUS.
+  ...(process.env.NEXT_BUILD_CPUS
+    ? { experimental: { cpus: Math.max(1, Number(process.env.NEXT_BUILD_CPUS) || 1) } }
+    : {}),
   images: {
     remotePatterns: [
       {

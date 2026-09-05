@@ -5,10 +5,12 @@ import { useEffect, useState } from "react";
 
 const SHORTCUTS = [
   { keys: "g d", href: "/admin", label: "Dashboard" },
+  { keys: "g m", href: "/admin/media", label: "Gallery" },
   { keys: "g p", href: "/admin/projects", label: "Projects" },
-  { keys: "g m", href: "/admin/media", label: "Media" },
-  { keys: "g l", href: "/admin/enquiries", label: "Leads" },
+  { keys: "g l", href: "/admin/enquiries", label: "Enquiries" },
+  { keys: "g w", href: "/admin/website-management", label: "Website" },
   { keys: "g s", href: "/admin/seo", label: "SEO" },
+  { keys: "g h", href: "/admin/system-health", label: "System Health" },
   { keys: "g o", href: "/admin/ops", label: "Operations" },
   { keys: "g ,", href: "/admin/settings", label: "Settings" },
 ] as const;
@@ -58,10 +60,12 @@ export function AdminShortcuts() {
       if (pendingG) {
         const map: Record<string, string> = {
           d: "/admin",
-          p: "/admin/projects",
           m: "/admin/media",
+          p: "/admin/projects",
           l: "/admin/enquiries",
+          w: "/admin/website-management",
           s: "/admin/seo",
+          h: "/admin/system-health",
           o: "/admin/ops",
           ",": "/admin/settings",
         };

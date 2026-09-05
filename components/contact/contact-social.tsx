@@ -1,4 +1,5 @@
 import type { ContactPageContent, SocialProfiles } from "@/content/static";
+import { SOCIAL_PLATFORMS, SocialIcon } from "@/components/icons/social-icon";
 
 import "@/styles/contact-page.css";
 
@@ -7,15 +8,8 @@ type ContactSocialProps = {
   profiles: SocialProfiles;
 };
 
-const PROFILE_ENTRIES = [
-  { key: "linkedin" as const, label: "LinkedIn" },
-  { key: "youtube" as const, label: "YouTube" },
-  { key: "instagram" as const, label: "Instagram" },
-  { key: "facebook" as const, label: "Facebook" },
-];
-
 export function ContactSocial({ section, profiles }: ContactSocialProps) {
-  const links = PROFILE_ENTRIES.map((entry) => ({
+  const links = SOCIAL_PLATFORMS.map((entry) => ({
     ...entry,
     href: profiles[entry.key],
   })).filter((entry) => entry.href);
@@ -40,8 +34,9 @@ export function ContactSocial({ section, profiles }: ContactSocialProps) {
               className="contact-social__link"
               target="_blank"
               rel="noopener noreferrer"
+              aria-label={entry.label}
             >
-              {entry.label}
+              <SocialIcon platform={entry.key} className="contact-social__icon" />
             </a>
           </li>
         ))}

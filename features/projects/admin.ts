@@ -3,12 +3,35 @@ import "server-only";
 import { getStaticProjects } from "@/content/static";
 import { requireAdminSession } from "@/features/auth/session";
 import { getSecretSupabase } from "@/lib/supabase/server";
+import { listProjectTestimonialsAdmin } from "@/features/projects/testimonials";
 
 export type AdminProjectListItem = {
   slug: string;
   title: string;
   category: string;
   status: string;
+  source: "cms" | "static";
+};
+
+export type AdminProjectDetail = {
+  id: string | null;
+  slug: string;
+  title: string;
+  summary: string | null;
+  location: string | null;
+  status: string;
+  is_featured: boolean;
+  cover_media_id: string | null;
+  category_slug: string | null;
+  gallery_media_ids: string[];
+  testimonials: Array<{
+    id?: string;
+    quote: string;
+    author_name: string;
+    author_role: string | null;
+    location: string | null;
+    is_enabled: boolean;
+  }>;
   source: "cms" | "static";
 };
 
@@ -52,13 +75,52 @@ export async function listAdminProjects(): Promise<AdminProjectListItem[]> {
   }));
 }
 
-export async function getAdminProject(slug: string) {
+export async function getAdminProject(slug: string): Promise<AdminProjectDetail | null> {
   await requireAdminSession();
 
   try {
     const supabase = getSecretSupabase();
     const { data, error } = await supabase.from("projects").select("*").eq("slug", slug).maybeSingle();
-    if (!error && data) return { ...data, source: "cms" as const };
+    if (!error && data) {
+      const [{ data: category }, { data: gallery }, testimonials] = await Promise.all([
+        data.category_id
+          ? supabase
+              .from("project_categories")
+              .select("slug")
+              .eq("id", data.category_id)
+              .maybeSingle()
+          : Promise.resolve({ data: null }),
+        supabase
+          .from("project_media")
+          .select("media_asset_id, sort_order")
+          .eq("project_id", data.id)
+          .eq("role", "gallery")
+          .order("sort_order", { ascending: true }),
+        listProjectTestimonialsAdmin(data.id),
+      ]);
+
+      return {
+        id: data.id,
+        slug: data.slug,
+        title: data.title,
+        summary: data.summary,
+        location: data.location,
+        status: data.status,
+        is_featured: data.is_featured,
+        cover_media_id: data.cover_media_id,
+        category_slug: category?.slug ?? null,
+        gallery_media_ids: (gallery ?? []).map((row) => row.media_asset_id),
+        testimonials: testimonials.map((t) => ({
+          id: t.id,
+          quote: t.quote,
+          author_name: t.author_name,
+          author_role: t.author_role,
+          location: t.location,
+          is_enabled: t.is_enabled,
+        })),
+        source: "cms" as const,
+      };
+    }
   } catch {
     // Fall through.
   }
@@ -72,8 +134,12 @@ export async function getAdminProject(slug: string) {
     title: fallback.title,
     summary: fallback.summary,
     location: fallback.location,
-    status: "published" as const,
+    status: "published",
     is_featured: true,
+    cover_media_id: null,
+    category_slug: fallback.category.toLowerCase().replace(/\s+/g, "-"),
+    gallery_media_ids: [],
+    testimonials: [],
     source: "static" as const,
   };
 }

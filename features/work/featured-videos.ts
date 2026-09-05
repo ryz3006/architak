@@ -3,6 +3,7 @@ import "server-only";
 import { getFeaturedWorkVideos } from "@/content/static";
 import { isR2Configured } from "@/lib/env";
 import { getStorageService } from "@/lib/storage/r2";
+import { getPublicWebsiteSectionConfig } from "@/features/website/public";
 
 export type ResolvedFeaturedWorkVideo = {
   id: string;
@@ -35,8 +36,7 @@ function resolveVideoUrl(objectPath: string, localPath: string): string {
   return localPath.startsWith("/") ? localPath : `/${localPath}`;
 }
 
-/** Featured work reels for homepage and studio carousel. */
-export function resolveFeaturedWorkVideos(): ResolvedFeaturedWorkVideo[] {
+function resolveAllVideos(): ResolvedFeaturedWorkVideo[] {
   return getFeaturedWorkVideos().map((item) => {
     const videoUrl = resolveVideoUrl(item.video.objectPath, item.video.localPath);
     const posterUrl = item.poster.startsWith("/") ? item.poster : `/${item.poster}`;
@@ -53,6 +53,29 @@ export function resolveFeaturedWorkVideos(): ResolvedFeaturedWorkVideo[] {
       alt: `${item.title} — ${item.category} interior in ${item.location}`,
     };
   });
+}
+
+/** Featured work reels for homepage and studio carousel. */
+export function resolveFeaturedWorkVideos(): ResolvedFeaturedWorkVideo[] {
+  return resolveAllVideos();
+}
+
+/** Async variant that respects Website Management homepageVideoIds order. */
+export async function resolveFeaturedWorkVideosFromCms(): Promise<ResolvedFeaturedWorkVideo[]> {
+  const all = resolveAllVideos();
+  try {
+    const config = await getPublicWebsiteSectionConfig();
+    if (config.homepageVideoIds.length === 0) return all;
+
+    const byId = new Map(all.map((v) => [v.id, v]));
+    const ordered = config.homepageVideoIds
+      .map((id) => byId.get(id))
+      .filter((v): v is ResolvedFeaturedWorkVideo => Boolean(v));
+
+    return ordered.length > 0 ? ordered : all;
+  } catch {
+    return all;
+  }
 }
 
 export function toDepthCarouselItems(videos: ResolvedFeaturedWorkVideo[]): DepthCarouselItem[] {

@@ -7,7 +7,23 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 
 export type ContentStatus = "draft" | "published" | "archived";
 export type MediaVisibility = "public" | "private";
-export type EnquiryStatus = "new" | "contacted" | "qualified" | "closed" | "spam";
+export type EnquiryStatus =
+  | "new"
+  | "contacted"
+  | "in_discussion"
+  | "qualified"
+  | "converted"
+  | "closed"
+  | "spam";
+
+export type EnquiryEventType =
+  | "created"
+  | "status_changed"
+  | "assigned"
+  | "note_added"
+  | "notification_queued"
+  | "notification_sent"
+  | "notification_failed";
 
 type TableDef<Row, Insert, Update> = {
   Row: Row;
@@ -332,7 +348,7 @@ export type Database = {
         {
           id: string;
           enquiry_id: string;
-          event_type: "created" | "status_changed" | "assigned" | "note_added";
+          event_type: EnquiryEventType;
           from_status: EnquiryStatus | null;
           to_status: EnquiryStatus | null;
           note: string | null;
@@ -343,7 +359,7 @@ export type Database = {
         {
           id?: string;
           enquiry_id: string;
-          event_type: "created" | "status_changed" | "assigned" | "note_added";
+          event_type: EnquiryEventType;
           from_status?: EnquiryStatus | null;
           to_status?: EnquiryStatus | null;
           note?: string | null;
@@ -354,7 +370,7 @@ export type Database = {
         {
           id?: string;
           enquiry_id?: string;
-          event_type?: "created" | "status_changed" | "assigned" | "note_added";
+          event_type?: EnquiryEventType;
           from_status?: EnquiryStatus | null;
           to_status?: EnquiryStatus | null;
           note?: string | null;
@@ -472,6 +488,94 @@ export type Database = {
           request_id?: string | null;
           ip_address?: string | null;
           created_at?: string;
+        }
+      >;
+      seo_versions: TableDef<
+        {
+          id: number;
+          seo_metadata_id: string;
+          version_number: number;
+          title: string | null;
+          description: string | null;
+          canonical_url: string | null;
+          robots: string | null;
+          open_graph: Json;
+          structured_data: Json;
+          ai_summary: string | null;
+          quality_score: number | null;
+          changed_by: string | null;
+          change_summary: string | null;
+          created_at: string;
+        },
+        {
+          id?: number;
+          seo_metadata_id: string;
+          version_number: number;
+          title?: string | null;
+          description?: string | null;
+          canonical_url?: string | null;
+          robots?: string | null;
+          open_graph?: Json;
+          structured_data?: Json;
+          ai_summary?: string | null;
+          quality_score?: number | null;
+          changed_by?: string | null;
+          change_summary?: string | null;
+          created_at?: string;
+        },
+        {
+          id?: number;
+          seo_metadata_id?: string;
+          version_number?: number;
+          title?: string | null;
+          description?: string | null;
+          canonical_url?: string | null;
+          robots?: string | null;
+          open_graph?: Json;
+          structured_data?: Json;
+          ai_summary?: string | null;
+          quality_score?: number | null;
+          changed_by?: string | null;
+          change_summary?: string | null;
+          created_at?: string;
+        }
+      >;
+      project_testimonials: TableDef<
+        {
+          id: string;
+          project_id: string;
+          quote: string;
+          author_name: string;
+          author_role: string | null;
+          location: string | null;
+          is_enabled: boolean;
+          sort_order: number;
+          created_at: string;
+          updated_at: string;
+        },
+        {
+          id?: string;
+          project_id: string;
+          quote: string;
+          author_name: string;
+          author_role?: string | null;
+          location?: string | null;
+          is_enabled?: boolean;
+          sort_order?: number;
+          created_at?: string;
+          updated_at?: string;
+        },
+        {
+          id?: string;
+          project_id?: string;
+          quote?: string;
+          author_name?: string;
+          author_role?: string | null;
+          location?: string | null;
+          is_enabled?: boolean;
+          sort_order?: number;
+          created_at?: string;
+          updated_at?: string;
         }
       >;
       clients: TableDef<

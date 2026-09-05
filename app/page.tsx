@@ -12,7 +12,7 @@ import { SmoothScroll } from "@/components/motion/smooth-scroll";
 import { SpaceStorySection } from "@/components/motion/space-story";
 import { getHeroChapters, getManifesto, getSpaceStory, getStudioPageContent } from "@/content/static";
 import { buildPageMetadata } from "@/features/discovery/metadata";
-import { getPageSeo } from "@/features/discovery/page-seo";
+import { getPageSeoFromCms } from "@/features/discovery/page-seo-cms";
 import {
   buildWebPageJsonLd,
   buildWebSiteJsonLd,
@@ -20,18 +20,21 @@ import {
 } from "@/features/discovery/structured-data";
 import { getDriftWallImages } from "@/features/story/drift-images";
 import { getFeaturedAccordionItems } from "@/features/work/accordion-items";
-import { resolveFeaturedWorkVideos } from "@/features/work/featured-videos";
+import { resolveFeaturedWorkVideosFromCms } from "@/features/work/featured-videos";
 import { resolveHeroJourney, preloadHeroImageHints } from "@/lib/hero/journey";
 
 import "@/styles/home-work.css";
 
-const homeSeo = getPageSeo("/")!;
+export const revalidate = 60;
 
-export const metadata: Metadata = buildPageMetadata({
-  path: "/",
-  title: homeSeo.title,
-  description: homeSeo.description,
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const homeSeo = await getPageSeoFromCms("/");
+  return buildPageMetadata({
+    path: "/",
+    title: homeSeo.title,
+    description: homeSeo.description,
+  });
+}
 
 export default async function HomePage() {
   const journey = await resolveHeroJourney();
@@ -40,11 +43,12 @@ export default async function HomePage() {
   const spaceStory = getSpaceStory();
   const driftImages = getDriftWallImages();
   const featuredWork = await getFeaturedAccordionItems();
-  const featuredVideos = resolveFeaturedWorkVideos();
+  const featuredVideos = await resolveFeaturedWorkVideosFromCms();
   const studioWork = getStudioPageContent().work;
   const studioCta = getStudioPageContent().cta;
   const threeEnabled = process.env.FEATURE_THREE_D === "true";
   const lcpImage = preloadHeroImageHints(journey)[0]?.src;
+  const homeSeo = await getPageSeoFromCms("/");
 
   return (
     <>
@@ -73,8 +77,8 @@ export default async function HomePage() {
           <div className="mt-fluid-md">
             <h2 className="display text-display-md">Selected work</h2>
           </div>
-          <FeaturedWorkAccordion items={featuredWork} />
-          <FeaturedWorkReel items={featuredVideos} />
+          {featuredWork.length > 0 ? <FeaturedWorkAccordion items={featuredWork} /> : null}
+          {featuredVideos.length > 0 ? <FeaturedWorkReel items={featuredVideos} /> : null}
           <footer className="home-work-more">
             <p className="home-work-more__support">{studioWork.support}</p>
             <Link href="/studio#work" className="home-work-more__link">

@@ -41,6 +41,11 @@ const serverSchema = z.object({
 
   FEATURE_JOURNAL_NAV: booleanFromString,
   FEATURE_THREE_D: booleanFromString,
+
+  TELEGRAM_NOTIFICATIONS_ENABLED: booleanFromString,
+  TELEGRAM_BOT_TOKEN: z.string().default(""),
+  TELEGRAM_CHAT_ID: z.string().default(""),
+  TELEGRAM_NOTIFICATION_TIMEOUT_MS: z.coerce.number().int().positive().default(5_000),
 });
 
 export type ServerEnv = z.infer<typeof serverSchema>;
@@ -81,6 +86,10 @@ function readRawEnv(): Record<string, string | undefined> {
     RATE_LIMIT_MAX: process.env.RATE_LIMIT_MAX,
     FEATURE_JOURNAL_NAV: process.env.FEATURE_JOURNAL_NAV,
     FEATURE_THREE_D: process.env.FEATURE_THREE_D,
+    TELEGRAM_NOTIFICATIONS_ENABLED: process.env.TELEGRAM_NOTIFICATIONS_ENABLED,
+    TELEGRAM_BOT_TOKEN: process.env.TELEGRAM_BOT_TOKEN,
+    TELEGRAM_CHAT_ID: process.env.TELEGRAM_CHAT_ID,
+    TELEGRAM_NOTIFICATION_TIMEOUT_MS: process.env.TELEGRAM_NOTIFICATION_TIMEOUT_MS,
   };
 }
 

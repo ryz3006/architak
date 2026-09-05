@@ -1,8 +1,10 @@
 "use server";
 
+import { after } from "next/server";
 import { headers } from "next/headers";
 
 import { enquirySchema, type EnquiryActionState } from "@/features/enquiries/schema";
+import { processEnquiryNotification } from "@/features/notifications/service";
 import { checkRateLimit } from "@/lib/security/rate-limit";
 import { getPublishableSupabase } from "@/lib/supabase/server";
 
@@ -88,6 +90,16 @@ export async function submitEnquiryAction(
       "Enquiry storage is not available in this environment yet. Please call or email the studio.",
     );
   }
+
+  after(async () => {
+    await processEnquiryNotification({
+      name: parsed.data.name,
+      email: parsed.data.email || null,
+      phone: parsed.data.phone || null,
+      message: parsed.data.message,
+      sourcePage: parsed.data.sourcePage,
+    });
+  });
 
   return {
     ok: true,

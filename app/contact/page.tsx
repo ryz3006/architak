@@ -11,7 +11,7 @@ import { StudioLocation } from "@/components/studio/studio-location";
 import { StudioReveal } from "@/components/studio/studio-reveal";
 import { getContactPageContent, getSocialProfiles, getStaticSite, getStudioPageContent } from "@/content/static";
 import { buildPageMetadata } from "@/features/discovery/metadata";
-import { getPageSeo } from "@/features/discovery/page-seo";
+import { getPageSeoFromCms } from "@/features/discovery/page-seo-cms";
 import {
   buildBreadcrumbJsonLd,
   buildContactPageJsonLd,
@@ -21,15 +21,16 @@ import {
 import "@/styles/contact-page.css";
 import "@/styles/studio-page.css";
 
-const contactSeo = getPageSeo("/contact")!;
+export async function generateMetadata(): Promise<Metadata> {
+  const contactSeo = await getPageSeoFromCms("/contact");
+  return buildPageMetadata({
+    path: "/contact",
+    title: contactSeo.title,
+    description: contactSeo.description,
+  });
+}
 
-export const metadata: Metadata = buildPageMetadata({
-  path: "/contact",
-  title: contactSeo.title,
-  description: contactSeo.description,
-});
-
-export default function ContactPage() {
+export default async function ContactPage() {
   const { studio } = getStaticSite();
   const page = getContactPageContent();
   const studioPage = getStudioPageContent();

@@ -25,13 +25,15 @@ export function PageHeader({
         className,
       )}
     >
-      <div className="min-w-0">
+      <div className="min-w-0 flex-1">
         <h2 className="text-display-sm font-semibold leading-tight text-foreground">{title}</h2>
         {description ? (
-          <p className="mt-1.5 max-w-[60ch] text-fluid-sm text-muted">{description}</p>
+          <p className="mt-1.5 max-w-prose text-pretty text-fluid-sm text-muted">{description}</p>
         ) : null}
       </div>
-      {actions ? <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div> : null}
+      {actions ? (
+        <div className="flex shrink-0 flex-wrap items-center gap-2 sm:pt-1">{actions}</div>
+      ) : null}
     </div>
   );
 }

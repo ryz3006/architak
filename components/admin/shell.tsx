@@ -55,7 +55,7 @@ function NavLinks({ pathname, onNavigate }: { pathname: string; onNavigate?: () 
                       className={cn("size-4 shrink-0", active ? "text-accent" : "text-muted")}
                       aria-hidden="true"
                     />
-                    {item.label}
+                    <span className="truncate">{item.label}</span>
                   </Link>
                 </li>
               );
@@ -69,7 +69,7 @@ function NavLinks({ pathname, onNavigate }: { pathname: string; onNavigate?: () 
 
 function Brand() {
   return (
-    <Link href="/admin" className="flex flex-col gap-0.5">
+    <Link href="/admin" className="flex min-w-0 flex-col gap-0.5">
       <span className="text-fluid-sm font-semibold tracking-[0.2em] uppercase text-foreground">
         ARCHITAK
       </span>
@@ -84,9 +84,9 @@ function UserMenu({ username }: { username: string }) {
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className="flex items-center gap-2 rounded-[var(--admin-radius-sm)] border border-[var(--admin-border)] px-2.5 py-1.5 text-fluid-sm text-foreground transition-colors hover:border-[var(--admin-border-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
+          className="flex max-w-full items-center gap-2 rounded-[var(--admin-radius-sm)] border border-[var(--admin-border)] px-2.5 py-1.5 text-fluid-sm text-foreground transition-colors hover:border-[var(--admin-border-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
         >
-          <span className="flex size-6 items-center justify-center rounded-full bg-[var(--admin-surface-raised)]">
+          <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[var(--admin-surface-raised)]">
             <User className="size-3.5 text-muted" aria-hidden="true" />
           </span>
           <span className="hidden max-w-32 truncate sm:inline">{username}</span>
@@ -119,7 +119,7 @@ function UserMenu({ username }: { username: string }) {
 function Breadcrumbs({ pathname }: { pathname: string }) {
   const crumbs = getBreadcrumbs(pathname);
   return (
-    <nav aria-label="Breadcrumb" className="flex items-center gap-1 text-fluid-xs text-muted">
+    <nav aria-label="Breadcrumb" className="flex min-w-0 items-center gap-1 text-fluid-xs text-muted">
       {crumbs.map((crumb, index) => (
         <Fragment key={crumb.href}>
           {index > 0 ? <ChevronRight className="size-3 shrink-0" aria-hidden="true" /> : null}
@@ -154,79 +154,94 @@ export function AdminShell({
   const title = getPageTitle(pathname);
 
   return (
-    <div className="min-h-dvh bg-background text-foreground lg:grid lg:grid-cols-[16rem_minmax(0,1fr)]">
+    <div className="admin-shell min-h-dvh bg-background text-foreground">
+      {/* Overlays must stay outside the layout grid — fixed nodes still occupy grid cells. */}
       <AdminShortcuts />
       <IdleLogout timeoutMinutes={idleTimeoutMinutes} />
       <CommandMenu open={commandOpen} onOpenChange={setCommandOpen} />
       <Toaster />
 
-      {/* Desktop sidebar */}
-      <aside className="sticky top-0 hidden h-dvh flex-col border-r border-[var(--admin-border)] bg-[var(--admin-surface)] lg:flex">
-        <div className="border-b border-[var(--admin-border)] px-5 py-4">
-          <Brand />
-        </div>
-        <nav aria-label="Admin" className="flex-1 overflow-y-auto px-3 py-4">
-          <NavLinks pathname={pathname} />
-        </nav>
-        <div className="border-t border-[var(--admin-border)] px-3 py-3">
-          <button
-            type="button"
-            onClick={() => setCommandOpen(true)}
-            className="flex w-full items-center gap-2 rounded-[var(--admin-radius-sm)] border border-[var(--admin-border)] px-3 py-2 text-fluid-xs text-muted transition-colors hover:text-foreground"
-          >
-            <Search className="size-3.5" aria-hidden="true" />
-            <span>Search</span>
-            <kbd className="ml-auto flex items-center gap-0.5 text-[0.65rem]">
-              <CommandIcon className="size-3" aria-hidden="true" />K
-            </kbd>
-          </button>
-        </div>
-      </aside>
-
-      <div className="flex min-w-0 flex-col">
-        {/* Top header */}
-        <header className="sticky top-0 z-[var(--z-header)] flex items-center gap-3 border-b border-[var(--admin-border)] bg-background/90 px-4 py-3 backdrop-blur md:px-6">
-          {/* Mobile menu trigger */}
-          <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
-            <SheetTrigger asChild>
-              <button
-                type="button"
-                className="rounded-[var(--admin-radius-sm)] border border-[var(--admin-border)] p-2 text-foreground lg:hidden"
-                aria-label="Open navigation"
-              >
-                <Menu className="size-4" />
-              </button>
-            </SheetTrigger>
-            <SheetContent side="left" className="p-0">
-              <div className="border-b border-[var(--admin-border)] px-5 py-4">
-                <Brand />
-              </div>
-              <nav aria-label="Admin" className="flex-1 overflow-y-auto px-3 py-4">
-                <NavLinks pathname={pathname} onNavigate={() => setMenuOpen(false)} />
-              </nav>
-            </SheetContent>
-          </Sheet>
-
-          <div className="flex min-w-0 flex-col">
-            <Breadcrumbs pathname={pathname} />
-            <h1 className="truncate text-fluid-base font-semibold text-foreground">{title}</h1>
+      <div className="admin-shell__layout">
+        <aside className="admin-shell__sidebar hidden lg:flex">
+          <div className="shrink-0 border-b border-[var(--admin-border)] px-5 py-4">
+            <Brand />
           </div>
-
-          <div className="ml-auto flex items-center gap-2">
+          <nav aria-label="Admin" className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-3 py-4">
+            <NavLinks pathname={pathname} />
+          </nav>
+          <div className="shrink-0 border-t border-[var(--admin-border)] px-3 py-3">
             <button
               type="button"
               onClick={() => setCommandOpen(true)}
-              className="rounded-[var(--admin-radius-sm)] border border-[var(--admin-border)] p-2 text-muted transition-colors hover:text-foreground lg:hidden"
-              aria-label="Search"
+              className="flex w-full items-center gap-2 rounded-[var(--admin-radius-sm)] border border-[var(--admin-border)] px-3 py-2 text-fluid-xs text-muted transition-colors hover:text-foreground"
             >
-              <Search className="size-4" />
+              <Search className="size-3.5 shrink-0" aria-hidden="true" />
+              <span className="truncate">Search</span>
+              <kbd className="ml-auto flex shrink-0 items-center gap-0.5 text-[0.65rem]">
+                <CommandIcon className="size-3" aria-hidden="true" />K
+              </kbd>
             </button>
-            <UserMenu username={username} />
           </div>
-        </header>
+        </aside>
 
-        <div className="min-w-0 flex-1">
-          <div className="mx-auto w-full max-w-[80rem] px-4 py-6 md:px-6 md:py-8">{children}</div>
+        <div className="admin-shell__main">
+          <header className="admin-shell__header sticky top-0 z-[var(--z-header)] flex items-center gap-3 border-b border-[var(--admin-border)] bg-background/90 px-4 py-3 backdrop-blur md:px-6">
+            <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+              <SheetTrigger asChild>
+                <button
+                  type="button"
+                  className="shrink-0 rounded-[var(--admin-radius-sm)] border border-[var(--admin-border)] p-2 text-foreground lg:hidden"
+                  aria-label="Open navigation"
+                >
+                  <Menu className="size-4" />
+                </button>
+              </SheetTrigger>
+              <SheetContent side="left" className="p-0">
+                <div className="border-b border-[var(--admin-border)] px-5 py-4 pr-12">
+                  <Brand />
+                </div>
+                <nav aria-label="Admin" className="flex-1 overflow-y-auto px-3 py-4">
+                  <NavLinks pathname={pathname} onNavigate={() => setMenuOpen(false)} />
+                </nav>
+                <div className="border-t border-[var(--admin-border)] px-3 py-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      setCommandOpen(true);
+                    }}
+                    className="flex w-full items-center gap-2 rounded-[var(--admin-radius-sm)] border border-[var(--admin-border)] px-3 py-2 text-fluid-xs text-muted"
+                  >
+                    <Search className="size-3.5" aria-hidden="true" />
+                    Search
+                  </button>
+                </div>
+              </SheetContent>
+            </Sheet>
+
+            <div className="min-w-0 flex-1">
+              <Breadcrumbs pathname={pathname} />
+              <h1 className="truncate text-fluid-base font-semibold text-foreground">{title}</h1>
+            </div>
+
+            <div className="ml-auto flex shrink-0 items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setCommandOpen(true)}
+                className="rounded-[var(--admin-radius-sm)] border border-[var(--admin-border)] p-2 text-muted transition-colors hover:text-foreground lg:hidden"
+                aria-label="Search"
+              >
+                <Search className="size-4" />
+              </button>
+              <UserMenu username={username} />
+            </div>
+          </header>
+
+          <div className="admin-shell__content min-w-0 flex-1">
+            <div className="admin-shell__content-inner mx-auto w-full max-w-7xl px-4 py-6 md:px-6 md:py-8">
+              {children}
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -67,7 +67,7 @@ export default async function AdminDashboardPage() {
       />
 
       {/* KPI cards */}
-      <section aria-label="Key metrics" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <section aria-label="Key metrics" className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
           label="Projects"
           value={analytics.projects.total}
@@ -100,17 +100,17 @@ export default async function AdminDashboardPage() {
       </section>
 
       {/* Charts */}
-      <section aria-label="Trends" className="mt-6 grid gap-4 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
+      <section aria-label="Trends" className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <Card className="min-w-0 lg:col-span-2">
           <CardHeader className="flex-row items-center justify-between">
-            <div>
+            <div className="min-w-0">
               <CardTitle>Enquiries over time</CardTitle>
               <p className="text-fluid-sm text-muted">
                 {analytics.enquiryTrendTotal} in the last 30 days
               </p>
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="min-w-0">
             {analytics.enquiryTrendTotal > 0 ? (
               <TrendChart
                 data={analytics.enquiryTrend}
@@ -125,12 +125,12 @@ export default async function AdminDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="min-w-0">
           <CardHeader>
             <CardTitle>Enquiry pipeline</CardTitle>
             <p className="text-fluid-sm text-muted">By status</p>
           </CardHeader>
-          <CardContent>
+          <CardContent className="min-w-0">
             {analytics.enquiryStatus.length > 0 ? (
               <CategoryBarChart
                 data={analytics.enquiryStatus}
@@ -144,12 +144,12 @@ export default async function AdminDashboardPage() {
         </Card>
       </section>
 
-      <section aria-label="Composition" className="mt-4 grid gap-4 lg:grid-cols-2">
-        <Card>
+      <section aria-label="Composition" className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <Card className="min-w-0">
           <CardHeader>
             <CardTitle>Projects by status</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="min-w-0">
             {analytics.projects.byStatus.length > 0 ? (
               <DonutChart data={analytics.projects.byStatus} ariaLabel="Projects by status" />
             ) : (
@@ -158,8 +158,8 @@ export default async function AdminDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex-row items-center justify-between">
+        <Card className="min-w-0">
+          <CardHeader className="flex-row items-center justify-between gap-2">
             <CardTitle>Storage</CardTitle>
             <Badge
               variant={
@@ -169,9 +169,9 @@ export default async function AdminDashboardPage() {
               {usage.percentUsed}% used
             </Badge>
           </CardHeader>
-          <CardContent className="flex flex-col gap-4">
+          <CardContent className="flex min-w-0 flex-col gap-4">
             <div>
-              <div className="mb-1.5 flex items-center justify-between text-fluid-sm">
+              <div className="mb-1.5 flex items-center justify-between gap-2 text-fluid-sm">
                 <span className="text-muted">{usage.formatted.total} used</span>
                 <span className="text-muted">{usage.formatted.max}</span>
               </div>
@@ -192,11 +192,11 @@ export default async function AdminDashboardPage() {
       </section>
 
       {/* Recent enquiries + activity */}
-      <section aria-label="Recent" className="mt-4 grid gap-4 lg:grid-cols-2">
-        <Card>
-          <CardHeader className="flex-row items-center justify-between">
+      <section aria-label="Recent" className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <Card className="min-w-0">
+          <CardHeader className="flex-row items-center justify-between gap-2">
             <CardTitle>Recent enquiries</CardTitle>
-            <Link href="/admin/enquiries" className="text-fluid-sm text-accent">
+            <Link href="/admin/enquiries" className="shrink-0 text-fluid-sm text-accent">
               View all
             </Link>
           </CardHeader>
@@ -230,7 +230,7 @@ export default async function AdminDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="min-w-0">
           <CardHeader>
             <CardTitle>Recent activity</CardTitle>
           </CardHeader>

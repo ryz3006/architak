@@ -135,3 +135,73 @@
   border-radius: var(--admin-radius);
   box-shadow: var(--admin-shadow);
 }
+
+/*
+ * Admin shell layout.
+ *
+ * Kept in CSS (not Tailwind arbitrary grid values) so the sidebar/main split
+ * cannot be broken by overlay siblings or comma-parsing quirks. Only
+ * `.admin-shell__layout` is a grid — overlays live outside it.
+ */
+.admin-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+.admin-shell__layout {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  width: 100%;
+}
+
+.admin-shell__sidebar {
+  position: sticky;
+  top: 0;
+  flex-direction: column;
+  flex-shrink: 0;
+  width: 16rem;
+  max-width: 100%;
+  height: 100dvh;
+  border-right: 1px solid var(--admin-border);
+  background: var(--admin-surface);
+}
+
+.admin-shell__main {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+}
+
+.admin-shell__content {
+  min-width: 0;
+  width: 100%;
+}
+
+.admin-shell__content-inner {
+  min-width: 0;
+}
+
+/* Charts / tables must be able to shrink inside grid/flex parents. */
+.admin-shell__content .recharts-responsive-container,
+.admin-shell__content table {
+  max-width: 100%;
+}
+
+@media (max-width: 1023px) {
+  .admin-shell__sidebar {
+    display: none;
+  }
+}
+
+@media (min-width: 1280px) {
+  .admin-shell__sidebar {
+    width: 17.5rem;
+  }
+}

@@ -22,8 +22,13 @@ export function DonutChart({
   const total = data.reduce((sum, entry) => sum + entry.value, 0);
 
   return (
-    <div className="flex flex-col items-center gap-4 sm:flex-row">
-      <div role="img" aria-label={ariaLabel ?? "Composition"} style={{ width: 160, height }}>
+    <div className="flex min-w-0 flex-col items-center gap-4 sm:flex-row">
+      <div
+        role="img"
+        aria-label={ariaLabel ?? "Composition"}
+        className="shrink-0"
+        style={{ width: 160, height }}
+      >
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie

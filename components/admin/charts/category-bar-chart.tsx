@@ -20,7 +20,12 @@ export function CategoryBarChart({
   ariaLabel?: string;
 }) {
   return (
-    <div role="img" aria-label={ariaLabel ?? "Category breakdown"} style={{ width: "100%", height }}>
+    <div
+      role="img"
+      aria-label={ariaLabel ?? "Category breakdown"}
+      className="min-w-0 w-full"
+      style={{ height }}
+    >
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} layout="vertical" margin={{ top: 4, right: 12, bottom: 4, left: 8 }}>
           <CartesianGrid stroke={CHART_GRID} strokeDasharray="3 3" horizontal={false} />

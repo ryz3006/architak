@@ -64,7 +64,10 @@ export function StatCard({
 
   if (href) {
     return (
-      <Link href={href} className="rounded-[var(--admin-radius)] focus-visible:outline-none">
+      <Link
+        href={href}
+        className="block min-w-0 rounded-[var(--admin-radius)] focus-visible:outline-none"
+      >
         {body}
       </Link>
     );

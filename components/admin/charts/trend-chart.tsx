@@ -30,7 +30,12 @@ export function TrendChart({
   ariaLabel?: string;
 }) {
   return (
-    <div role="img" aria-label={ariaLabel ?? `${valueLabel} trend`} style={{ width: "100%", height }}>
+    <div
+      role="img"
+      aria-label={ariaLabel ?? `${valueLabel} trend`}
+      className="min-w-0 w-full"
+      style={{ height }}
+    >
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: -16 }}>
           <defs>

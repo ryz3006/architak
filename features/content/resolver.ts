@@ -4,6 +4,9 @@ import { getStaticProjectBySlug, getStaticProjects, type StaticProject } from "@
 import { getStorageService } from "@/lib/storage/r2";
 import { createPublishableClient } from "@/lib/supabase/client";
 
+export type ProjectBodySection = { heading?: string; body?: string };
+export type ProjectBody = { intro?: string; sections?: ProjectBodySection[] } | null;
+
 export type ResolvedProject = {
   id: string | null;
   slug: string;
@@ -13,9 +16,27 @@ export type ResolvedProject = {
   summary: string;
   coverImage: string;
   gallery: string[];
+  body: ProjectBody;
   source: "cms" | "static";
   status?: string;
 };
+
+function parseProjectBody(value: unknown): ProjectBody {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const raw = value as { intro?: unknown; sections?: unknown };
+  const intro = typeof raw.intro === "string" ? raw.intro : undefined;
+  const sections = Array.isArray(raw.sections)
+    ? raw.sections
+        .filter((s): s is Record<string, unknown> => Boolean(s) && typeof s === "object")
+        .map((s) => ({
+          heading: typeof s.heading === "string" ? s.heading : undefined,
+          body: typeof s.body === "string" ? s.body : undefined,
+        }))
+        .filter((s) => s.heading || s.body)
+    : undefined;
+  if (!intro && (!sections || sections.length === 0)) return null;
+  return { intro, sections };
+}
 
 function mediaPublicUrl(storageKey: string | null | undefined): string | null {
   if (!storageKey?.startsWith("public/")) return null;
@@ -36,6 +57,7 @@ function staticToResolved(project: StaticProject): ResolvedProject {
     summary: project.summary,
     coverImage: project.coverImage,
     gallery: project.gallery,
+    body: null,
     source: "static",
   };
 }
@@ -49,7 +71,7 @@ export async function resolvePublishedProjects(): Promise<ResolvedProject[]> {
     const supabase = createPublishableClient();
     const { data: projects, error } = await supabase
       .from("projects")
-      .select("id, slug, title, summary, location, status, cover_media_id, category_id, sort_order")
+      .select("id, slug, title, summary, location, status, cover_media_id, category_id, sort_order, body")
       .eq("status", "published")
       .order("sort_order", { ascending: true });
 
@@ -92,6 +114,7 @@ export async function resolvePublishedProjects(): Promise<ResolvedProject[]> {
         coverImage:
           mediaPublicUrl(coverKey) || staticFallback?.coverImage || "/brand/logo-mark.png",
         gallery: galleryUrls.length > 0 ? galleryUrls : staticFallback?.gallery || [],
+        body: parseProjectBody(row.body),
         source: "cms" as const,
         status: row.status,
       };

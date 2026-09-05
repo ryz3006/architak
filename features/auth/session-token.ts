@@ -1,6 +1,14 @@
 export type SessionPayload = {
+  /** Username. */
   u: string;
+  /** Issued-at (unix seconds). Anchors the absolute-expiry window. */
+  iat: number;
+  /** Absolute expiry (unix seconds). */
   exp: number;
+  /** Idle expiry (unix seconds). Refreshed on activity for sliding sessions. */
+  idle: number;
+  /** Session epoch/version for "sign out everywhere" revocation. */
+  v: number;
 };
 
 function getSessionSecret(): string {
@@ -93,17 +101,53 @@ export async function decodeSession(
   }
 
   try {
-    const parsed = JSON.parse(fromBase64Url(body)) as SessionPayload;
+    const parsed = JSON.parse(fromBase64Url(body)) as Partial<SessionPayload>;
     if (typeof parsed.u !== "string" || typeof parsed.exp !== "number") {
       return null;
     }
-    if (parsed.exp * 1000 < Date.now()) {
+    const now = Date.now();
+    // Absolute expiry.
+    if (parsed.exp * 1000 < now) {
       return null;
     }
-    return parsed;
+    // Idle expiry (sliding). Tokens without an idle claim are rejected so a
+    // deploy that introduces the field forces a clean re-login.
+    if (typeof parsed.idle !== "number" || parsed.idle * 1000 < now) {
+      return null;
+    }
+    return {
+      u: parsed.u,
+      iat: typeof parsed.iat === "number" ? parsed.iat : Math.floor(now / 1000),
+      exp: parsed.exp,
+      idle: parsed.idle,
+      v: typeof parsed.v === "number" ? parsed.v : 0,
+    };
   } catch {
     return null;
   }
+}
+
+export function idleTimeoutSeconds(): number {
+  const minutes = Number(process.env.SESSION_IDLE_TIMEOUT_MINUTES) || 30;
+  return minutes * 60;
+}
+
+export function absoluteTimeoutSeconds(): number {
+  const hours = Number(process.env.SESSION_ABSOLUTE_TIMEOUT_HOURS) || 12;
+  return hours * 60 * 60;
+}
+
+/**
+ * Re-issue a token with a refreshed idle window (sliding session), never
+ * extending past the absolute expiry. Isomorphic so the edge proxy can call it.
+ */
+export async function refreshSession(
+  payload: SessionPayload,
+  secret = getSessionSecret(),
+): Promise<string> {
+  const now = Math.floor(Date.now() / 1000);
+  const nextIdle = Math.min(now + idleTimeoutSeconds(), payload.exp);
+  return encodeSession({ ...payload, idle: nextIdle }, secret);
 }
 
 export function timingSafeStringEqual(a: string, b: string): boolean {

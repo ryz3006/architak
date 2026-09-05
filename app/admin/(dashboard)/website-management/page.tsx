@@ -1,16 +1,17 @@
 import { WebsiteManagementForm } from "@/components/admin/website-management-form";
-import { getFeaturedWorkVideos } from "@/content/static";
 import { resolvePublishedProjects } from "@/features/content/resolver";
+import { getFeaturedWorkVideos } from "@/features/content/site-content";
 import { getWebsiteSectionConfig } from "@/features/website/admin";
 import { requireAdminSession } from "@/features/auth/session";
 
 export default async function WebsiteManagementPage() {
   await requireAdminSession();
-  const [config, projects] = await Promise.all([
+  const [config, projects, videoList] = await Promise.all([
     getWebsiteSectionConfig(),
     resolvePublishedProjects(),
+    getFeaturedWorkVideos(),
   ]);
-  const videos = getFeaturedWorkVideos().map((v) => ({ id: v.id, title: v.title }));
+  const videos = videoList.map((v) => ({ id: v.id, title: v.title }));
 
   return (
     <main id="main-content">

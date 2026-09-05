@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "../styles/tokens.css";
+@import "../styles/admin.css";
 @import "../styles/site-brand.css";
 @import "../styles/specular-button.css";
 

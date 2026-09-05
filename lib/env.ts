@@ -39,6 +39,18 @@ const serverSchema = z.object({
   RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(60_000),
   RATE_LIMIT_MAX: z.coerce.number().int().positive().default(20),
 
+  // Stricter, dedicated limits for the admin login (credential-stuffing defense).
+  LOGIN_RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(15 * 60_000),
+  LOGIN_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(5),
+
+  // Durable rate limiting via Upstash Redis REST (optional; falls back to memory).
+  UPSTASH_REDIS_REST_URL: z.union([z.string().url(), z.literal("")]).default(""),
+  UPSTASH_REDIS_REST_TOKEN: z.string().default(""),
+
+  // Admin session lifecycle.
+  SESSION_IDLE_TIMEOUT_MINUTES: z.coerce.number().int().positive().default(30),
+  SESSION_ABSOLUTE_TIMEOUT_HOURS: z.coerce.number().int().positive().default(12),
+
   FEATURE_JOURNAL_NAV: booleanFromString,
   FEATURE_THREE_D: booleanFromString,
 
@@ -84,6 +96,12 @@ function readRawEnv(): Record<string, string | undefined> {
     DISCOVERY_PUBLIC_API_ENABLED: process.env.DISCOVERY_PUBLIC_API_ENABLED,
     RATE_LIMIT_WINDOW_MS: process.env.RATE_LIMIT_WINDOW_MS,
     RATE_LIMIT_MAX: process.env.RATE_LIMIT_MAX,
+    LOGIN_RATE_LIMIT_WINDOW_MS: process.env.LOGIN_RATE_LIMIT_WINDOW_MS,
+    LOGIN_RATE_LIMIT_MAX: process.env.LOGIN_RATE_LIMIT_MAX,
+    UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,
+    UPSTASH_REDIS_REST_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN,
+    SESSION_IDLE_TIMEOUT_MINUTES: process.env.SESSION_IDLE_TIMEOUT_MINUTES,
+    SESSION_ABSOLUTE_TIMEOUT_HOURS: process.env.SESSION_ABSOLUTE_TIMEOUT_HOURS,
     FEATURE_JOURNAL_NAV: process.env.FEATURE_JOURNAL_NAV,
     FEATURE_THREE_D: process.env.FEATURE_THREE_D,
     TELEGRAM_NOTIFICATIONS_ENABLED: process.env.TELEGRAM_NOTIFICATIONS_ENABLED,
@@ -135,6 +153,11 @@ export function getPublicEnv(): PublicEnv {
 
 export function getAdminBasePath(): string {
   return process.env.ADMIN_BASE_PATH?.replace(/\/$/, "") || "/admin";
+}
+
+export function isDurableRateLimitConfigured(): boolean {
+  const env = getServerEnv();
+  return Boolean(env.UPSTASH_REDIS_REST_URL && env.UPSTASH_REDIS_REST_TOKEN);
 }
 
 export function isR2Configured(): boolean {

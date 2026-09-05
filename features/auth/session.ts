@@ -4,16 +4,22 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import {
+  ADMIN_SESSION_COOKIE,
+  sessionCookieBase,
+  sessionCookieMaxAgeSeconds,
+} from "@/features/auth/cookie";
+import { getSessionEpoch } from "@/features/auth/revocation";
+import {
+  absoluteTimeoutSeconds,
   decodeSession,
   encodeSession,
+  idleTimeoutSeconds,
   timingSafeStringEqual,
   type SessionPayload,
 } from "@/features/auth/session-token";
 import { getServerEnv } from "@/lib/env";
 
-export const ADMIN_SESSION_COOKIE = "architak_admin_session";
-
-const SESSION_TTL_SECONDS = 60 * 60 * 12;
+export { ADMIN_SESSION_COOKIE };
 
 export function verifyCredentials(username: string, password: string): boolean {
   const env = getServerEnv();
@@ -24,9 +30,14 @@ export function verifyCredentials(username: string, password: string): boolean {
 }
 
 export async function createSessionToken(username: string): Promise<string> {
+  const now = Math.floor(Date.now() / 1000);
+  const epoch = await getSessionEpoch();
   const payload: SessionPayload = {
     u: username,
-    exp: Math.floor(Date.now() / 1000) + SESSION_TTL_SECONDS,
+    iat: now,
+    exp: now + absoluteTimeoutSeconds(),
+    idle: now + idleTimeoutSeconds(),
+    v: epoch,
   };
   return encodeSession(payload);
 }
@@ -34,7 +45,12 @@ export async function createSessionToken(username: string): Promise<string> {
 export async function getAdminSession(): Promise<SessionPayload | null> {
   try {
     const jar = await cookies();
-    return await decodeSession(jar.get(ADMIN_SESSION_COOKIE)?.value);
+    const session = await decodeSession(jar.get(ADMIN_SESSION_COOKIE)?.value);
+    if (!session) return null;
+    // Revocation: reject tokens minted before the current epoch.
+    const epoch = await getSessionEpoch();
+    if (session.v < epoch) return null;
+    return session;
   } catch {
     return null;
   }
@@ -53,11 +69,8 @@ export function sessionCookieOptions(token: string) {
   return {
     name: ADMIN_SESSION_COOKIE,
     value: token,
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax" as const,
-    path: "/",
-    maxAge: SESSION_TTL_SECONDS,
+    ...sessionCookieBase(),
+    maxAge: sessionCookieMaxAgeSeconds(),
   };
 }
 
@@ -65,10 +78,7 @@ export function clearSessionCookieOptions() {
   return {
     name: ADMIN_SESSION_COOKIE,
     value: "",
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax" as const,
-    path: "/",
+    ...sessionCookieBase(),
     maxAge: 0,
   };
 }

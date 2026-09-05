@@ -1,150 +1,306 @@
+import { Activity, FolderOpen, HardDrive, Image as ImageIcon, Inbox } from "lucide-react";
 import Link from "next/link";
 
-import { StorageBar } from "@/components/admin/storage-bar";
+import { CategoryBarChart } from "@/components/admin/charts/category-bar-chart";
+import { DonutChart } from "@/components/admin/charts/donut-chart";
+import { TrendChart } from "@/components/admin/charts/trend-chart";
+import { EmptyState } from "@/components/admin/empty-state";
+import { PageHeader } from "@/components/admin/page-header";
+import { Badge } from "@/components/admin/ui/badge";
+import { Button } from "@/components/admin/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/admin/ui/card";
+import { Progress } from "@/components/admin/ui/progress";
+import { StatCard } from "@/components/admin/ui/stat-card";
+import { getDashboardAnalytics } from "@/features/analytics/admin";
 import { requireAdminSession } from "@/features/auth/session";
+import { getEnquiryMetrics, listAdminEnquiries } from "@/features/enquiries/admin";
 import { runSystemHealthChecks } from "@/features/health/checks";
 import { getStorageUsage } from "@/features/media/storage-accounting";
-import { listAdminProjects } from "@/features/projects/admin";
-import { getEnquiryMetrics, listAdminEnquiries } from "@/features/enquiries/admin";
-import { listAdminMedia } from "@/features/media/admin";
-import { getTelegramConfig } from "@/features/notifications/config";
+
+function relativeTime(iso: string): string {
+  const then = new Date(iso).getTime();
+  const diff = Date.now() - then;
+  const mins = Math.round(diff / 60000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hours = Math.round(mins / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.round(hours / 24);
+  if (days < 30) return `${days}d ago`;
+  return new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+}
+
+const HEALTH_BADGE = {
+  healthy: { variant: "success" as const, label: "All systems normal" },
+  degraded: { variant: "warning" as const, label: "Needs attention" },
+  down: { variant: "danger" as const, label: "Service disruption" },
+};
 
 export default async function AdminDashboardPage() {
   await requireAdminSession();
 
-  const [projects, enquiries, media, usage, metrics, health] = await Promise.all([
-    listAdminProjects(),
-    listAdminEnquiries({ page: 1, pageSize: 5, sort: "newest" }),
-    listAdminMedia({ limit: 5 }),
-    getStorageUsage(),
+  const [analytics, metrics, enquiries, usage, health] = await Promise.all([
+    getDashboardAnalytics(),
     getEnquiryMetrics(),
+    listAdminEnquiries({ page: 1, pageSize: 5, sort: "newest" }),
+    getStorageUsage(),
     runSystemHealthChecks(),
   ]);
 
-  const telegram = getTelegramConfig();
-  const published = projects.filter((p) => p.status === "published").length;
-  const drafts = projects.filter((p) => p.status === "draft").length;
-  const telegramCheck = health.checks.find((c) => c.id === "telegram");
+  const enquirySpark = analytics.enquiryTrend.slice(-14).map((point) => point.value);
+  const storageDonut = [
+    { label: "Images", value: Math.max(0, Math.round(usage.imageBytes / 1024 / 1024)) },
+    { label: "Videos", value: Math.max(0, Math.round(usage.videoBytes / 1024 / 1024)) },
+  ].filter((entry) => entry.value > 0);
+  const healthBadge = HEALTH_BADGE[health.overall];
 
   return (
     <main id="main-content">
-      <h1 className="display text-display-md">Dashboard</h1>
-      <p className="measure mt-4 text-muted">
-        Website control room — content, enquiries, storage, and health at a glance.
-      </p>
+      <PageHeader
+        title="Dashboard"
+        description="Your website at a glance — content, enquiries, storage and health."
+        actions={
+          <Link href="/admin/system-health">
+            <Badge variant={healthBadge.variant}>{healthBadge.label}</Badge>
+          </Link>
+        }
+      />
 
-      <section className="mt-10 border border-border p-5">
-        <p className="text-fluid-xs tracking-widest text-muted uppercase">Website health</p>
-        <p className="display mt-2 text-display-sm">{health.overallLabel}</p>
-        <Link href="/admin/system-health" className="mt-3 inline-block text-fluid-sm text-accent">
-          View technical details →
-        </Link>
+      {/* KPI cards */}
+      <section aria-label="Key metrics" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <StatCard
+          label="Projects"
+          value={analytics.projects.total}
+          icon={FolderOpen}
+          href="/admin/projects"
+          hint={`${analytics.projects.published} published · ${analytics.projects.draft} draft`}
+        />
+        <StatCard
+          label="New enquiries"
+          value={metrics.newCount}
+          icon={Inbox}
+          href="/admin/enquiries"
+          hint={`${metrics.today} today · ${metrics.week} this week`}
+          spark={enquirySpark}
+        />
+        <StatCard
+          label="Gallery assets"
+          value={usage.assetCount}
+          icon={ImageIcon}
+          href="/admin/media"
+          hint={`${usage.formatted.total} of ${usage.formatted.max} used`}
+        />
+        <StatCard
+          label="Storage used"
+          value={`${usage.percentUsed}%`}
+          icon={HardDrive}
+          href="/admin/media"
+          hint={`${usage.formatted.remaining} remaining`}
+        />
       </section>
 
-      <ul className="mt-8 grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(min(14rem,100%),1fr))]">
-        <li className="border border-border p-5">
-          <p className="text-fluid-xs tracking-widest text-muted uppercase">Projects</p>
-          <p className="display mt-2 text-display-sm">{projects.length}</p>
-          <p className="mt-2 text-fluid-xs text-muted">
-            {published} published · {drafts} draft
-          </p>
-          <Link href="/admin/projects" className="mt-4 inline-block text-fluid-sm text-accent">
-            Open projects →
-          </Link>
-        </li>
-        <li className="border border-border p-5">
-          <p className="text-fluid-xs tracking-widest text-muted uppercase">Customer enquiries</p>
-          <p className="display mt-2 text-display-sm">{metrics.newCount} new</p>
-          <p className="mt-2 text-fluid-xs text-muted">
-            Today {metrics.today} · Week {metrics.week} · Month {metrics.month}
-          </p>
-          <Link href="/admin/enquiries" className="mt-4 inline-block text-fluid-sm text-accent">
-            View enquiries →
-          </Link>
-        </li>
-        <li className="border border-border p-5">
-          <p className="text-fluid-xs tracking-widest text-muted uppercase">Gallery</p>
-          <p className="display mt-2 text-display-sm">{media.length}+</p>
-          <p className="mt-2 text-fluid-xs text-muted">{usage.assetCount} assets tracked</p>
-          <Link href="/admin/media" className="mt-4 inline-block text-fluid-sm text-accent">
-            Open gallery →
-          </Link>
-        </li>
-        <li className="border border-border p-5">
-          <p className="text-fluid-xs tracking-widest text-muted uppercase">Telegram</p>
-          <p className="display mt-2 text-display-sm">
-            {telegram.enabled && telegram.configured ? "On" : "Off"}
-          </p>
-          <p className="mt-2 text-fluid-xs text-muted">
-            {telegramCheck?.businessStatus ?? (telegram.configured ? "Configured" : "Not configured")}
-          </p>
-          <Link href="/admin/settings" className="mt-4 inline-block text-fluid-sm text-accent">
-            Notification settings →
-          </Link>
-        </li>
-      </ul>
+      {/* Charts */}
+      <section aria-label="Trends" className="mt-6 grid gap-4 lg:grid-cols-3">
+        <Card className="lg:col-span-2">
+          <CardHeader className="flex-row items-center justify-between">
+            <div>
+              <CardTitle>Enquiries over time</CardTitle>
+              <p className="text-fluid-sm text-muted">
+                {analytics.enquiryTrendTotal} in the last 30 days
+              </p>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {analytics.enquiryTrendTotal > 0 ? (
+              <TrendChart
+                data={analytics.enquiryTrend}
+                valueLabel="Enquiries"
+                ariaLabel="Enquiries received per day over the last 30 days"
+              />
+            ) : (
+              <p className="py-10 text-center text-fluid-sm text-muted">
+                No enquiries in the last 30 days yet.
+              </p>
+            )}
+          </CardContent>
+        </Card>
 
-      <div className="mt-8">
-        <StorageBar usage={usage} />
-      </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Enquiry pipeline</CardTitle>
+            <p className="text-fluid-sm text-muted">By status</p>
+          </CardHeader>
+          <CardContent>
+            {analytics.enquiryStatus.length > 0 ? (
+              <CategoryBarChart
+                data={analytics.enquiryStatus}
+                height={220}
+                ariaLabel="Enquiries by status"
+              />
+            ) : (
+              <p className="py-10 text-center text-fluid-sm text-muted">No enquiries yet.</p>
+            )}
+          </CardContent>
+        </Card>
+      </section>
 
-      <section className="mt-10">
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <h2 className="display text-fluid-xl">Recent enquiries</h2>
-          <Link href="/admin/enquiries" className="text-fluid-sm text-accent">
-            View all
-          </Link>
-        </div>
-        {enquiries.items.length === 0 ? (
-          <p className="mt-4 text-fluid-sm text-muted">No enquiries yet.</p>
-        ) : (
-          <ul className="mt-4 flex flex-col gap-3">
-            {enquiries.items.map((enquiry) => (
-              <li key={enquiry.id} className="border border-border p-4">
-                <Link href={`/admin/enquiries/${enquiry.id}`} className="display text-fluid-xl">
-                  {enquiry.name}
-                </Link>
-                <p className="mt-1 text-fluid-xs tracking-widest text-muted uppercase">
-                  {enquiry.status}
-                </p>
-                <p className="mt-2 line-clamp-2 text-fluid-sm">{enquiry.message}</p>
+      <section aria-label="Composition" className="mt-4 grid gap-4 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Projects by status</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {analytics.projects.byStatus.length > 0 ? (
+              <DonutChart data={analytics.projects.byStatus} ariaLabel="Projects by status" />
+            ) : (
+              <p className="py-10 text-center text-fluid-sm text-muted">No projects yet.</p>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex-row items-center justify-between">
+            <CardTitle>Storage</CardTitle>
+            <Badge
+              variant={
+                usage.state === "healthy" ? "success" : usage.state === "warning" ? "warning" : "danger"
+              }
+            >
+              {usage.percentUsed}% used
+            </Badge>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-4">
+            <div>
+              <div className="mb-1.5 flex items-center justify-between text-fluid-sm">
+                <span className="text-muted">{usage.formatted.total} used</span>
+                <span className="text-muted">{usage.formatted.max}</span>
+              </div>
+              <Progress
+                value={usage.totalBytes}
+                max={usage.maxBytes}
+                state={usage.state}
+                label="Storage used"
+              />
+            </div>
+            {storageDonut.length > 0 ? (
+              <DonutChart data={storageDonut} height={180} ariaLabel="Storage by media type (MB)" />
+            ) : (
+              <p className="text-fluid-sm text-muted">No media uploaded yet.</p>
+            )}
+          </CardContent>
+        </Card>
+      </section>
+
+      {/* Recent enquiries + activity */}
+      <section aria-label="Recent" className="mt-4 grid gap-4 lg:grid-cols-2">
+        <Card>
+          <CardHeader className="flex-row items-center justify-between">
+            <CardTitle>Recent enquiries</CardTitle>
+            <Link href="/admin/enquiries" className="text-fluid-sm text-accent">
+              View all
+            </Link>
+          </CardHeader>
+          <CardContent>
+            {enquiries.items.length === 0 ? (
+              <EmptyState
+                icon={Inbox}
+                title="No enquiries yet"
+                description="Leads from the contact form will appear here."
+              />
+            ) : (
+              <ul className="flex flex-col divide-y divide-[var(--admin-border)]">
+                {enquiries.items.map((enquiry) => (
+                  <li key={enquiry.id} className="py-3 first:pt-0 last:pb-0">
+                    <Link
+                      href={`/admin/enquiries/${enquiry.id}`}
+                      className="flex items-start justify-between gap-3"
+                    >
+                      <div className="min-w-0">
+                        <p className="truncate font-medium text-foreground">{enquiry.name}</p>
+                        <p className="mt-0.5 line-clamp-1 text-fluid-sm text-muted">{enquiry.message}</p>
+                      </div>
+                      <Badge variant="neutral" className="shrink-0 capitalize">
+                        {enquiry.status.replace(/_/g, " ")}
+                      </Badge>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent activity</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {analytics.activity.length === 0 ? (
+              <EmptyState
+                icon={Activity}
+                title="No recent activity"
+                description="Content changes you make will be logged here."
+              />
+            ) : (
+              <ul className="flex flex-col gap-3">
+                {analytics.activity.map((item) => (
+                  <li key={item.id} className="flex items-center gap-3 text-fluid-sm">
+                    <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[var(--admin-surface-raised)]">
+                      <Activity className="size-3.5 text-muted" aria-hidden="true" />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-foreground">{item.label}</p>
+                      <p className="text-fluid-xs text-muted">{item.entityType}</p>
+                    </div>
+                    <time className="shrink-0 text-fluid-xs text-muted" dateTime={item.at}>
+                      {relativeTime(item.at)}
+                    </time>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </CardContent>
+        </Card>
+      </section>
+
+      {/* Alerts */}
+      <section aria-label="Alerts" className="mt-4">
+        <Card>
+          <CardHeader>
+            <CardTitle>Alerts</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="flex flex-col gap-2 text-fluid-sm">
+              <li className="flex items-center gap-2">
+                <Badge variant={usage.state === "healthy" ? "success" : "warning"}>Storage</Badge>
+                {usage.state === "healthy"
+                  ? "Storage healthy"
+                  : usage.state === "full"
+                    ? "Storage is full — remove unused media"
+                    : "Storage approaching the 7 GB limit"}
               </li>
-            ))}
-          </ul>
-        )}
-      </section>
-
-      <section className="mt-10">
-        <h2 className="display text-fluid-xl">Alerts</h2>
-        <ul className="mt-4 flex flex-col gap-2 text-fluid-sm">
-          {usage.state === "warning" || usage.state === "full" ? (
-            <li>
-              ⚠ Storage {usage.state === "full" ? "is full" : "is approaching the 7 GB limit"} —{" "}
-              {usage.formatted.total} used
-            </li>
-          ) : (
-            <li>✓ Storage healthy</li>
-          )}
-          {health.overall === "healthy" ? (
-            <li>✓ Website operating normally</li>
-          ) : (
-            <li>⚠ Website needs attention — check System Health</li>
-          )}
-          {metrics.newCount > 0 ? (
-            <li>● {metrics.newCount} new enquiries</li>
-          ) : (
-            <li>✓ No new enquiries waiting</li>
-          )}
-          {telegram.enabled && !telegram.configured ? (
-            <li>⚠ Telegram is enabled but missing bot token or chat ID</li>
-          ) : telegramCheck && !telegramCheck.ok ? (
-            <li>⚠ Telegram notifications need attention</li>
-          ) : telegram.enabled && telegram.configured ? (
-            <li>✓ Telegram notifications ready</li>
-          ) : (
-            <li>✓ Telegram notifications disabled (default in development)</li>
-          )}
-        </ul>
+              <li className="flex items-center gap-2">
+                <Badge variant={health.overall === "healthy" ? "success" : "warning"}>Website</Badge>
+                {health.overall === "healthy"
+                  ? "Website operating normally"
+                  : "Website needs attention — check System Health"}
+              </li>
+              <li className="flex items-center gap-2">
+                <Badge variant={metrics.newCount > 0 ? "info" : "success"}>Leads</Badge>
+                {metrics.newCount > 0
+                  ? `${metrics.newCount} new enquiries waiting`
+                  : "No new enquiries waiting"}
+              </li>
+            </ul>
+            <div className="mt-4">
+              <Link href="/admin/system-health">
+                <Button variant="outline" size="sm">
+                  View system health
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
       </section>
     </main>
   );

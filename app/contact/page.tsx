@@ -9,7 +9,12 @@ import { StudioAtmosphere } from "@/components/studio/studio-atmosphere";
 import { StudioBridge } from "@/components/studio/studio-bridge";
 import { StudioLocation } from "@/components/studio/studio-location";
 import { StudioReveal } from "@/components/studio/studio-reveal";
-import { getContactPageContent, getSocialProfiles, getStaticSite, getStudioPageContent } from "@/content/static";
+import {
+  getContactPageContent,
+  getSocialProfiles,
+  getStudioInfo,
+  getStudioPageContent,
+} from "@/features/content/site-content";
 import { buildPageMetadata } from "@/features/discovery/metadata";
 import { getPageSeoFromCms } from "@/features/discovery/page-seo-cms";
 import {
@@ -31,10 +36,12 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function ContactPage() {
-  const { studio } = getStaticSite();
-  const page = getContactPageContent();
-  const studioPage = getStudioPageContent();
-  const socialProfiles = getSocialProfiles();
+  const [studio, page, studioPage, socialProfiles] = await Promise.all([
+    getStudioInfo(),
+    getContactPageContent(),
+    getStudioPageContent(),
+    getSocialProfiles(),
+  ]);
 
   return (
     <main id="main-content" className="studio-page contact-page flex min-h-dvh flex-col">

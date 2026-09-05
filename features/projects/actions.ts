@@ -62,6 +62,24 @@ function parseTestimonials(formData: FormData) {
   return items;
 }
 
+function parseBody(formData: FormData): { intro?: string; sections?: Array<{ heading?: string; body?: string }> } {
+  const intro = String(formData.get("body_intro") ?? "").trim();
+  const sections: Array<{ heading?: string; body?: string }> = [];
+  for (let i = 0; i < 3; i += 1) {
+    const heading = String(formData.get(`body_heading_${i}`) ?? "").trim();
+    const body = String(formData.get(`body_body_${i}`) ?? "").trim();
+    if (!heading && !body) continue;
+    sections.push({
+      heading: heading || undefined,
+      body: body || undefined,
+    });
+  }
+  const result: { intro?: string; sections?: Array<{ heading?: string; body?: string }> } = {};
+  if (intro) result.intro = intro;
+  if (sections.length > 0) result.sections = sections;
+  return result;
+}
+
 export async function saveProjectAction(
   _prev: ProjectActionState,
   formData: FormData,
@@ -97,6 +115,7 @@ export async function saveProjectAction(
   const publishedAt =
     parsed.data.status === "published" ? new Date().toISOString() : null;
   const testimonials = parseTestimonials(formData);
+  const body = parseBody(formData);
 
   try {
     const supabase = getSecretSupabase();
@@ -139,6 +158,7 @@ export async function saveProjectAction(
           published_at: publishedAt,
           category_id: categoryId,
           cover_media_id: parsed.data.coverMediaId || null,
+          body: body as never,
         },
         { onConflict: "slug" },
       )

@@ -29,6 +29,7 @@ export function ProjectEditor({
     category?: string;
     cover_media_id?: string | null;
     gallery_media_ids?: string[];
+    body?: { intro?: string; sections?: Array<{ heading?: string; body?: string }> } | null;
     testimonials?: Array<{
       quote: string;
       author_name: string;
@@ -43,6 +44,7 @@ export function ProjectEditor({
   const isNew = !initialValues?.slug;
   const imageOptions = mediaOptions.filter((m) => m.kind === "image");
   const testimonials = initialValues?.testimonials ?? [];
+  const bodySections = initialValues?.body?.sections ?? [];
 
   return (
     <form action={action} className="measure flex flex-col gap-6">
@@ -219,6 +221,51 @@ export function ProjectEditor({
                     className="h-4 w-4 border border-border"
                   />
                   Show on studio
+                </label>
+              </div>
+            );
+          })}
+        </div>
+      </fieldset>
+
+      <fieldset className="border border-border p-4">
+        <legend className="px-2 text-fluid-xs tracking-widest text-muted uppercase">
+          Project story (optional)
+        </legend>
+        <p className="mt-2 text-fluid-xs text-muted">
+          A longer narrative shown on the project page, below the summary.
+        </p>
+        <label className="mt-3 flex flex-col gap-2 text-fluid-sm">
+          <span>Intro</span>
+          <textarea
+            name="body_intro"
+            defaultValue={initialValues?.body?.intro ?? ""}
+            rows={3}
+            className="border border-border bg-surface px-4 py-3"
+          />
+        </label>
+        <div className="mt-3 flex flex-col gap-6">
+          {[0, 1, 2].map((index) => {
+            const section = bodySections[index];
+            return (
+              <div key={index} className="border-t border-border pt-4 first:border-t-0 first:pt-0">
+                <p className="text-fluid-xs tracking-widest text-muted uppercase">Section {index + 1}</p>
+                <label className="mt-3 flex flex-col gap-2 text-fluid-sm">
+                  <span>Heading</span>
+                  <input
+                    name={`body_heading_${index}`}
+                    defaultValue={section?.heading ?? ""}
+                    className="min-h-11 border border-border bg-surface px-4 py-2"
+                  />
+                </label>
+                <label className="mt-3 flex flex-col gap-2 text-fluid-sm">
+                  <span>Body</span>
+                  <textarea
+                    name={`body_body_${index}`}
+                    defaultValue={section?.body ?? ""}
+                    rows={4}
+                    className="border border-border bg-surface px-4 py-3"
+                  />
                 </label>
               </div>
             );

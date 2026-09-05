@@ -34,6 +34,7 @@ export default async function EditProjectPage({ params }: Props) {
             category: project.category_slug ?? "residential",
             cover_media_id: project.cover_media_id,
             gallery_media_ids: project.gallery_media_ids,
+            body: project.body,
             testimonials: project.testimonials,
           }}
           mediaOptions={media.map((asset) => ({

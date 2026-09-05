@@ -12,7 +12,7 @@ import { StudioManifesto } from "@/components/studio/studio-manifesto";
 import { StudioProcess } from "@/components/studio/studio-process";
 import { StudioReveal } from "@/components/studio/studio-reveal";
 import { StudioWorkIntro } from "@/components/studio/studio-work-intro";
-import { getServicesPageContent, getStaticServices } from "@/content/static";
+import { getServices, getServicesPageContent } from "@/features/content/site-content";
 import { buildPageMetadata } from "@/features/discovery/metadata";
 import { getPageSeoFromCms } from "@/features/discovery/page-seo-cms";
 import {
@@ -34,8 +34,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function ServicesPage() {
-  const services = getStaticServices();
-  const page = getServicesPageContent();
+  const [services, page] = await Promise.all([getServices(), getServicesPageContent()]);
 
   return (
     <main id="main-content" className="studio-page services-page flex min-h-dvh flex-col">

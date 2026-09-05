@@ -10,7 +10,12 @@ import { OptionalThreeMark } from "@/components/motion/optional-three";
 import { Reveal } from "@/components/motion/reveal";
 import { SmoothScroll } from "@/components/motion/smooth-scroll";
 import { SpaceStorySection } from "@/components/motion/space-story";
-import { getHeroChapters, getManifesto, getSpaceStory, getStudioPageContent } from "@/content/static";
+import {
+  getHeroChapters,
+  getManifesto,
+  getSpaceStory,
+  getStudioPageContent,
+} from "@/features/content/site-content";
 import { buildPageMetadata } from "@/features/discovery/metadata";
 import { getPageSeoFromCms } from "@/features/discovery/page-seo-cms";
 import {
@@ -38,14 +43,17 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function HomePage() {
   const journey = await resolveHeroJourney();
-  const chapters = getHeroChapters();
-  const manifesto = getManifesto();
-  const spaceStory = getSpaceStory();
+  const [chapters, manifesto, spaceStory, studioPage] = await Promise.all([
+    getHeroChapters(),
+    getManifesto(),
+    getSpaceStory(),
+    getStudioPageContent(),
+  ]);
   const driftImages = getDriftWallImages();
   const featuredWork = await getFeaturedAccordionItems();
   const featuredVideos = await resolveFeaturedWorkVideosFromCms();
-  const studioWork = getStudioPageContent().work;
-  const studioCta = getStudioPageContent().cta;
+  const studioWork = studioPage.work;
+  const studioCta = studioPage.cta;
   const threeEnabled = process.env.FEATURE_THREE_D === "true";
   const lcpImage = preloadHeroImageHints(journey)[0]?.src;
   const homeSeo = await getPageSeoFromCms("/");

@@ -1,6 +1,7 @@
 import "server-only";
 
-import { getFeaturedWorkVideos } from "@/content/static";
+import { getFeaturedWorkVideos, type FeaturedWorkVideo } from "@/content/static";
+import { getFeaturedWorkVideos as getCmsFeaturedWorkVideos } from "@/features/content/site-content";
 import { isR2Configured } from "@/lib/env";
 import { getStorageService } from "@/lib/storage/r2";
 import { getPublicWebsiteSectionConfig } from "@/features/website/public";
@@ -36,8 +37,10 @@ function resolveVideoUrl(objectPath: string, localPath: string): string {
   return localPath.startsWith("/") ? localPath : `/${localPath}`;
 }
 
-function resolveAllVideos(): ResolvedFeaturedWorkVideo[] {
-  return getFeaturedWorkVideos().map((item) => {
+function resolveAllVideos(
+  videos: FeaturedWorkVideo[] = getFeaturedWorkVideos(),
+): ResolvedFeaturedWorkVideo[] {
+  return videos.map((item) => {
     const videoUrl = resolveVideoUrl(item.video.objectPath, item.video.localPath);
     const posterUrl = item.poster.startsWith("/") ? item.poster : `/${item.poster}`;
 
@@ -60,9 +63,9 @@ export function resolveFeaturedWorkVideos(): ResolvedFeaturedWorkVideo[] {
   return resolveAllVideos();
 }
 
-/** Async variant that respects Website Management homepageVideoIds order. */
+/** Async variant that reads CMS video content and respects the homepageVideoIds order. */
 export async function resolveFeaturedWorkVideosFromCms(): Promise<ResolvedFeaturedWorkVideo[]> {
-  const all = resolveAllVideos();
+  const all = resolveAllVideos(await getCmsFeaturedWorkVideos());
   try {
     const config = await getPublicWebsiteSectionConfig();
     if (config.homepageVideoIds.length === 0) return all;

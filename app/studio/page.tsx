@@ -16,11 +16,8 @@ import { StudioVoices } from "@/components/studio/studio-voices";
 import { StudioFeaturedWorks } from "@/components/studio/studio-featured-works";
 import { StudioWorkDome } from "@/components/studio/studio-work-dome";
 import { StudioWorkIntro } from "@/components/studio/studio-work-intro";
-import {
-  getStaticProjects,
-  getStudioPageContent,
-  getTestimonials,
-} from "@/content/static";
+import { getStaticProjects } from "@/content/static";
+import { getStudioPageContent, getTestimonials } from "@/features/content/site-content";
 import { resolvePublishedProjects, fillToMinimum } from "@/features/content/resolver";
 import { buildPageMetadata } from "@/features/discovery/metadata";
 import { getPageSeoFromCms } from "@/features/discovery/page-seo-cms";
@@ -50,7 +47,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function StudioPage() {
-  const page = getStudioPageContent();
+  const page = await getStudioPageContent();
   const config = await getPublicWebsiteSectionConfig();
   const resolved = await resolvePublishedProjects();
 
@@ -78,7 +75,7 @@ export default async function StudioPage() {
       : getStaticProjects();
 
   const cmsTestimonials = await listEnabledProjectTestimonials();
-  const testimonials = cmsTestimonials.length > 0 ? cmsTestimonials : getTestimonials();
+  const testimonials = cmsTestimonials.length > 0 ? cmsTestimonials : await getTestimonials();
   const featuredVideos = toDepthCarouselItems(await resolveFeaturedWorkVideosFromCms());
 
   return (

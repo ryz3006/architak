@@ -10,7 +10,8 @@ import { ProjectSummary } from "@/components/project/project-summary";
 import { SmoothScroll } from "@/components/motion/smooth-scroll";
 import { StudioAtmosphere } from "@/components/studio/studio-atmosphere";
 import { StudioReveal } from "@/components/studio/studio-reveal";
-import { getProjectPageContent, getStaticProjects, getStudioPageContent } from "@/content/static";
+import { getProjectPageContent, getStaticProjects } from "@/content/static";
+import { getStudioPageContent } from "@/features/content/site-content";
 import { resolvePublishedProject, resolvePublishedProjects } from "@/features/content/resolver";
 import { buildPageMetadata } from "@/features/discovery/metadata";
 import {
@@ -59,7 +60,7 @@ export default async function ProjectPage({ params }: Props) {
   if (!project) notFound();
 
   const pageCopy = getProjectPageContent();
-  const studioPage = getStudioPageContent();
+  const studioPage = await getStudioPageContent();
 
   const discoveryProject = {
     slug: project.slug,
@@ -108,6 +109,26 @@ export default async function ProjectPage({ params }: Props) {
         <StudioReveal variant="center">
           <ProjectSummary eyebrow={pageCopy.summaryEyebrow} summary={project.summary} />
         </StudioReveal>
+
+        {project.body && (project.body.intro || project.body.sections?.length) ? (
+          <StudioReveal variant="left">
+            <section className="page-frame measure py-fluid-lg">
+              {project.body.intro ? (
+                <p className="text-fluid-lg text-muted">{project.body.intro}</p>
+              ) : null}
+              {project.body.sections?.map((section, index) => (
+                <div key={index} className="mt-fluid-md">
+                  {section.heading ? (
+                    <h2 className="display text-display-sm">{section.heading}</h2>
+                  ) : null}
+                  {section.body ? (
+                    <p className="mt-3 text-fluid-base whitespace-pre-line">{section.body}</p>
+                  ) : null}
+                </div>
+              ))}
+            </section>
+          </StudioReveal>
+        ) : null}
 
         <StudioReveal variant="rise">
           <ProjectGallery

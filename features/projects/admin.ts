@@ -24,6 +24,7 @@ export type AdminProjectDetail = {
   cover_media_id: string | null;
   category_slug: string | null;
   gallery_media_ids: string[];
+  body: { intro?: string; sections?: Array<{ heading?: string; body?: string }> } | null;
   testimonials: Array<{
     id?: string;
     quote: string;
@@ -110,6 +111,10 @@ export async function getAdminProject(slug: string): Promise<AdminProjectDetail 
         cover_media_id: data.cover_media_id,
         category_slug: category?.slug ?? null,
         gallery_media_ids: (gallery ?? []).map((row) => row.media_asset_id),
+        body:
+          data.body && typeof data.body === "object" && !Array.isArray(data.body)
+            ? (data.body as AdminProjectDetail["body"])
+            : null,
         testimonials: testimonials.map((t) => ({
           id: t.id,
           quote: t.quote,
@@ -139,6 +144,7 @@ export async function getAdminProject(slug: string): Promise<AdminProjectDetail 
     cover_media_id: null,
     category_slug: fallback.category.toLowerCase().replace(/\s+/g, "-"),
     gallery_media_ids: [],
+    body: null,
     testimonials: [],
     source: "static" as const,
   };

@@ -4,7 +4,7 @@ import { EnquireButton } from "@/components/layout/enquire-button";
 import { BrandLockup } from "@/components/layout/brand-lockup";
 import { MobileNav, type NavLink } from "@/components/layout/mobile-nav";
 import { SOCIAL_PLATFORMS } from "@/components/icons/social-icon";
-import { getSocialProfiles, getStaticSite } from "@/content/static";
+import { getSocialProfiles, getStudioInfo } from "@/features/content/site-content";
 
 import "@/styles/site-footer.css";
 
@@ -19,8 +19,8 @@ const footerLinks: readonly NavLink[] = [
   { href: "/contact", label: "Contact" },
 ] as const;
 
-export function SiteHeader({ homeHero = false }: { homeHero?: boolean }) {
-  const tagline = getStaticSite().studio.tagline;
+export async function SiteHeader({ homeHero = false }: { homeHero?: boolean }) {
+  const tagline = (await getStudioInfo()).tagline;
 
   return (
     <header
@@ -51,9 +51,8 @@ export function SiteHeader({ homeHero = false }: { homeHero?: boolean }) {
   );
 }
 
-export function SiteFooter() {
-  const { studio } = getStaticSite();
-  const social = getSocialProfiles();
+export async function SiteFooter() {
+  const [studio, social] = await Promise.all([getStudioInfo(), getSocialProfiles()]);
   const phoneHref = `tel:${studio.phone.replace(/\s/g, "")}`;
   const year = new Date().getFullYear();
 

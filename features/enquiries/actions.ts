@@ -6,9 +6,13 @@ import { headers } from "next/headers";
 import { enquirySchema, type EnquiryActionState } from "@/features/enquiries/schema";
 import { processEnquiryNotification } from "@/features/notifications/service";
 import { checkRateLimit } from "@/lib/security/rate-limit";
+import { getClientIp } from "@/lib/security/client-ip";
 import { getPublishableSupabase } from "@/lib/supabase/server";
 
 const MIN_OPEN_MS = 2_500;
+/** Stricter than generic RATE_LIMIT_MAX — contact spam / malware floods. */
+const ENQUIRY_MAX_PER_WINDOW = 5;
+const ENQUIRY_WINDOW_MS = 60_000;
 
 function emptyState(message = ""): EnquiryActionState {
   return { ok: false, message };
@@ -19,14 +23,9 @@ export async function submitEnquiryAction(
   formData: FormData,
 ): Promise<EnquiryActionState> {
   const requestHeaders = await headers();
-  const forwarded = requestHeaders.get("x-forwarded-for");
-  const ip = forwarded?.split(",")[0]?.trim() || "unknown";
+  const ip = getClientIp(requestHeaders);
 
-  const limit = checkRateLimit(
-    `enquiry:${ip}`,
-    Number(process.env.RATE_LIMIT_MAX ?? 20),
-    Number(process.env.RATE_LIMIT_WINDOW_MS ?? 60_000),
-  );
+  const limit = checkRateLimit(`enquiry:${ip}`, ENQUIRY_MAX_PER_WINDOW, ENQUIRY_WINDOW_MS);
   if (!limit.ok) {
     return emptyState("Too many enquiries from this network. Please try again shortly.");
   }

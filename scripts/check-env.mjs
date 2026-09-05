@@ -60,12 +60,14 @@ const OPTIONAL = [
   "TELEGRAM_NOTIFICATION_TIMEOUT_MS",
   "DATABASE_URL",
   "SUPABASE_DB_PASSWORD",
+  "CRON_SECRET",
 ];
 
 /** Minimum lengths enforced by lib/env.ts, checked here so failures surface early. */
 const MIN_LENGTH = {
   ADMIN_PASSWORD: 8,
   ADMIN_SESSION_SECRET: 32,
+  CRON_SECRET: 32,
 };
 
 const MUST_BE_URL = new Set([

@@ -79,6 +79,12 @@ Unit script covers fill-to-minimum, SEO length scoring, media format rejects, st
 - ⚠ E2E Playwright coverage for admin flows not added (existing a11y/hero e2e only)
 - ⚠ Migration must be applied on the remote database before CMS/Telegram/SEO version features work against live Supabase
 
+### Supabase inactivity pause
+
+- Endpoint: `GET /api/cron/supabase-keepalive` (Bearer `CRON_SECRET`)
+- Vercel Cron: daily `0 3 * * *` (Hobby plan max frequency)
+- GitHub Actions: hourly `.github/workflows/supabase-keepalive.yml` (set secrets `KEEPALIVE_SITE_URL` + `CRON_SECRET`)
+
 ## Cutover checklist
 
 1. **Restore reachable Supabase** — current project host in `.env.local` returns NXDOMAIN; update URL/keys then `pnpm db:apply`

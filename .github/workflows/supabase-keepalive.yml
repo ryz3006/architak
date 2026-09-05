@@ -1,0 +1,48 @@
+# Hourly Supabase keep-alive (prevents free-tier inactivity pause).
+# Vercel Hobby cron is daily-only; this workflow covers hourly without site traffic.
+#
+# Required GitHub Actions secrets:
+#   KEEPALIVE_SITE_URL  — e.g. https://architak.vercel.app  (https only, no trailing slash)
+#   CRON_SECRET         — same value as Vercel env CRON_SECRET (min 32 chars)
+
+name: Supabase keep-alive
+
+on:
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Ping keep-alive endpoint
+        env:
+          SITE_URL: ${{ secrets.KEEPALIVE_SITE_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          set -euo pipefail
+          if [ -z "${SITE_URL:-}" ] || [ -z "${CRON_SECRET:-}" ]; then
+            echo "Missing KEEPALIVE_SITE_URL or CRON_SECRET GitHub secrets."
+            exit 1
+          fi
+          case "$SITE_URL" in
+            https://*) ;;
+            *)
+              echo "KEEPALIVE_SITE_URL must start with https://"
+              exit 1
+              ;;
+          esac
+          if [ "${#CRON_SECRET}" -lt 32 ]; then
+            echo "CRON_SECRET must be at least 32 characters."
+            exit 1
+          fi
+          url="${SITE_URL%/}/api/cron/supabase-keepalive"
+          code=$(curl -sS --proto '=https' --tlsv1.2 -o /tmp/keepalive.json -w "%{http_code}" \
+            -H "Authorization: Bearer ${CRON_SECRET}" \
+            "$url")
+          echo "HTTP $code"
+          cat /tmp/keepalive.json
+          echo
+          test "$code" = "200"

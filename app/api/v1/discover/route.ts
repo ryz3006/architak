@@ -9,6 +9,7 @@ import {
 } from "@/features/discovery";
 import { getStaticServices, getStaticSite } from "@/content/static";
 import { checkRateLimit } from "@/lib/security/rate-limit";
+import { getClientIpFromRequest } from "@/lib/security/client-ip";
 
 /**
  * Published-only JSON index for agents that prefer structured data over HTML.
@@ -19,11 +20,7 @@ import { checkRateLimit } from "@/lib/security/rate-limit";
 export const dynamic = "force-dynamic";
 
 function clientKey(request: NextRequest): string {
-  // Vercel sets x-forwarded-for; fall back to a constant so the limiter still
-  // applies rather than silently disabling itself.
-  const forwarded = request.headers.get("x-forwarded-for");
-  const ip = forwarded?.split(",")[0]?.trim();
-  return `discover:${ip || "unknown"}`;
+  return `discover:${getClientIpFromRequest(request)}`;
 }
 
 function jsonResponse(body: unknown, init: ResponseInit = {}): Response {

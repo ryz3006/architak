@@ -1,7 +1,7 @@
 import "server-only";
 
 import { getStaticProjectBySlug, getStaticProjects, type StaticProject } from "@/content/static";
-import { getStorageService } from "@/lib/storage/r2";
+import { resolvePublicMediaUrl } from "@/features/media/public-url";
 import { createPublishableClient } from "@/lib/supabase/client";
 
 export type ProjectBodySection = { heading?: string; body?: string };
@@ -39,12 +39,8 @@ function parseProjectBody(value: unknown): ProjectBody {
 }
 
 function mediaPublicUrl(storageKey: string | null | undefined): string | null {
-  if (!storageKey?.startsWith("public/")) return null;
-  try {
-    return getStorageService().getPublicUrl(storageKey);
-  } catch {
-    return null;
-  }
+  if (!storageKey) return null;
+  return resolvePublicMediaUrl(storageKey);
 }
 
 function staticToResolved(project: StaticProject): ResolvedProject {

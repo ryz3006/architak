@@ -1,7 +1,7 @@
 import "server-only";
 
 import { getStaticProjects } from "@/content/static";
-import { getStorageService } from "@/lib/storage/r2";
+import { resolvePublicMediaUrl } from "@/features/media/public-url";
 import { createPublishableClient } from "@/lib/supabase/client";
 import { getPublicWebsiteSectionConfig } from "@/features/website/public";
 
@@ -13,13 +13,7 @@ export type AccordionGalleryItem = {
 };
 
 function resolveStorageKeyUrl(storageKey: string): string | null {
-  const legacyMatch = storageKey.match(/^public\/legacy\/(.+)$/);
-  if (legacyMatch) {
-    return `/media/${legacyMatch[1]}`;
-  }
-
-  const storage = getStorageService();
-  return storage.getPublicUrl(storageKey);
+  return resolvePublicMediaUrl(storageKey);
 }
 
 function resolveCoverUrl(coverImage: string): string {

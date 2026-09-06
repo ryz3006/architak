@@ -1,6 +1,7 @@
 import "server-only";
 
 import { requireAdminSession } from "@/features/auth/session";
+import { resolvePublicMediaUrl } from "@/features/media/public-url";
 import { getStorageService } from "@/lib/storage/r2";
 import { getSecretSupabase } from "@/lib/supabase/server";
 import { validateMediaFileMeta } from "@/features/media/validation";
@@ -70,7 +71,6 @@ export async function listAdminMedia(options?: {
     const { data, error } = await query;
     if (error || !data) return [];
 
-    const storage = getStorageService();
     return data.map((row) => {
       const metadata =
         row.metadata && typeof row.metadata === "object" && !Array.isArray(row.metadata)
@@ -89,7 +89,9 @@ export async function listAdminMedia(options?: {
         created_at: row.created_at,
         updated_at: row.updated_at,
         publicUrl:
-          row.visibility === "public" ? storage.getPublicUrl(row.storage_key) : null,
+          row.visibility === "public"
+            ? resolvePublicMediaUrl(row.storage_key, metadata)
+            : null,
         kind: kindFromMime(row.mime_type),
         pendingUpload: metadata.pendingUpload === true,
       };

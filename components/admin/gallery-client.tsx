@@ -184,6 +184,7 @@ export function GalleryClient({
                 <p className="truncate text-fluid-sm">{asset.storage_key.split("/").pop()}</p>
                 <p className="text-fluid-xs text-muted">
                   {asset.kind} · {formatBytes(asset.byte_size)}
+                  {asset.storage_key.startsWith("public/legacy/") ? " · local seed" : ""}
                 </p>
                 <button
                   type="button"

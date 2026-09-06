@@ -7,6 +7,10 @@
     {
       "path": "/api/cron/supabase-keepalive",
       "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/cron/traffic-retention",
+      "schedule": "15 3 * * *"
     }
   ]
 }

@@ -1,4 +1,4 @@
-import { Activity, FolderOpen, HardDrive, Image as ImageIcon, Inbox } from "lucide-react";
+import { Activity, Eye, FolderOpen, HardDrive, Inbox } from "lucide-react";
 import Link from "next/link";
 
 import { CategoryBarChart } from "@/components/admin/charts/category-bar-chart";
@@ -11,7 +11,16 @@ import { Button } from "@/components/admin/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/admin/ui/card";
 import { Progress } from "@/components/admin/ui/progress";
 import { StatCard } from "@/components/admin/ui/stat-card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/admin/ui/table";
 import { getDashboardAnalytics } from "@/features/analytics/admin";
+import { getTrafficAnalytics } from "@/features/analytics/traffic";
 import { requireAdminSession } from "@/features/auth/session";
 import { getEnquiryMetrics, listAdminEnquiries } from "@/features/enquiries/admin";
 import { runSystemHealthChecks } from "@/features/health/checks";
@@ -30,6 +39,23 @@ function relativeTime(iso: string): string {
   return new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
 }
 
+function formatVisitTime(iso: string): string {
+  return new Date(iso).toLocaleString("en-GB", {
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function locationLabel(visit: {
+  city: string | null;
+  region: string | null;
+  country: string | null;
+}): string {
+  return [visit.city, visit.region, visit.country].filter(Boolean).join(", ") || "Unknown";
+}
+
 const HEALTH_BADGE = {
   healthy: { variant: "success" as const, label: "All systems normal" },
   degraded: { variant: "warning" as const, label: "Needs attention" },
@@ -39,8 +65,9 @@ const HEALTH_BADGE = {
 export default async function AdminDashboardPage() {
   await requireAdminSession();
 
-  const [analytics, metrics, enquiries, usage, health] = await Promise.all([
+  const [analytics, traffic, metrics, enquiries, usage, health] = await Promise.all([
     getDashboardAnalytics(),
+    getTrafficAnalytics(),
     getEnquiryMetrics(),
     listAdminEnquiries({ page: 1, pageSize: 5, sort: "newest" }),
     getStorageUsage(),
@@ -48,6 +75,7 @@ export default async function AdminDashboardPage() {
   ]);
 
   const enquirySpark = analytics.enquiryTrend.slice(-14).map((point) => point.value);
+  const trafficSpark = traffic.trend.slice(-14).map((point) => point.value);
   const storageDonut = [
     { label: "Images", value: Math.max(0, Math.round(usage.imageBytes / 1024 / 1024)) },
     { label: "Videos", value: Math.max(0, Math.round(usage.videoBytes / 1024 / 1024)) },
@@ -58,7 +86,7 @@ export default async function AdminDashboardPage() {
     <main id="main-content">
       <PageHeader
         title="Dashboard"
-        description="Your website at a glance — content, enquiries, storage and health."
+        description="Your website at a glance — traffic, content, enquiries, storage and health."
         actions={
           <Link href="/admin/system-health">
             <Badge variant={healthBadge.variant}>{healthBadge.label}</Badge>
@@ -68,6 +96,13 @@ export default async function AdminDashboardPage() {
 
       {/* KPI cards */}
       <section aria-label="Key metrics" className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <StatCard
+          label="Website visits"
+          value={traffic.viewsToday}
+          icon={Eye}
+          hint={`${traffic.totalViews} in ${traffic.retention.days}d · ${traffic.uniqueVisitors} visitors`}
+          spark={trafficSpark}
+        />
         <StatCard
           label="Projects"
           value={analytics.projects.total}
@@ -84,13 +119,6 @@ export default async function AdminDashboardPage() {
           spark={enquirySpark}
         />
         <StatCard
-          label="Gallery assets"
-          value={usage.assetCount}
-          icon={ImageIcon}
-          href="/admin/media"
-          hint={`${usage.formatted.total} of ${usage.formatted.max} used`}
-        />
-        <StatCard
           label="Storage used"
           value={`${usage.percentUsed}%`}
           icon={HardDrive}
@@ -99,8 +127,170 @@ export default async function AdminDashboardPage() {
         />
       </section>
 
-      {/* Charts */}
-      <section aria-label="Trends" className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-3">
+      {/* Website traffic */}
+      <section aria-label="Website traffic" className="mt-6 flex flex-col gap-4">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h3 className="text-fluid-base font-semibold text-foreground">Website traffic</h3>
+            <p className="mt-1 text-fluid-sm text-muted">
+              First-party visits · kept {traffic.retention.days} days or {traffic.retention.maxLabel}{" "}
+              max
+            </p>
+          </div>
+          <div className="min-w-[12rem]">
+            <div className="mb-1 flex justify-between text-fluid-xs text-muted">
+              <span>Traffic log</span>
+              <span>
+                {traffic.retention.usedLabel} / {traffic.retention.maxLabel}
+              </span>
+            </div>
+            <Progress
+              value={traffic.retention.usedBytes}
+              max={traffic.retention.maxBytes}
+              state={traffic.retention.percentUsed >= 90 ? "warning" : "healthy"}
+              label="Traffic data used"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+          <Card className="min-w-0 lg:col-span-2">
+            <CardHeader>
+              <CardTitle>Visits over time</CardTitle>
+              <p className="text-fluid-sm text-muted">
+                {traffic.totalViews} page views in the last {traffic.retention.days} days
+              </p>
+            </CardHeader>
+            <CardContent className="min-w-0">
+              {traffic.totalViews > 0 ? (
+                <TrendChart
+                  data={traffic.trend}
+                  valueLabel="Visits"
+                  ariaLabel="Website visits per day"
+                />
+              ) : (
+                <p className="py-10 text-center text-fluid-sm text-muted">
+                  No visits recorded yet. Open the public site to start collecting.
+                </p>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card className="min-w-0">
+            <CardHeader>
+              <CardTitle>By browser</CardTitle>
+              <p className="text-fluid-sm text-muted">Last {traffic.retention.days} days</p>
+            </CardHeader>
+            <CardContent className="min-w-0">
+              {traffic.byBrowser.length > 0 ? (
+                <DonutChart data={traffic.byBrowser} ariaLabel="Visits by browser" />
+              ) : (
+                <p className="py-10 text-center text-fluid-sm text-muted">No browser data yet.</p>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+          <Card className="min-w-0">
+            <CardHeader>
+              <CardTitle>By location</CardTitle>
+              <p className="text-fluid-sm text-muted">Country (from edge geo)</p>
+            </CardHeader>
+            <CardContent className="min-w-0">
+              {traffic.byCountry.length > 0 ? (
+                <CategoryBarChart
+                  data={traffic.byCountry}
+                  height={220}
+                  ariaLabel="Visits by country"
+                />
+              ) : (
+                <p className="py-10 text-center text-fluid-sm text-muted">No location data yet.</p>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card className="min-w-0">
+            <CardHeader>
+              <CardTitle>By hour of day</CardTitle>
+              <p className="text-fluid-sm text-muted">When visitors arrive</p>
+            </CardHeader>
+            <CardContent className="min-w-0">
+              {traffic.totalViews > 0 ? (
+                <CategoryBarChart
+                  data={traffic.byHour.filter((point) => point.value > 0)}
+                  height={220}
+                  ariaLabel="Visits by hour of day"
+                />
+              ) : (
+                <p className="py-10 text-center text-fluid-sm text-muted">No timing data yet.</p>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card className="min-w-0">
+            <CardHeader>
+              <CardTitle>Top pages</CardTitle>
+              <p className="text-fluid-sm text-muted">Most viewed paths</p>
+            </CardHeader>
+            <CardContent className="min-w-0">
+              {traffic.byPath.length > 0 ? (
+                <CategoryBarChart data={traffic.byPath} height={220} ariaLabel="Visits by page" />
+              ) : (
+                <p className="py-10 text-center text-fluid-sm text-muted">No page data yet.</p>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        <Card className="min-w-0">
+          <CardHeader>
+            <CardTitle>Recent visits</CardTitle>
+            <p className="text-fluid-sm text-muted">
+              Path, location, browser and time for the latest page views
+            </p>
+          </CardHeader>
+          <CardContent>
+            {traffic.recent.length === 0 ? (
+              <EmptyState
+                icon={Eye}
+                title="No traffic yet"
+                description="Visits to the public site will appear here with location and browser details."
+              />
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>When</TableHead>
+                    <TableHead>Page</TableHead>
+                    <TableHead>Location</TableHead>
+                    <TableHead>Browser</TableHead>
+                    <TableHead>Device</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {traffic.recent.map((visit) => (
+                    <TableRow key={visit.id}>
+                      <TableCell className="whitespace-nowrap text-muted">
+                        {formatVisitTime(visit.at)}
+                      </TableCell>
+                      <TableCell className="max-w-[14rem] truncate font-medium">
+                        {visit.path}
+                      </TableCell>
+                      <TableCell className="text-muted">{locationLabel(visit)}</TableCell>
+                      <TableCell>{visit.browser ?? "—"}</TableCell>
+                      <TableCell className="capitalize text-muted">{visit.device ?? "—"}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        </Card>
+      </section>
+
+      {/* Enquiry charts */}
+      <section aria-label="Enquiry trends" className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-3">
         <Card className="min-w-0 lg:col-span-2">
           <CardHeader className="flex-row items-center justify-between">
             <div className="min-w-0">

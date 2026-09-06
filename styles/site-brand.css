@@ -6,19 +6,21 @@
 }
 
 .brand-lockup-logo-wrap {
-  display: block;
+  display: grid;
+  place-items: center;
   flex-shrink: 0;
-  height: clamp(4.25rem, 9vw, 5.75rem);
-  width: clamp(4.25rem, 9vw, 5.75rem);
-  overflow: hidden;
+  height: clamp(3.25rem, 7vw, 4.25rem);
+  width: clamp(3.25rem, 7vw, 4.25rem);
 }
 
 .brand-lockup-logo {
   display: block;
-  height: 138%;
+  height: 100%;
   width: 100%;
   object-fit: contain;
-  object-position: top center;
+  object-position: center;
+  /* Soft lift so the cream mark reads on near-black without a hard box */
+  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--color-foreground) 28%, transparent));
 }
 
 .brand-lockup-text {
@@ -50,8 +52,8 @@
   }
 
   .brand-lockup-logo-wrap {
-    height: clamp(3rem, 12vw, 3.75rem);
-    width: clamp(3rem, 12vw, 3.75rem);
+    height: clamp(2.5rem, 10vw, 3.25rem);
+    width: clamp(2.5rem, 10vw, 3.25rem);
   }
 
   .brand-lockup-name {

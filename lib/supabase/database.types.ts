@@ -578,6 +578,44 @@ export type Database = {
           updated_at?: string;
         }
       >;
+      page_views: TableDef<
+        {
+          id: number;
+          occurred_at: string;
+          path: string;
+          country: string | null;
+          region: string | null;
+          city: string | null;
+          browser: string | null;
+          device: string | null;
+          referrer_host: string | null;
+          visitor_id: string | null;
+        },
+        {
+          id?: number;
+          occurred_at?: string;
+          path: string;
+          country?: string | null;
+          region?: string | null;
+          city?: string | null;
+          browser?: string | null;
+          device?: string | null;
+          referrer_host?: string | null;
+          visitor_id?: string | null;
+        },
+        {
+          id?: number;
+          occurred_at?: string;
+          path?: string;
+          country?: string | null;
+          region?: string | null;
+          city?: string | null;
+          browser?: string | null;
+          device?: string | null;
+          referrer_host?: string | null;
+          visitor_id?: string | null;
+        }
+      >;
       clients: TableDef<
         {
           id: string;
@@ -650,7 +688,12 @@ export type Database = {
       >;
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      page_views_relation_bytes: {
+        Args: Record<string, never>;
+        Returns: number;
+      };
+    };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
   };

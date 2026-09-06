@@ -131,7 +131,7 @@ export async function getFeaturedAccordionItems(): Promise<AccordionGalleryItem[
         .in("slug", config.selectedWorkSlugs);
 
       if (!error && rows?.length) {
-        const bySlug = new Map((rows as CmsFeaturedRow[]).map((r) => [r.slug, r]));
+        const bySlug = new Map((rows as unknown as CmsFeaturedRow[]).map((r) => [r.slug, r]));
         data = config.selectedWorkSlugs
           .map((slug) => bySlug.get(slug))
           .filter((r): r is CmsFeaturedRow => Boolean(r));
@@ -147,7 +147,7 @@ export async function getFeaturedAccordionItems(): Promise<AccordionGalleryItem[
         .order("sort_order", { ascending: true });
 
       if (!error && rows?.length) {
-        data = rows as CmsFeaturedRow[];
+        data = rows as unknown as CmsFeaturedRow[];
       }
     }
 

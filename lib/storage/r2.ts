@@ -1,5 +1,6 @@
 import {
   DeleteObjectCommand,
+  HeadObjectCommand,
   PutObjectCommand,
   GetObjectCommand,
   S3Client,
@@ -111,6 +112,22 @@ export class R2StorageService implements StorageService {
         Key: storageKey,
       }),
     );
+  }
+
+  async objectExists(storageKey: string): Promise<boolean> {
+    const env = getServerEnv();
+    const client = getR2Client();
+    try {
+      await client.send(
+        new HeadObjectCommand({
+          Bucket: env.R2_BUCKET_NAME,
+          Key: storageKey,
+        }),
+      );
+      return true;
+    } catch {
+      return false;
+    }
   }
 }
 

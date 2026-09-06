@@ -33,7 +33,7 @@ export const testimonialSchema = z.object({
   name: requiredText(120),
   role: text(120),
   location: text(120),
-  image: text(400),
+  image: text(800),
 });
 export const testimonialsSchema = z.array(testimonialSchema).max(50);
 export type TestimonialInput = z.infer<typeof testimonialSchema>;
@@ -44,10 +44,10 @@ export const videoSchema = z.object({
   category: text(120),
   location: text(120),
   summary: text(600),
-  poster: text(400),
+  poster: text(800),
   video: z.object({
-    objectPath: text(400),
-    localPath: text(400),
+    objectPath: text(800),
+    localPath: text(800),
     mimeType: text(80),
   }),
 });
@@ -59,7 +59,7 @@ export const serviceSchema = z.object({
   title: requiredText(160),
   description: text(400),
   detail: text(1200),
-  image: text(400),
+  image: text(800),
 });
 export const servicesSchema = z.array(serviceSchema).max(30);
 export type ServiceInput = z.infer<typeof serviceSchema>;

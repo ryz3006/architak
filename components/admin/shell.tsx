@@ -8,6 +8,7 @@ import { Fragment, useState } from "react";
 import { AdminShortcuts } from "@/components/admin/shortcuts";
 import { CommandMenu } from "@/components/admin/command-menu";
 import { IdleLogout } from "@/components/admin/idle-logout";
+import { AdminLoadingOverlay, AdminLoadingProvider } from "@/components/admin/loading";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -154,14 +155,16 @@ export function AdminShell({
   const title = getPageTitle(pathname);
 
   return (
-    <div className="admin-shell min-h-dvh bg-background text-foreground">
-      {/* Overlays must stay outside the layout grid — fixed nodes still occupy grid cells. */}
-      <AdminShortcuts />
-      <IdleLogout timeoutMinutes={idleTimeoutMinutes} />
-      <CommandMenu open={commandOpen} onOpenChange={setCommandOpen} />
-      <Toaster />
+    <AdminLoadingProvider>
+      <div className="admin-shell min-h-dvh bg-background text-foreground">
+        {/* Overlays must stay outside the layout grid — fixed nodes still occupy grid cells. */}
+        <AdminShortcuts />
+        <IdleLogout timeoutMinutes={idleTimeoutMinutes} />
+        <CommandMenu open={commandOpen} onOpenChange={setCommandOpen} />
+        <Toaster />
+        <AdminLoadingOverlay />
 
-      <div className="admin-shell__layout">
+        <div className="admin-shell__layout">
         <aside className="admin-shell__sidebar hidden lg:flex">
           <div className="shrink-0 border-b border-[var(--admin-border)] px-5 py-4">
             <Brand />
@@ -244,6 +247,7 @@ export function AdminShell({
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </AdminLoadingProvider>
   );
 }

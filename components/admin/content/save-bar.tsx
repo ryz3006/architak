@@ -1,8 +1,9 @@
 "use client";
 
-import { useTransition } from "react";
+import { useEffect, useTransition } from "react";
 import { toast } from "sonner";
 
+import { useAdminLoading } from "@/components/admin/loading";
 import { Button } from "@/components/admin/ui/button";
 
 export type SaveResult = { ok: boolean; message: string };
@@ -12,6 +13,12 @@ export type SaveResult = { ok: boolean; message: string };
  */
 export function useContentSave<T>(action: (input: T) => Promise<SaveResult>) {
   const [pending, startTransition] = useTransition();
+  const { start, stop } = useAdminLoading();
+
+  useEffect(() => {
+    if (pending) start("content-save");
+    else stop("content-save");
+  }, [pending, start, stop]);
 
   function save(input: T) {
     startTransition(async () => {

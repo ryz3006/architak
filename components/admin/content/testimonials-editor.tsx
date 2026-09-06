@@ -5,6 +5,7 @@ import { Plus } from "lucide-react";
 import { AreaRow, TextRow } from "@/components/admin/content/fields";
 import { ListItemShell, useListState } from "@/components/admin/content/list-editor";
 import { SaveBar, useContentSave } from "@/components/admin/content/save-bar";
+import { MediaPathField } from "@/components/admin/media-picker";
 import { Button } from "@/components/admin/ui/button";
 import { EmptyState } from "@/components/admin/empty-state";
 import { saveTestimonialsAction } from "@/features/content/actions";
@@ -43,11 +44,18 @@ export function TestimonialsEditor({ initial }: { initial: TestimonialInput[] })
               value={item.location}
               onChange={(v) => list.update(index, { location: v })}
             />
-            <TextRow
-              label="Image path"
-              hint="Optional. Public image path."
+            <MediaPathField
+              label="Image"
+              hint="Optional. Choose a portrait or space still from the Gallery."
+              kind="image"
               value={item.image}
-              onChange={(v) => list.update(index, { image: v })}
+              onPick={(picked) =>
+                list.update(index, {
+                  image: picked.publicUrl || `/${picked.storageKey}`,
+                })
+              }
+              onClear={() => list.update(index, { image: "" })}
+              pickerTitle="Choose testimonial image"
             />
           </ListItemShell>
         ))

@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/admin/page-header";
 import { WebsiteManagementForm } from "@/components/admin/website-management-form";
 import { resolvePublishedProjects } from "@/features/content/resolver";
 import { getFeaturedWorkVideos } from "@/features/content/site-content";
@@ -15,11 +16,10 @@ export default async function WebsiteManagementPage() {
 
   return (
     <main id="main-content">
-      <h1 className="display text-display-md">Website management</h1>
-      <p className="measure mt-2 text-muted">
-        Control which projects and videos appear on Home and Studio. Publish intentionally after
-        reviewing selections.
-      </p>
+      <PageHeader
+        title="Placement"
+        description="Choose which projects and videos appear on Home and Studio. Add from the dropdowns, then reorder or remove."
+      />
       <WebsiteManagementForm
         initialConfig={config}
         projectOptions={projects.map((p) => ({ slug: p.slug, title: p.title }))}

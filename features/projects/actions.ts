@@ -211,3 +211,48 @@ export async function saveProjectAction(
   revalidatePath("/");
   redirect(`/admin/projects/${parsed.data.slug}`);
 }
+
+export async function deleteProjectAction(slug: string): Promise<ProjectActionState> {
+  await requireAdminSession();
+
+  const clean = slug.trim().toLowerCase();
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(clean)) {
+    return { ok: false, message: "Invalid project slug." };
+  }
+
+  try {
+    const supabase = getSecretSupabase();
+    const { data: existing } = await supabase
+      .from("projects")
+      .select("id, slug, title")
+      .eq("slug", clean)
+      .maybeSingle();
+
+    if (!existing) {
+      return { ok: false, message: "Project not found." };
+    }
+
+    await supabase.from("project_media").delete().eq("project_id", existing.id);
+    await supabase.from("project_testimonials").delete().eq("project_id", existing.id);
+
+    const { error } = await supabase.from("projects").delete().eq("id", existing.id);
+    if (error) {
+      return { ok: false, message: "Could not delete the project." };
+    }
+
+    await supabase.from("audit_events").insert({
+      action: "project.deleted",
+      entity_type: "projects",
+      entity_id: existing.id,
+      before_data: { slug: existing.slug, title: existing.title },
+    });
+  } catch {
+    return { ok: false, message: "Could not delete the project." };
+  }
+
+  revalidatePath("/admin/projects");
+  revalidatePath(`/work/${clean}`);
+  revalidatePath("/studio");
+  revalidatePath("/");
+  return { ok: true, message: "Project deleted." };
+}

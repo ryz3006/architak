@@ -205,3 +205,62 @@
     width: 17.5rem;
   }
 }
+
+/* ---- Global loading overlay ---- */
+.admin-loading-overlay {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--z-modal) + 20);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--color-background) 55%, transparent);
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  transition: opacity 160ms var(--ease-standard);
+}
+
+.admin-loading-overlay[data-visible="true"] {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+.admin-loading-overlay__panel {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border: 1px solid var(--admin-border-strong);
+  border-radius: var(--admin-radius);
+  background: var(--admin-surface-raised);
+  padding: 0.85rem 1.15rem;
+  box-shadow: var(--admin-shadow);
+}
+
+.admin-loading-overlay__spinner {
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 999px;
+  border: 2px solid color-mix(in srgb, var(--color-accent) 35%, transparent);
+  border-top-color: var(--color-accent);
+  animation: adminSpin 0.7s linear infinite;
+}
+
+.admin-loading-overlay__label {
+  font-size: var(--step-00);
+  color: var(--color-foreground);
+}
+
+@keyframes adminSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-loading-overlay__spinner {
+    animation: none;
+    border-top-color: var(--color-accent);
+    opacity: 0.7;
+  }
+}

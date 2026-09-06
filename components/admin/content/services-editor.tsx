@@ -5,6 +5,7 @@ import { Plus } from "lucide-react";
 import { AreaRow, TextRow } from "@/components/admin/content/fields";
 import { ListItemShell, useListState } from "@/components/admin/content/list-editor";
 import { SaveBar, useContentSave } from "@/components/admin/content/save-bar";
+import { MediaPathField } from "@/components/admin/media-picker";
 import { Button } from "@/components/admin/ui/button";
 import { EmptyState } from "@/components/admin/empty-state";
 import { saveServicesListAction } from "@/features/content/actions";
@@ -48,11 +49,18 @@ export function ServicesEditor({ initial }: { initial: ServiceInput[] }) {
               value={service.detail}
               onChange={(v) => list.update(index, { detail: v })}
             />
-            <TextRow
-              label="Image path"
-              hint="Public image path, e.g. /media/hero/feel-lobby.jpg"
+            <MediaPathField
+              label="Image"
+              hint="Choose a card image from the Gallery."
+              kind="image"
               value={service.image}
-              onChange={(v) => list.update(index, { image: v })}
+              onPick={(picked) =>
+                list.update(index, {
+                  image: picked.publicUrl || `/${picked.storageKey}`,
+                })
+              }
+              onClear={() => list.update(index, { image: "" })}
+              pickerTitle="Choose service image"
             />
           </ListItemShell>
         ))

@@ -35,6 +35,8 @@ export interface StorageService {
   createDownloadUrl(input: CreateDownloadUrlInput): Promise<string>;
   getPublicUrl(storageKey: string): string | null;
   deleteObject(storageKey: string, visibility: MediaVisibility): Promise<void>;
+  /** Best-effort existence check used after browser PUT to avoid orphan DB rows. */
+  objectExists?(storageKey: string): Promise<boolean>;
 }
 
 export class StorageVisibilityError extends Error {

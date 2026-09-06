@@ -1,14 +1,73 @@
 "use client";
 
-import Image from "next/image";
+import { ImageIcon, Video } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 
 import { MediaUploader } from "@/components/admin/media-uploader";
 import { StorageBar } from "@/components/admin/storage-bar";
+import { useAdminLoading } from "@/components/admin/loading";
+import { Badge } from "@/components/admin/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/admin/ui/dialog";
 import { formatBytes } from "@/features/media/capabilities";
 import type { AdminMediaAsset, MediaUsage } from "@/features/media/admin";
 import type { StorageUsage } from "@/features/media/storage-accounting";
+
+function GalleryThumb({ asset }: { asset: AdminMediaAsset }) {
+  const [broken, setBroken] = useState(false);
+  const incomplete = asset.pendingUpload || asset.byte_size <= 0;
+
+  function bindError(node: HTMLImageElement | HTMLVideoElement | null) {
+    if (!node) return;
+    node.onerror = () => setBroken(true);
+  }
+
+  if (!asset.publicUrl || broken) {
+    return (
+      <div className="flex h-full flex-col items-center justify-center gap-2 bg-[var(--admin-surface)] px-3 text-center text-fluid-xs text-muted">
+        {asset.kind === "video" ? (
+          <Video className="size-5" aria-hidden="true" />
+        ) : (
+          <ImageIcon className="size-5" aria-hidden="true" />
+        )}
+        <span>{broken ? "Preview unavailable" : "No preview"}</span>
+        {incomplete ? <Badge variant="warning">Incomplete</Badge> : null}
+      </div>
+    );
+  }
+
+  if (asset.kind === "video") {
+    return (
+      <video
+        key={asset.publicUrl}
+        ref={bindError}
+        src={asset.publicUrl}
+        className="h-full w-full object-cover"
+        muted
+        playsInline
+        preload="metadata"
+      />
+    );
+  }
+
+  return (
+    // eslint-disable-next-line @next/next/no-img-element -- admin gallery; avoid optimizer failures on missing CDN objects
+    <img
+      key={asset.publicUrl}
+      ref={bindError}
+      src={asset.publicUrl}
+      alt={asset.alt_text || asset.storage_key.split("/").pop() || "Media"}
+      className="h-full w-full object-cover"
+      loading="lazy"
+    />
+  );
+}
 
 export function GalleryClient({
   initialAssets,
@@ -18,6 +77,7 @@ export function GalleryClient({
   usage: StorageUsage;
 }) {
   const router = useRouter();
+  const { withLoading } = useAdminLoading();
   const [pending, startTransition] = useTransition();
   const [search, setSearch] = useState("");
   const [kind, setKind] = useState<"all" | "image" | "video">("all");
@@ -47,23 +107,25 @@ export function GalleryClient({
 
   async function deleteSelected(force = false) {
     if (!selected) return;
-    const res = await fetch(`/api/admin/media/${selected.id}`, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ force }),
-    });
-    const json = (await res.json()) as {
-      ok: boolean;
-      message: string;
-      usages?: MediaUsage[];
-    };
-    if (!json.ok) {
-      setMessage(json.message);
-      if (json.usages) setUsages(json.usages);
-      return;
-    }
-    setSelected(null);
-    startTransition(() => router.refresh());
+    await withLoading(async () => {
+      const res = await fetch(`/api/admin/media/${selected.id}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ force }),
+      });
+      const json = (await res.json()) as {
+        ok: boolean;
+        message: string;
+        usages?: MediaUsage[];
+      };
+      if (!json.ok) {
+        setMessage(json.message);
+        if (json.usages) setUsages(json.usages);
+        return;
+      }
+      setSelected(null);
+      startTransition(() => router.refresh());
+    }, "media-delete");
   }
 
   return (
@@ -110,28 +172,13 @@ export function GalleryClient({
         <ul className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(min(16rem,100%),1fr))]">
           {filtered.map((asset) => (
             <li key={asset.id} className="flex flex-col border border-border">
-              <div className="relative aspect-[4/3] bg-surface">
-                {asset.kind === "image" && asset.publicUrl ? (
-                  <Image
-                    src={asset.publicUrl}
-                    alt={asset.alt_text || asset.storage_key}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 280px"
-                  />
-                ) : asset.kind === "video" && asset.publicUrl ? (
-                  <video
-                    src={asset.publicUrl}
-                    className="h-full w-full object-cover"
-                    muted
-                    playsInline
-                    preload="metadata"
-                  />
-                ) : (
-                  <div className="flex h-full items-center justify-center text-fluid-xs text-muted">
-                    No preview
-                  </div>
-                )}
+              <div className="relative aspect-[4/3] overflow-hidden bg-surface">
+                <GalleryThumb asset={asset} />
+                {asset.byte_size <= 0 ? (
+                  <span className="absolute top-2 left-2">
+                    <Badge variant="warning">0 B</Badge>
+                  </span>
+                ) : null}
               </div>
               <div className="flex flex-1 flex-col gap-2 p-4">
                 <p className="truncate text-fluid-sm">{asset.storage_key.split("/").pop()}</p>
@@ -152,19 +199,15 @@ export function GalleryClient({
       )}
 
       {selected ? (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label="Manage media"
-          className="fixed inset-0 z-[var(--z-modal)] flex items-end justify-center bg-background/80 p-4 sm:items-center"
-          onClick={() => setSelected(null)}
-        >
-          <div
-            className="max-h-[90dvh] w-full max-w-lg overflow-y-auto border border-border bg-surface p-6"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <h2 className="display text-display-sm">Manage asset</h2>
-            <p className="mt-2 break-all text-fluid-sm text-muted">{selected.storage_key}</p>
+        <Dialog open={Boolean(selected)} onOpenChange={(open) => !open && setSelected(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Manage asset</DialogTitle>
+              <DialogDescription className="break-all">{selected.storage_key}</DialogDescription>
+            </DialogHeader>
+            {selected.publicUrl ? (
+              <p className="break-all text-fluid-xs text-muted">{selected.publicUrl}</p>
+            ) : null}
             <p className="mt-4 text-fluid-xs tracking-widest text-muted uppercase">Used by</p>
             {usages.length === 0 ? (
               <p className="mt-2 text-fluid-sm text-muted">Not referenced. Safe to delete.</p>
@@ -178,7 +221,7 @@ export function GalleryClient({
               </ul>
             )}
             {message ? (
-              <p role="alert" className="mt-4 text-fluid-sm text-red-300">
+              <p role="alert" className="mt-4 text-fluid-sm text-[var(--admin-danger)]">
                 {message}
               </p>
             ) : null}
@@ -199,8 +242,8 @@ export function GalleryClient({
                 Cancel
               </button>
             </div>
-          </div>
-        </div>
+          </DialogContent>
+        </Dialog>
       ) : null}
     </div>
   );

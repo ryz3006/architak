@@ -37,12 +37,18 @@ function resolveVideoUrl(objectPath: string, localPath: string): string {
   return localPath.startsWith("/") ? localPath : `/${localPath}`;
 }
 
+function resolvePosterUrl(poster: string): string {
+  if (!poster) return "";
+  if (/^https?:\/\//i.test(poster) || poster.startsWith("//")) return poster;
+  return poster.startsWith("/") ? poster : `/${poster}`;
+}
+
 function resolveAllVideos(
   videos: FeaturedWorkVideo[] = getFeaturedWorkVideos(),
 ): ResolvedFeaturedWorkVideo[] {
   return videos.map((item) => {
     const videoUrl = resolveVideoUrl(item.video.objectPath, item.video.localPath);
-    const posterUrl = item.poster.startsWith("/") ? item.poster : `/${item.poster}`;
+    const posterUrl = resolvePosterUrl(item.poster);
 
     return {
       id: item.id,

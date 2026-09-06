@@ -21,6 +21,7 @@ export type AdminMediaAsset = {
   updated_at: string;
   publicUrl: string | null;
   kind: "image" | "video" | "other";
+  pendingUpload: boolean;
 };
 
 export type MediaUsage = {
@@ -50,7 +51,7 @@ export async function listAdminMedia(options?: {
     let query = supabase
       .from("media_assets")
       .select(
-        "id, storage_key, visibility, mime_type, byte_size, width, height, alt_text, caption, created_at, updated_at",
+        "id, storage_key, visibility, mime_type, byte_size, width, height, alt_text, caption, created_at, updated_at, metadata",
       )
       .order("created_at", { ascending: false })
       .range(offset, offset + limit - 1);
@@ -70,12 +71,29 @@ export async function listAdminMedia(options?: {
     if (error || !data) return [];
 
     const storage = getStorageService();
-    return data.map((row) => ({
-      ...row,
-      publicUrl:
-        row.visibility === "public" ? storage.getPublicUrl(row.storage_key) : null,
-      kind: kindFromMime(row.mime_type),
-    }));
+    return data.map((row) => {
+      const metadata =
+        row.metadata && typeof row.metadata === "object" && !Array.isArray(row.metadata)
+          ? (row.metadata as Record<string, unknown>)
+          : {};
+      return {
+        id: row.id,
+        storage_key: row.storage_key,
+        visibility: row.visibility,
+        mime_type: row.mime_type,
+        byte_size: row.byte_size,
+        width: row.width,
+        height: row.height,
+        alt_text: row.alt_text,
+        caption: row.caption,
+        created_at: row.created_at,
+        updated_at: row.updated_at,
+        publicUrl:
+          row.visibility === "public" ? storage.getPublicUrl(row.storage_key) : null,
+        kind: kindFromMime(row.mime_type),
+        pendingUpload: metadata.pendingUpload === true,
+      };
+    });
   } catch {
     return [];
   }
@@ -214,11 +232,24 @@ export async function confirmMediaUpload(mediaAssetId: string): Promise<{ ok: bo
     const supabase = getSecretSupabase();
     const { data, error } = await supabase
       .from("media_assets")
-      .select("id, metadata")
+      .select("id, storage_key, visibility, metadata")
       .eq("id", mediaAssetId)
       .maybeSingle();
 
     if (error || !data) return { ok: false, message: "Media asset not found." };
+
+    const storage = getStorageService();
+    if (typeof storage.objectExists === "function") {
+      const exists = await storage.objectExists(data.storage_key);
+      if (!exists) {
+        await supabase.from("media_assets").delete().eq("id", mediaAssetId);
+        return {
+          ok: false,
+          message:
+            "File never reached storage. Check R2 CORS allows PUT from this site, then try again.",
+        };
+      }
+    }
 
     const metadata =
       data.metadata && typeof data.metadata === "object" && !Array.isArray(data.metadata)

@@ -33,8 +33,13 @@ function shouldSkipPath(path: string): boolean {
     path === "/llms.txt" ||
     path === "/llms-full.txt" ||
     path === "/favicon.ico" ||
-    path === "/icon.png" ||
+    path === "/favicon.svg" ||
+    path === "/favicon-96x96.png" ||
+    path === "/apple-touch-icon.png" ||
     path === "/apple-icon.png" ||
+    path === "/icon.png" ||
+    path === "/icon-192.png" ||
+    path === "/icon-512.png" ||
     path === "/opengraph-image"
   ) {
     return true;

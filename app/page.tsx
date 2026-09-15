@@ -34,11 +34,16 @@ export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
   const homeSeo = await getPageSeoFromCms("/");
-  return buildPageMetadata({
-    path: "/",
-    title: homeSeo.title,
-    description: homeSeo.description,
-  });
+  return {
+    ...buildPageMetadata({
+      path: "/",
+      title: homeSeo.title,
+      description: homeSeo.description,
+    }),
+    title: {
+      absolute: `ARCHITAK — ${homeSeo.title}`,
+    },
+  };
 }
 
 export default async function HomePage() {

@@ -1,0 +1,41 @@
+/* Journal post styles */
+
+.journal-post {
+  font-feature-settings: "kern" 1, "liga" 1;
+}
+
+.journal-post article {
+  max-width: 100%;
+}
+
+.journal-post .measure {
+  max-width: var(--measure, 65ch);
+  margin-inline: auto;
+}
+
+/* RTL support */
+.journal-post[dir="rtl"] {
+  direction: rtl;
+  text-align: start;
+}
+
+/* Multi-script font stacks with fallbacks */
+.journal-post[lang="ar"],
+.journal-post[lang="hi"],
+.journal-post[lang="ml"],
+.journal-post[lang="ta"],
+.journal-post[lang="kn"] {
+  font-family: 
+    "DM Sans",
+    "Noto Sans",
+    "Noto Serif",
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
+
+/* Ensure site chrome remains LTR */
+.journal-post[dir="rtl"] .site-header,
+.journal-post[dir="rtl"] .site-footer {
+  direction: ltr;
+}

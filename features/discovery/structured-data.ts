@@ -163,6 +163,23 @@ export function buildProjectJsonLd(project: DiscoveryProject) {
   };
 }
 
+export function buildJournalPostJsonLd(post: { slug: string; title: string; excerpt: string | null; published_at: string | null; coverImage: string | null }) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "@id": `${absoluteUrl(`/journal/${post.slug}`)}#article`,
+    headline: post.title,
+    description: post.excerpt || undefined,
+    image: post.coverImage ? absoluteUrl(post.coverImage) : undefined,
+    url: absoluteUrl(`/journal/${post.slug}`),
+    datePublished: post.published_at || undefined,
+    author: { "@id": STUDIO_ID() },
+    publisher: { "@id": STUDIO_ID() },
+    isPartOf: { "@id": WEBSITE_ID() },
+    inLanguage: "en-IN",
+  };
+}
+
 export type Breadcrumb = { name: string; path: string };
 
 export function buildBreadcrumbJsonLd(trail: readonly Breadcrumb[]) {

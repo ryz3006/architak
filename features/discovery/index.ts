@@ -131,6 +131,7 @@ export function buildLlmsText(options: { full: boolean }): string {
     "## Pages",
     "",
     ...routes.map((route) => `- [${route.title}](${absoluteUrl(route.path)}): ${route.description}`),
+    "- [Journal](https://architak.in/journal): Insights, case studies, and studio announcements",
     "",
     "## Practice areas",
     "",

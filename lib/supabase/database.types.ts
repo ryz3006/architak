@@ -6,6 +6,7 @@
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 export type ContentStatus = "draft" | "published" | "archived";
+export type JournalStatus = "draft" | "published" | "archived" | "trashed";
 export type MediaVisibility = "public" | "private";
 export type EnquiryStatus =
   | "new"
@@ -411,7 +412,7 @@ export type Database = {
       seo_metadata: TableDef<
         {
           id: string;
-          subject_type: "global" | "page" | "project";
+          subject_type: "global" | "page" | "project" | "journal_post";
           subject_id: string | null;
           title: string | null;
           description: string | null;
@@ -425,7 +426,7 @@ export type Database = {
         },
         {
           id?: string;
-          subject_type: "global" | "page" | "project";
+          subject_type: "global" | "page" | "project" | "journal_post";
           subject_id?: string | null;
           title?: string | null;
           description?: string | null;
@@ -439,7 +440,7 @@ export type Database = {
         },
         {
           id?: string;
-          subject_type?: "global" | "page" | "project";
+          subject_type?: "global" | "page" | "project" | "journal_post";
           subject_id?: string | null;
           title?: string | null;
           description?: string | null;
@@ -686,10 +687,140 @@ export type Database = {
           updated_at?: string;
         }
       >;
+      journal_posts: TableDef<
+        {
+          id: string;
+          slug: string;
+          title: string;
+          excerpt: string | null;
+          body: Json;
+          cover_media_id: string | null;
+          status: JournalStatus;
+          published_at: string | null;
+          expires_at: string | null;
+          expiry_action: "hard_delete" | "archive";
+          trashed_at: string | null;
+          lang: "en" | "hi" | "ar" | "ml" | "ta" | "kn" | null;
+          dir: "auto" | "ltr" | "rtl" | null;
+          reading_time: number | null;
+          featured: boolean;
+          created_at: string;
+          updated_at: string;
+        },
+        {
+          id?: string;
+          slug: string;
+          title: string;
+          excerpt?: string | null;
+          body?: Json;
+          cover_media_id?: string | null;
+          status?: JournalStatus;
+          published_at?: string | null;
+          expires_at?: string | null;
+          expiry_action?: "hard_delete" | "archive";
+          trashed_at?: string | null;
+          lang?: "en" | "hi" | "ar" | "ml" | "ta" | "kn" | null;
+          dir?: "auto" | "ltr" | "rtl" | null;
+          reading_time?: number | null;
+          featured?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        },
+        {
+          id?: string;
+          slug?: string;
+          title?: string;
+          excerpt?: string | null;
+          body?: Json;
+          cover_media_id?: string | null;
+          status?: JournalStatus;
+          published_at?: string | null;
+          expires_at?: string | null;
+          expiry_action?: "hard_delete" | "archive";
+          trashed_at?: string | null;
+          lang?: "en" | "hi" | "ar" | "ml" | "ta" | "kn" | null;
+          dir?: "auto" | "ltr" | "rtl" | null;
+          reading_time?: number | null;
+          featured?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        }
+      >;
+      journal_post_related_projects: TableDef<
+        {
+          journal_post_id: string;
+          project_id: string;
+          sort_order: number;
+          created_at: string;
+        },
+        {
+          journal_post_id: string;
+          project_id: string;
+          sort_order?: number;
+          created_at?: string;
+        },
+        {
+          journal_post_id?: string;
+          project_id?: string;
+          sort_order?: number;
+          created_at?: string;
+        }
+      >;
+      engagement_events: TableDef<
+        {
+          id: number;
+          occurred_at: string;
+          event_type: "share" | "download" | "click";
+          subject_type: "journal_post" | "project" | "page";
+          subject_slug: string;
+          method: string | null;
+          country: string | null;
+          region: string | null;
+          city: string | null;
+          browser: string | null;
+          device: string | null;
+          referrer_host: string | null;
+          visitor_id: string | null;
+        },
+        {
+          id?: number;
+          occurred_at?: string;
+          event_type: "share" | "download" | "click";
+          subject_type: "journal_post" | "project" | "page";
+          subject_slug: string;
+          method?: string | null;
+          country?: string | null;
+          region?: string | null;
+          city?: string | null;
+          browser?: string | null;
+          device?: string | null;
+          referrer_host?: string | null;
+          visitor_id?: string | null;
+        },
+        {
+          id?: number;
+          occurred_at?: string;
+          event_type?: "share" | "download" | "click";
+          subject_type?: "journal_post" | "project" | "page";
+          subject_slug?: string;
+          method?: string | null;
+          country?: string | null;
+          region?: string | null;
+          city?: string | null;
+          browser?: string | null;
+          device?: string | null;
+          referrer_host?: string | null;
+          visitor_id?: string | null;
+        }
+      >;
     };
     Views: Record<string, never>;
     Functions: {
       page_views_relation_bytes: {
+        Args: Record<string, never>;
+        Returns: number;
+      };
+      engagement_events_relation_bytes: {
         Args: Record<string, never>;
         Returns: number;
       };

@@ -3,7 +3,7 @@
 import { useActionState } from "react";
 
 import { Button } from "@/components/admin/ui/button";
-import { TextAreaField, TextField } from "@/components/admin/content/fields";
+import { TextField, TextAreaField } from "@/components/ui/field";
 import { saveJournalPostAction, type JournalActionState } from "@/features/journal/actions";
 
 const initial: JournalActionState = { ok: false, message: "" };

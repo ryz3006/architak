@@ -70,8 +70,9 @@ export function ServicesHero({ hero }: ServicesHeroProps) {
           <div className="studio-hero__primary">
             <p className="studio-eyebrow studio-hero__eyebrow">{hero.eyebrow}</p>
             <h1 className="studio-hero__headline display">
+              <span className="sr-only">{hero.headline.join(" ")}</span>
               {hero.headline.map((line) => (
-                <span key={line} className="studio-hero__headline-line">
+                <span key={line} className="studio-hero__headline-line" aria-hidden="true">
                   {line}
                 </span>
               ))}

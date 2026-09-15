@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return buildPageMetadata({
     path: `/journal/${post.slug}`,
     title: post.title,
-    description: post.excerpt || undefined,
+    description: post.excerpt || post.title,
     ogType: "article",
   });
 }

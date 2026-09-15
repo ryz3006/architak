@@ -27,7 +27,7 @@ const STATUS_VARIANT = {
   published: "success" as const,
   draft: "warning" as const,
   archived: "neutral" as const,
-  trashed: "destructive" as const,
+  trashed: "danger" as const,
 };
 
 function formatDate(date: string | null): string {

@@ -39,7 +39,7 @@ export default async function JournalPostPage({ params }: Props) {
   const post = await resolvePublishedJournalPost(slug);
   if (!post) notFound();
 
-  const lang = post.lang || undefined;
+  const lang = post.lang || "en";
   const dir = post.dir === "ltr" || post.dir === "rtl" ? post.dir : undefined;
 
   return (

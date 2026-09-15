@@ -11,6 +11,10 @@
     {
       "path": "/api/cron/traffic-retention",
       "schedule": "15 3 * * *"
+    },
+    {
+      "path": "/api/cron/journal-expiry",
+      "schedule": "0 * * * *"
     }
   ]
 }
